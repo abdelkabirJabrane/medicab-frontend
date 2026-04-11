@@ -1,0 +1,163 @@
+<!-- ── Header ─────────────────────────── -->
+<div class="agenda-header">
+    <div>
+        <h2 class="agenda-header__title">Mon Agenda Professionnel</h2>
+        <p class="agenda-header__subtitle">{{ getDateLabel() }} — Planifiez et gérez vos consultations</p>
+    </div>
+    <div class="header-actions">
+        <button class="btn-primary" (click)="ouvrirDialogNouveauRdv()">
+            <i class="pi pi-plus"></i> Nouveau RDV
+        </button>
+    </div>
+</div>
+
+<!-- ── Main Calendar Content ────────────────── -->
+<div class="calendar-wrapper panel">
+    <full-calendar [options]="calendarOptions"></full-calendar>
+</div>
+
+<!-- ── Dialog Detail RDV ──────────────── -->
+<p-dialog
+    header="Détails du Rendez-vous"
+    [(visible)]="rdvDetailVisible"
+    [modal]="true"
+    [style]="{width:'420px'}"
+    [draggable]="false"
+    styleClass="mc-dialog">
+
+    @if (rdvSelectionne) {
+        <div class="rdv-detail">
+            <div class="rdv-detail__header">
+                <div class="rdv-detail__avatar">{{ rdvSelectionne.initiales }}</div>
+                <div class="rdv-detail__info">
+                    <h3 class="rdv-detail__name">{{ rdvSelectionne.patient }}</h3>
+                    <p class="rdv-detail__meta">Patient ID: #{{ rdvSelectionne.patientId }}</p>
+                </div>
+            </div>
+
+            <div class="rdv-detail__body">
+                <div class="detail-item">
+                    <i class="pi pi-calendar detail-item__icon"></i>
+                    <div class="detail-item__content">
+                        <label>Date & Heure</label>
+                        <span>{{ rdvSelectionne.date | date:'EEEE d MMMM yyyy' }} à {{ rdvSelectionne.heure }}</span>
+                    </div>
+                </div>
+
+                <div class="detail-item">
+                    <i class="pi pi-tag detail-item__icon"></i>
+                    <div class="detail-item__content">
+                        <label>Type de consultation</label>
+                        <span class="badge badge--{{ rdvSelectionne.statut | lowercase }}">
+                            {{ rdvSelectionne.typeLabel }}
+                        </span>
+                    </div>
+                </div>
+
+                <div class="detail-item">
+                    <i class="pi pi-comment detail-item__icon"></i>
+                    <div class="detail-item__content">
+                        <label>Motif</label>
+                        <span>{{ rdvSelectionne.motif || 'Aucun motif précisé' }}</span>
+                    </div>
+                </div>
+
+                <div class="detail-item">
+                    <i class="pi pi-info-circle detail-item__icon"></i>
+                    <div class="detail-item__content">
+                        <label>Statut</label>
+                        <span class="badge badge--{{ rdvSelectionne.statut | lowercase }}">
+                            {{ getStatutLabel(rdvSelectionne.statut) }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="rdv-detail__actions">
+                @if (rdvSelectionne.statut === 'EN_ATTENTE') {
+                    <button class="btn-primary w-full" (click)="confirmerRdv(rdvSelectionne); rdvDetailVisible = false">
+                        <i class="pi pi-check"></i> Confirmer le RDV
+                    </button>
+                }
+                <div class="flex-row-gap">
+                    <button class="btn-outline flex-1" routerLink="/medecin/consultations">
+                        <i class="pi pi-heart"></i> Lancer Consultation
+                    </button>
+                    @if (rdvSelectionne.statut !== 'ANNULE') {
+                        <button class="btn-outline btn-outline--danger flex-1" (click)="annulerRdv(rdvSelectionne); rdvDetailVisible = false">
+                            <i class="pi pi-times"></i> Annuler
+                        </button>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+</p-dialog>
+
+<!-- ── Dialog Nouveau RDV ──────────────── -->
+<p-dialog
+    header="Nouveau Rendez-vous"
+    [(visible)]="dialogVisible"
+    [modal]="true"
+    [style]="{width:'480px'}"
+    [draggable]="false"
+    styleClass="mc-dialog">
+
+    <div class="dialog-form">
+
+        <div class="form-field">
+            <label class="form-label">Patient <span class="form-required">*</span></label>
+            <p-select [(ngModel)]="nouveauRdv.patientId"
+                      [options]="patientsOptions"
+                      optionLabel="nomComplet"
+                      optionValue="id"
+                      placeholder="Sélectionner un patient"
+                      [filter]="true"
+                      filterBy="nomComplet"
+                      styleClass="w-full">
+            </p-select>
+        </div>
+
+        <div class="form-row">
+            <div class="form-field">
+                <label class="form-label">Heure <span class="form-required">*</span></label>
+                <p-select [(ngModel)]="nouveauRdv.heure"
+                          [options]="heureOptions"
+                          optionLabel="label"
+                          optionValue="value"
+                          placeholder="Choisir"
+                          styleClass="w-full">
+                </p-select>
+            </div>
+            <div class="form-field">
+                <label class="form-label">Type</label>
+                <p-select [(ngModel)]="nouveauRdv.type"
+                          [options]="typeOptions"
+                          optionLabel="label"
+                          optionValue="value"
+                          placeholder="Choisir"
+                          styleClass="w-full">
+                </p-select>
+            </div>
+        </div>
+
+        <div class="form-field">
+            <label class="form-label">Motif</label>
+            <input pInputText
+                   class="form-input"
+                   [(ngModel)]="nouveauRdv.motif"
+                   placeholder="Motif de la consultation"/>
+        </div>
+
+    </div>
+
+    <ng-template pTemplate="footer">
+        <div class="dialog-footer">
+            <button class="btn-outline" (click)="dialogVisible = false">Annuler</button>
+            <button class="btn-primary" (click)="sauvegarderRdv()">
+                <i class="pi pi-check"></i> Créer RDV
+            </button>
+        </div>
+    </ng-template>
+
+</p-dialog>

@@ -1,0 +1,386 @@
+<p-toast></p-toast>
+<p-confirmDialog></p-confirmDialog>
+
+<!-- ── En-tête ─────────────────────────── -->
+<div class="page-header">
+    <div>
+        <h2 class="page-header__title">Facturation</h2>
+        <p class="page-header__subtitle">Gestion des paiements & factures</p>
+    </div>
+    <div style="display: flex; gap: .75rem">
+        <button class="btn-outline" (click)="dialogCaisseVisible = true">
+            <i class="pi pi-wallet"></i> Clôture de Caisse
+        </button>
+        <button class="btn-primary" (click)="ouvrirNouvelleFacture()">
+            <i class="pi pi-plus"></i> Nouvelle Facture
+        </button>
+    </div>
+</div>
+
+<!-- ── KPIs ────────────────────────────── -->
+<div class="kpi-grid">
+
+    <div class="kpi-card kpi-card--green">
+        <div class="kpi-card__icon"><i class="pi pi-check-circle"></i></div>
+        <div class="kpi-card__body">
+            <div class="kpi-card__label">Encaissé Aujourd'hui</div>
+            <div class="kpi-card__value">{{ stats.encaisseJour }} <span class="kpi-card__unit">MAD</span></div>
+        </div>
+    </div>
+
+    <div class="kpi-card kpi-card--red">
+        <div class="kpi-card__icon"><i class="pi pi-exclamation-circle"></i></div>
+        <div class="kpi-card__body">
+            <div class="kpi-card__label">Total Impayé</div>
+            <div class="kpi-card__value">{{ stats.totalImpaye }} <span class="kpi-card__unit">MAD</span></div>
+        </div>
+    </div>
+
+    <div class="kpi-card kpi-card--blue">
+        <div class="kpi-card__icon"><i class="pi pi-file-invoice"></i></div>
+        <div class="kpi-card__body">
+            <div class="kpi-card__label">Factures du Jour</div>
+            <div class="kpi-card__value">{{ stats.facturesJour }}</div>
+        </div>
+    </div>
+
+    <div class="kpi-card kpi-card--orange">
+        <div class="kpi-card__icon"><i class="pi pi-clock"></i></div>
+        <div class="kpi-card__body">
+            <div class="kpi-card__label">En Attente Paiement</div>
+            <div class="kpi-card__value">{{ stats.enAttente }}</div>
+        </div>
+    </div>
+
+</div>
+
+<!-- ── Filtres ─────────────────────────── -->
+<div class="filters-bar">
+    <div class="filters-bar__search">
+        <i class="pi pi-search filters-bar__search-icon"></i>
+        <input class="filters-bar__input"
+               [(ngModel)]="searchQuery"
+               (ngModelChange)="filtrer()"
+               placeholder="Rechercher patient, numéro facture..."/>
+    </div>
+    <div class="filters-bar__tabs">
+        @for (tab of tabs; track tab.value) {
+            <button class="filter-tab"
+                    [class.filter-tab--active]="filtreActif === tab.value"
+                    (click)="setFiltre(tab.value)">
+                {{ tab.label }}
+                @if (tab.count > 0) {
+                    <span class="filter-tab__badge">{{ tab.count }}</span>
+                }
+            </button>
+        }
+    </div>
+</div>
+
+<!-- ── Tableau ─────────────────────────── -->
+<div class="panel">
+    <p-table
+        [value]="facturesFiltrees"
+        [paginator]="true"
+        [rows]="10"
+        [showCurrentPageReport]="true"
+        currentPageReportTemplate="{first}-{last} sur {totalRecords}"
+        responsiveLayout="scroll"
+        styleClass="mc-table">
+
+        <ng-template pTemplate="header">
+            <tr>
+                <th>N° Facture</th>
+                <th>Patient</th>
+                <th>Date</th>
+                <th>Consultation</th>
+                <th>Montant TTC</th>
+                <th>Payé</th>
+                <th>Restant</th>
+                <th>Mode</th>
+                <th>Statut</th>
+                <th>Actions</th>
+            </tr>
+        </ng-template>
+
+        <ng-template pTemplate="body" let-f>
+            <tr class="table-row">
+
+                <td><span class="td-mono">{{ f.numero }}</span></td>
+
+                <td>
+                    <div class="patient-cell">
+                        <div class="patient-cell__av">{{ f.initiales }}</div>
+                        <div>
+                            <div class="patient-cell__name">{{ f.patient }}</div>
+                            <div class="patient-cell__sub">{{ f.medecin }}</div>
+                        </div>
+                    </div>
+                </td>
+
+                <td><span class="td-muted">{{ f.date }}</span></td>
+
+                <td><span class="td-text">{{ f.typeConsultation }}</span></td>
+
+                <td><span class="td-amount">{{ f.montantTTC }} MAD</span></td>
+
+                <td><span class="td-paid">{{ f.montantPaye }} MAD</span></td>
+
+                <td>
+          <span [class]="f.montantRestant > 0 ? 'td-due' : 'td-zero'">
+            {{ f.montantRestant }} MAD
+          </span>
+                </td>
+
+                <td>
+                    @if (f.modePaiement) {
+                        <span class="mode-badge mode-badge--{{ f.modePaiement | lowercase }}">
+              <i [class]="getModeIcon(f.modePaiement)"></i>
+                            {{ getModeLabel(f.modePaiement) }}
+            </span>
+                    } @else {
+                        <span class="td-muted">—</span>
+                    }
+                </td>
+
+                <td>
+          <span class="badge badge--{{ f.statut | lowercase }}">
+            {{ getStatutLabel(f.statut) }}
+          </span>
+                </td>
+
+                <td>
+                    <div class="row-actions">
+                        @if (f.statut !== 'PAYEE' && f.statut !== 'ANNULEE') {
+                            <button class="btn-action btn-action--success"
+                                    title="Encaisser" (click)="ouvrirPaiement(f)">
+                                <i class="pi pi-credit-card"></i>
+                            </button>
+                        }
+                        <button class="btn-action btn-action--neutral"
+                                title="Imprimer" (click)="imprimerFacture(f)">
+                            <i class="pi pi-print"></i>
+                        </button>
+                        @if (f.statut !== 'PAYEE') {
+                            <button class="btn-action btn-action--danger"
+                                    title="Annuler" (click)="annulerFacture(f)">
+                                <i class="pi pi-times"></i>
+                            </button>
+                        }
+                    </div>
+                </td>
+
+            </tr>
+        </ng-template>
+
+        <ng-template pTemplate="empty">
+            <tr>
+                <td colspan="10">
+                    <div class="table-empty">
+                        <i class="pi pi-file-invoice table-empty__icon"></i>
+                        <p>Aucune facture trouvée</p>
+                    </div>
+                </td>
+            </tr>
+        </ng-template>
+
+    </p-table>
+</div>
+
+<!-- ── Dialog Nouvelle Facture ─────────── -->
+<p-dialog
+    header="Nouvelle Facture"
+    [(visible)]="dialogFactureVisible"
+    [modal]="true"
+    [style]="{width:'520px'}"
+    [draggable]="false"
+    styleClass="mc-dialog">
+
+    <div class="dialog-form">
+
+        <div class="form-row">
+            <div class="form-field">
+                <label class="form-label">Patient <span class="form-required">*</span></label>
+                <p-select [(ngModel)]="nouvelleFacture.patientId"
+                          [options]="patientOptions"
+                          [filter]="true" filterBy="label"
+                          optionLabel="label" optionValue="value"
+                          placeholder="Choisir un patient" styleClass="w-full">
+                </p-select>
+            </div>
+            <div class="form-field">
+                <label class="form-label">Médecin</label>
+                <p-select [(ngModel)]="nouvelleFacture.medecinId"
+                          [options]="medecinOptions"
+                          optionLabel="label" optionValue="value"
+                          placeholder="Choisir" styleClass="w-full">
+                </p-select>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-field">
+                <label class="form-label">Type consultation</label>
+                <p-select [(ngModel)]="nouvelleFacture.typeConsultation"
+                          [options]="typeConsultOptions"
+                          optionLabel="label" optionValue="value"
+                          placeholder="Choisir" styleClass="w-full">
+                </p-select>
+            </div>
+            <div class="form-field">
+                <label class="form-label">Montant TTC <span class="form-required">*</span></label>
+                <input class="form-input" pInputText type="number"
+                       [(ngModel)]="nouvelleFacture.montantTTC" placeholder="150"/>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-field">
+                <label class="form-label">Montant payé</label>
+                <input class="form-input" pInputText type="number"
+                       [(ngModel)]="nouvelleFacture.montantPaye" placeholder="0"/>
+            </div>
+            <div class="form-field">
+                <label class="form-label">Mode de paiement</label>
+                <p-select [(ngModel)]="nouvelleFacture.modePaiement"
+                          [options]="modePaiementOptions"
+                          optionLabel="label" optionValue="value"
+                          placeholder="Choisir" styleClass="w-full">
+                </p-select>
+            </div>
+        </div>
+
+    </div>
+
+    <ng-template pTemplate="footer">
+        <div class="dialog-footer">
+            <button class="btn-outline" (click)="dialogFactureVisible = false">Annuler</button>
+            <button class="btn-primary" (click)="sauvegarderFacture()">
+                <i class="pi pi-check"></i> Créer Facture
+            </button>
+        </div>
+    </ng-template>
+
+</p-dialog>
+
+<!-- ── Dialog Paiement ────────────────── -->
+<p-dialog
+    header="Encaisser le Paiement"
+    [(visible)]="dialogPaiementVisible"
+    [modal]="true"
+    [style]="{width:'400px'}"
+    [draggable]="false"
+    styleClass="mc-dialog">
+
+    @if (factureSelectionnee) {
+
+        <div class="payment-summary">
+            <div class="payment-summary__row">
+                <span class="payment-summary__label">Facture</span>
+                <span class="payment-summary__value payment-summary__value--mono">{{ factureSelectionnee.numero }}</span>
+            </div>
+            <div class="payment-summary__row">
+                <span class="payment-summary__label">Patient</span>
+                <span class="payment-summary__value">{{ factureSelectionnee.patient }}</span>
+            </div>
+            <div class="payment-summary__divider"></div>
+            <div class="payment-summary__row">
+                <span class="payment-summary__label">Restant dû</span>
+                <span class="payment-summary__value payment-summary__value--due">{{ factureSelectionnee.montantRestant }} MAD</span>
+            </div>
+        </div>
+
+        <div class="dialog-form">
+            <div class="form-field">
+                <label class="form-label">Montant à encaisser <span class="form-unit">(MAD)</span></label>
+                <input class="form-input form-input--lg" pInputText type="number"
+                       [(ngModel)]="montantPaiement"
+                       [max]="factureSelectionnee.montantRestant"/>
+            </div>
+            <div class="form-field">
+                <label class="form-label">Mode de paiement</label>
+                <div class="mode-selector">
+                    @for (mode of modePaiementOptions; track mode.value) {
+                        <button class="mode-btn"
+                                [class.mode-btn--active]="modePaiement === mode.value"
+                                (click)="modePaiement = mode.value">
+                            <i [class]="getModeIcon(mode.value)"></i>
+                            <span>{{ mode.label }}</span>
+                        </button>
+                    }
+                </div>
+            </div>
+        </div>
+
+    }
+
+    <ng-template pTemplate="footer">
+        <div class="dialog-footer">
+            <button class="btn-outline" (click)="dialogPaiementVisible = false">Annuler</button>
+            <button class="btn-success" (click)="enregistrerPaiement()">
+                <i class="pi pi-check"></i> Confirmer Paiement
+            </button>
+        </div>
+    </ng-template>
+
+</p-dialog>
+
+<!-- ── Dialog Clôture de Caisse (Z-Report) ── -->
+<p-dialog
+    header="Clôture de Caisse (Aujourd'hui)"
+    [(visible)]="dialogCaisseVisible"
+    [modal]="true"
+    [style]="{width:'450px'}"
+    [draggable]="false"
+    styleClass="mc-dialog">
+
+    <div class="z-report-preview">
+        <div class="z-header">
+            <i class="pi pi-print"></i>
+            <h3>Aperçu du Rapport Z</h3>
+            <p>{{ stats.encaisseJour }} MAD encaissés aujourd'hui</p>
+        </div>
+
+        <div class="z-details">
+            <div class="z-row">
+                <span><i class="pi pi-money-bill"></i> Espèces</span>
+                <span class="z-val">{{ caisseDetails.especes }} MAD</span>
+            </div>
+            <div class="z-row">
+                <span><i class="pi pi-credit-card"></i> TPE / Carte</span>
+                <span class="z-val">{{ caisseDetails.cmi }} MAD</span>
+            </div>
+            <div class="z-row">
+                <span><i class="pi pi-file"></i> Chèques</span>
+                <span class="z-val">{{ caisseDetails.cheque }} MAD</span>
+            </div>
+            <div class="z-row">
+                <span><i class="pi pi-send"></i> Virements</span>
+                <span class="z-val">{{ caisseDetails.virement }} MAD</span>
+            </div>
+            <div class="z-row">
+                <span><i class="pi pi-shield"></i> Assurance</span>
+                <span class="z-val">{{ caisseDetails.assurance }} MAD</span>
+            </div>
+            <div class="z-divider"></div>
+            <div class="z-row z-row--total">
+                <span>TOTAL RÉCOLTÉ</span>
+                <span class="z-val">{{ caisseDetails.total }} MAD</span>
+            </div>
+            <div class="z-row z-row--count">
+                <span>Nombre de transactions</span>
+                <span class="z-val">{{ caisseDetails.count }}</span>
+            </div>
+        </div>
+    </div>
+
+    <ng-template pTemplate="footer">
+        <div class="dialog-footer">
+            <button class="btn-outline" (click)="dialogCaisseVisible = false">Fermer</button>
+            <button class="btn-primary" (click)="imprimerZReport()">
+                <i class="pi pi-print"></i> Imprimer Ticket Z
+            </button>
+        </div>
+    </ng-template>
+
+</p-dialog>

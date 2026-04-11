@@ -1,0 +1,304 @@
+<p-toast></p-toast>
+<p-confirmDialog></p-confirmDialog>
+
+<!-- ── En-tête ─────────────────────────── -->
+<div class="page-header">
+    <div>
+        <h2 class="page-header__title">💰 ABONNEMENTS SaaS</h2>
+        <p class="page-header__subtitle">Gestion des plans et renouvellements</p>
+    </div>
+    <button class="btn-primary" (click)="ouvrirCreerPlan()">
+        <i class="pi pi-plus"></i> Nouveau plan
+    </button>
+</div>
+
+<!-- ── Cartes Plans ─────────────────────── -->
+<div class="plans-grid">
+    @for (plan of plans; track plan.id) {
+        <div class="plan-card" [style.border-top-color]="plan.color">
+            <div class="plan-card__header">
+                <span class="plan-card__badge" [style.background-color]="plan.color + '22'" [style.color]="plan.color">{{ plan.label }}</span>
+                <div class="plan-card__header-right">
+                    <span class="plan-card__count" [style.color]="plan.color">{{ plan.abonnes }}</span>
+                    <button class="plan-card__delete-btn" title="Supprimer ce plan"
+                            (click)="$event.stopPropagation(); supprimerPlan(plan)">
+                        <i class="pi pi-trash"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="plan-card__price">
+                @if (plan.prix) {
+                    <span class="plan-card__amount">{{ plan.prix }} DH/mois</span>
+                } @else {
+                    <span class="plan-card__amount">Sur devis</span>
+                }
+            </div>
+            <ul class="plan-card__features">
+                @for (f of plan.features; track f) {
+                    <li><i class="pi pi-check"></i> {{ f }}</li>
+                }
+            </ul>
+            <button class="plan-card__btn" [style.border-color]="plan.color" [style.color]="plan.color"
+                    (click)="ouvrirModifierPlan({id: null, plan: plan.id, cabinet: plan.label})">
+                Modifier le plan
+            </button>
+        </div>
+    }
+
+    <!-- Carte Créer nouveau plan -->
+    <div class="plan-card plan-card--add" (click)="ouvrirCreerPlan()">
+        <i class="pi pi-plus-circle plan-card__add-icon"></i>
+        <span class="plan-card__add-label">Créer un nouveau plan</span>
+    </div>
+</div>
+
+<!-- ── Stats rapides ───────────────────── -->
+<div class="stats-row">
+    <div class="stat-chip stat-chip--green">
+        <i class="pi pi-check-circle"></i>
+        <span>{{ stats.actifs }} actifs</span>
+    </div>
+    <div class="stat-chip stat-chip--orange">
+        <i class="pi pi-clock"></i>
+        <span>{{ stats.expirant }} expirant bientôt</span>
+    </div>
+    <div class="stat-chip stat-chip--red">
+        <i class="pi pi-times-circle"></i>
+        <span>{{ stats.expires }} expirés</span>
+    </div>
+    <div class="stat-chip stat-chip--purple">
+        <i class="pi pi-money-bill"></i>
+        <span>MRR : {{ stats.mrr }} DH</span>
+    </div>
+</div>
+
+<!-- ── Renouvellements à venir ───────────── -->
+@if (renouvellements.length > 0) {
+    <div class="panel panel--renewals">
+        <div class="panel__header">
+            <i class="pi pi-refresh"></i>
+            <h3>RENOUVELLEMENTS À VENIR</h3>
+        </div>
+        @for (a of renouvellements; track a.id) {
+            <div class="renewal-row">
+                <div class="renewal-row__info">
+                    <div class="renewal-row__name">{{ a.cabinet }}</div>
+                    <div class="renewal-row__plan">Plan {{ a.plan }}</div>
+                </div>
+                <div class="renewal-row__right">
+                    <span class="renewal-row__date" [class.text-urgent]="a.joursRestants <= 15">{{ a.dateExpiration }}</span>
+                    <span class="renewal-row__amount">{{ a.montant > 0 ? a.montant : '—' }} {{ a.montant > 0 ? 'DH' : '' }}</span>
+                    <button class="btn-renouveler" (click)="renouveler(a)">Renouveler</button>
+                </div>
+            </div>
+        }
+    </div>
+}
+
+<!-- ── Tableau complet ─────────────────── -->
+<div class="panel">
+    <div class="panel__header">
+        <div class="panel__search">
+            <i class="pi pi-search"></i>
+            <input class="panel__search-input" [(ngModel)]="searchQuery" (ngModelChange)="filtrer()" placeholder="Rechercher un cabinet..."/>
+        </div>
+    </div>
+
+    <p-table [value]="abonnementsFiltres" [paginator]="true" [rows]="10" [loading]="loading"
+             [showCurrentPageReport]="true" currentPageReportTemplate="{first}-{last} sur {totalRecords}"
+             responsiveLayout="scroll" styleClass="mc-table">
+
+        <ng-template pTemplate="header">
+            <tr>
+                <th>Cabinet</th>
+                <th>Plan</th>
+                <th>Expiration</th>
+                <th>Jours restants</th>
+                <th>Montant</th>
+                <th>Statut</th>
+                <th>Actions</th>
+            </tr>
+        </ng-template>
+
+        <ng-template pTemplate="body" let-a>
+            <tr>
+                <td>
+                    <div class="cabinet-cell">
+                        <div class="cabinet-cell__av">{{ a.initiales }}</div>
+                        <div>
+                            <div class="cabinet-cell__name">{{ a.cabinet }}</div>
+                            <div class="cabinet-cell__email">{{ a.email }}</div>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <span class="plan-badge" [style.background-color]="getPlanColor(a.plan) + '22'" [style.color]="getPlanColor(a.plan)">
+                        {{ a.plan }}
+                    </span>
+                </td>
+                <td><span class="td-muted">{{ a.dateExpiration }}</span></td>
+                <td>
+                    <span class="jours-badge" [ngClass]="getJoursClass(a.joursRestants)">
+                        {{ a.joursRestants > 0 ? a.joursRestants + 'j' : 'Expiré' }}
+                    </span>
+                </td>
+                <td><span class="td-amount">{{ a.montant > 0 ? a.montant + ' DH' : '—' }}</span></td>
+                <td>
+                    <span class="badge" [ngClass]="a.statut === 'actif' ? 'badge--payee' : 'badge--annulee'">
+                        {{ a.statutLabel }}
+                    </span>
+                </td>
+                <td>
+                    <div class="row-actions">
+                        <button class="btn-action btn-action--primary" title="Modifier plan" (click)="ouvrirModifierPlan(a)">
+                            <i class="pi pi-pencil"></i>
+                        </button>
+                        <button class="btn-action btn-action--success" title="Renouveler" (click)="renouveler(a)">
+                            <i class="pi pi-refresh"></i>
+                        </button>
+                        <button class="btn-action btn-action--danger" title="Résilier" (click)="resilier(a)">
+                            <i class="pi pi-ban"></i>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        </ng-template>
+
+        <ng-template pTemplate="empty">
+            <tr>
+                <td colspan="7">
+                    <div class="table-empty">
+                        <i class="pi pi-credit-card table-empty__icon"></i>
+                        <p>Aucun abonnement trouvé</p>
+                    </div>
+                </td>
+            </tr>
+        </ng-template>
+    </p-table>
+</div>
+
+<!-- ── Dialog Modifier Plan ───────────── -->
+<p-dialog header="Modifier l'abonnement"
+          [(visible)]="dialogPlanVisible"
+          [modal]="true"
+          [style]="{width:'420px'}"
+          [draggable]="false"
+          styleClass="mc-dialog">
+
+    @if (selectedAbonnement) {
+        <div class="dialog-info">
+            <i class="pi pi-building"></i>
+            <strong>{{ selectedAbonnement.cabinet }}</strong>
+        </div>
+        <div class="dialog-form">
+            <div class="form-field">
+                <label class="form-label">Plan d'abonnement</label>
+                <p-select [(ngModel)]="formPlan.plan"
+                          [options]="planOptions"
+                          optionLabel="label" optionValue="value"
+                          styleClass="w-full">
+                </p-select>
+            </div>
+            <div class="form-field">
+                <label class="form-label">Date d'expiration</label>
+                <input class="form-input" type="date" [(ngModel)]="formPlan.dateExpiration"/>
+                <p class="form-hint">Laissez vide pour +1 an automatiquement</p>
+            </div>
+        </div>
+    }
+
+    <ng-template pTemplate="footer">
+        <div class="dialog-footer">
+            <button class="btn-outline" (click)="dialogPlanVisible = false">Annuler</button>
+            <button class="btn-primary" (click)="sauvegarderPlan()">
+                <i class="pi pi-check"></i> Enregistrer
+            </button>
+        </div>
+    </ng-template>
+</p-dialog>
+
+<!-- ── Dialog Créer nouveau Plan ──────── -->
+<p-dialog header="Créer un nouveau plan"
+          [(visible)]="dialogCreerPlanVisible"
+          [modal]="true"
+          [style]="{width:'500px'}"
+          [draggable]="false"
+          styleClass="mc-dialog">
+
+    <div class="dialog-form">
+        <div class="form-row">
+            <div class="form-field">
+                <label class="form-label">Identifiant <span class="form-required">*</span></label>
+                <input class="form-input" [(ngModel)]="formNouveauPlan.planId" placeholder="Ex: Business" />
+                <p class="form-hint">Clé unique du plan (sans espaces)</p>
+            </div>
+            <div class="form-field">
+                <label class="form-label">Nom affiché <span class="form-required">*</span></label>
+                <input class="form-input" [(ngModel)]="formNouveauPlan.label" placeholder="Ex: Business Pro" />
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-field">
+                <label class="form-label">Prix mensuel (DH)</label>
+                <input class="form-input" type="number" [(ngModel)]="formNouveauPlan.prix" placeholder="0 = Sur devis" min="0" />
+            </div>
+            <div class="form-field">
+                <label class="form-label">Couleur du plan</label>
+                <p-select [(ngModel)]="formNouveauPlan.color"
+                          [options]="PLAN_COLORS"
+                          optionLabel="label" optionValue="value"
+                          styleClass="w-full">
+                    <ng-template pTemplate="item" let-item>
+                        <div style="display:flex; align-items:center; gap:.5rem">
+                            <span style="display:inline-block; width:12px; height:12px; border-radius:50%;" [style.background]="item.value"></span>
+                            {{ item.label }}
+                        </div>
+                    </ng-template>
+                    <ng-template pTemplate="selectedItem" let-item>
+                        <div style="display:flex; align-items:center; gap:.5rem" *ngIf="item">
+                            <span style="display:inline-block;width:12px;height:12px;border-radius:50%;" [style.background]="item.value"></span>
+                            {{ item.label }}
+                        </div>
+                    </ng-template>
+                </p-select>
+            </div>
+        </div>
+
+        <div class="form-field">
+            <label class="form-label">Fonctionnalités incluses</label>
+            <textarea class="form-input" pTextarea
+                      [(ngModel)]="formNouveauPlan.features"
+                      rows="4"
+                      placeholder="Une fonctionnalité par ligne&#10;Ex: 5-10 médecins&#10;Ex: 1000 RDV/mois">
+            </textarea>
+            <p class="form-hint">Saisissez une fonctionnalité par ligne</p>
+        </div>
+
+        <!-- Aperçu du plan -->
+        @if (formNouveauPlan.planId || formNouveauPlan.label) {
+            <div class="plan-preview" [style.border-top-color]="formNouveauPlan.color || '#10b981'">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.75rem">
+                    <span class="plan-card__badge"
+                          [style.background-color]="(formNouveauPlan.color || '#10b981') + '22'"
+                          [style.color]="formNouveauPlan.color || '#10b981'">
+                        {{ formNouveauPlan.label || 'Mon Plan' }}
+                    </span>
+                    <span style="font-size:1.25rem;font-weight:800;" [style.color]="formNouveauPlan.color || '#10b981'">0</span>
+                </div>
+                <div style="font-size:1rem;font-weight:700;color:#0D1B3E;margin-bottom:.5rem">
+                    {{ formNouveauPlan.prix ? formNouveauPlan.prix + ' DH/mois' : 'Sur devis' }}
+                </div>
+            </div>
+        }
+    </div>
+
+    <ng-template pTemplate="footer">
+        <div class="dialog-footer">
+            <button class="btn-outline" (click)="dialogCreerPlanVisible = false">Annuler</button>
+            <button class="btn-primary" (click)="sauvegarderNouveauPlan()">
+                <i class="pi pi-plus"></i> Créer le plan
+            </button>
+        </div>
+    </ng-template>
+</p-dialog>

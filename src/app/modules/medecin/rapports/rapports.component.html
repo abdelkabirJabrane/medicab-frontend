@@ -1,0 +1,80 @@
+<div class="flex flex-col gap-4">
+  <!-- ── En-tête (Design Harmonisé) ─────────────────────────── -->
+  <div class="page-header">
+    <div>
+      <h1 class="page-header__title"><i class="pi pi-chart-line mr-2 text-primary"></i>Rapport Financier</h1>
+      <p class="page-header__subtitle">Analyse des revenus et performances du cabinet</p>
+    </div>
+    <div class="flex gap-2">
+      <p-button label="PDF" icon="pi pi-file-pdf" (onClick)="exportPdf()" severity="danger" [outlined]="true"></p-button>
+      <p-button label="Excel" icon="pi pi-file-excel" (onClick)="exportExcel()" severity="success" [outlined]="true"></p-button>
+    </div>
+  </div>
+
+  <!-- ── KPIs ────────────────────────────── -->
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+    <div class="p-5 bg-white rounded-xl shadow-sm text-center border-t-4 border-primary">
+      <div class="text-slate-500 font-bold mb-2 uppercase text-xs tracking-wider">Chiffre d'Affaires</div>
+      <div class="text-3xl font-extrabold text-slate-900">{{totalCa | number:'1.0-0'}} <span class="text-sm font-medium text-slate-400">DH</span></div>
+    </div>
+    <div class="p-5 bg-white rounded-xl shadow-sm text-center border-t-4 border-green-500">
+      <div class="text-slate-500 font-bold mb-2 uppercase text-xs tracking-wider">Consultations</div>
+      <div class="text-3xl font-extrabold text-slate-900">{{totalConsultations}}</div>
+    </div>
+    <div class="p-5 bg-white rounded-xl shadow-sm text-center border-t-4 border-orange-500">
+      <div class="text-slate-500 font-bold mb-2 uppercase text-xs tracking-wider">Taux Recouvrement</div>
+      <div class="text-3xl font-extrabold text-slate-900">{{tauxRecouvrement}}<span class="text-sm font-medium text-slate-400">%</span></div>
+    </div>
+    <div class="p-5 bg-white rounded-xl shadow-sm text-center border-t-4 border-red-500">
+      <div class="text-slate-500 font-bold mb-2 uppercase text-xs tracking-wider">Impayés</div>
+      <div class="text-3xl font-extrabold text-slate-900">{{totalImpayes | number:'1.0-0'}} <span class="text-sm font-medium text-slate-400">DH</span></div>
+    </div>
+  </div>
+
+  <!-- ── Graphiques ────────────────────────── -->
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+    <div class="lg:col-span-2 bg-white shadow-sm rounded-xl p-6 border border-slate-100">
+      <h2 class="text-lg font-bold mb-6 text-slate-800">Évolution du Chiffre d'Affaires</h2>
+      <p-chart type="line" [data]="lineChartData" [options]="chartOptions" height="300px"></p-chart>
+    </div>
+    <div class="bg-white shadow-sm rounded-xl p-6 border border-slate-100">
+      <h2 class="text-lg font-bold mb-6 text-slate-800">Répartition des Consultations</h2>
+      <p-chart type="pie" [data]="pieChartData" [options]="pieOptions" height="300px"></p-chart>
+    </div>
+  </div>
+
+  <!-- ── Tableau de données ────────────────── -->
+  <div class="bg-white shadow-sm rounded-xl p-6 border border-slate-100 overflow-hidden">
+    <h2 class="text-lg font-bold mb-6 text-slate-800">Données Périodiques Détaillées</h2>
+    <p-table [value]="reportData" styleClass="p-datatable-striped" responsiveLayout="scroll">
+      <ng-template pTemplate="header">
+        <tr class="bg-slate-50">
+          <th class="py-4 px-4 text-xs font-bold uppercase tracking-wider text-slate-500 border-b border-slate-100">Période</th>
+          <th class="py-4 px-4 text-xs font-bold uppercase tracking-wider text-slate-500 text-center border-b border-slate-100">Consultations</th>
+          <th class="py-4 px-4 text-xs font-bold uppercase tracking-wider text-slate-500 text-right border-b border-slate-100">Chiffre d'Affaires</th>
+          <th class="py-4 px-4 text-xs font-bold uppercase tracking-wider text-slate-500 text-right border-b border-slate-100">Impayés</th>
+          <th class="py-4 px-4 text-xs font-bold uppercase tracking-wider text-slate-500 border-b border-slate-100">Recouvrement</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-item>
+        <tr class="hover:bg-slate-50 transition-colors duration-150">
+          <td class="py-4 px-4 border-b border-slate-50 font-semibold text-slate-700">{{item.period}}</td>
+          <td class="py-4 px-4 border-b border-slate-50 text-center font-medium">{{item.consultations}}</td>
+          <td class="py-4 px-4 border-b border-slate-50 text-right text-blue-600 font-bold">{{item.ca | number:'1.0-0'}} DH</td>
+          <td class="py-4 px-4 border-b border-slate-50 text-right font-bold" [ngClass]="item.impayes > 0 ? 'text-red-500' : 'text-slate-400'">
+            {{item.impayes > 0 ? (item.impayes | number:'1.0-0') + ' DH' : '-'}}
+          </td>
+          <td class="py-4 px-4 border-b border-slate-50">
+            <div class="flex items-center gap-3">
+              <span class="text-sm font-bold min-w-[3rem] text-slate-600">{{item.taux}}%</span>
+              <div class="w-full bg-slate-100 rounded-full h-2">
+                <div [class]="item.taux >= 95 ? 'bg-green-500 h-2 rounded-full' : (item.taux >= 80 ? 'bg-orange-500 h-2 rounded-full' : 'bg-red-500 h-2 rounded-full')" 
+                     [style.width.%]="item.taux"></div>
+              </div>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+</div>

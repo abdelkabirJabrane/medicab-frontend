@@ -1,0 +1,156 @@
+<p-toast></p-toast>
+
+<!-- ── En-tête (Design Harmonisé) ─────────────────────────── -->
+<div class="page-header">
+    <div>
+        <h2 class="page-header__title">Mon Profil</h2>
+        <p class="page-header__subtitle">Gérer vos informations personnelles et sécurité</p>
+    </div>
+</div>
+
+<!-- ── Contenu Principal ────────────────── -->
+<div class="panel">
+    <div class="grid grid-cols-12 gap-12">
+
+        <!-- Colonne GAUCHE (Formulaire) -->
+        <div class="col-span-12 lg:col-span-8">
+            
+            <div class="mb-8">
+                <h5 class="font-bold text-xl mb-6 text-slate-800 border-b-2 border-slate-100 pb-3">Informations Personnelles</h5>
+
+                <!-- Layout Vertical Simple pour alignement à gauche parfait -->
+                <div class="p-fluid flex flex-col gap-6 max-w-2xl">
+                    
+                    <div class="field m-0">
+                        <label for="prenom" class="font-bold text-xs uppercase tracking-widest mb-3 block text-slate-500">Prénom</label>
+                        <input id="prenom" type="text" pInputText [(ngModel)]="profil.prenom" 
+                               class="py-3 px-4 border-slate-200 focus:border-blue-500 rounded-xl"
+                               placeholder="Votre prénom" />
+                    </div>
+
+                    <div class="field m-0">
+                        <label for="nom" class="font-bold text-xs uppercase tracking-widest mb-3 block text-slate-500">Nom</label>
+                        <input id="nom" type="text" pInputText [(ngModel)]="profil.nom" 
+                               class="py-3 px-4 border-slate-200 focus:border-blue-500 rounded-xl"
+                               placeholder="Votre nom" />
+                    </div>
+
+                    <div class="field m-0">
+                        <label for="email" class="font-bold text-xs uppercase tracking-widest mb-3 block text-slate-500">Email professionnel</label>
+                        <input id="email" type="email" pInputText [(ngModel)]="profil.email" 
+                               class="py-3 px-4 border-slate-200 focus:border-blue-500 rounded-xl"
+                               placeholder="email@exemple.com" />
+                    </div>
+
+                    <div class="field m-0">
+                        <label for="telephone" class="font-bold text-xs uppercase tracking-widest mb-3 block text-slate-500">Téléphone</label>
+                        <input id="telephone" type="text" pInputText [(ngModel)]="profil.telephone" 
+                               class="py-3 px-4 border-slate-200 focus:border-blue-500 rounded-xl"
+                               placeholder="06XXXXXXXX" />
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Sécurité Section -->
+            <div class="mt-10 pt-8 border-t border-slate-100">
+                <h5 class="font-bold text-xl mb-6 text-slate-800 flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
+                        <i class="pi pi-lock text-sm"></i>
+                    </div>
+                    Sécurité & Accès
+                </h5>
+                
+                <div class="p-fluid max-w-2xl">
+                    <div class="field m-0">
+                        <label for="newPassword" class="font-bold text-xs uppercase tracking-widest mb-3 block text-slate-500">
+                            Nouveau Mot de Passe
+                            <span class="text-[10px] text-slate-300 ml-2 font-normal normal-case">(laisser vide pour ne pas changer)</span>
+                        </label>
+                        <p-password id="newPassword"
+                                    [(ngModel)]="profil.newPassword"
+                                    [toggleMask]="true"
+                                    promptLabel="Optionnel"
+                                    weakLabel="Faible"
+                                    mediumLabel="Moyen"
+                                    strongLabel="Fort"
+                                    styleClass="w-full"
+                                    inputStyleClass="py-3 px-4 rounded-xl border-slate-200">
+                        </p-password>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bouton Sauvegarde -->
+            <div class="flex justify-start mt-10">
+                <p-button
+                    label="Enregistrer les modifications"
+                    icon="pi pi-check"
+                    [loading]="loading"
+                    [raised]="true"
+                    severity="primary"
+                    styleClass="px-8 py-3 rounded-xl font-bold"
+                    (onClick)="sauvegarder()">
+                </p-button>
+            </div>
+        </div>
+
+        <!-- Colonne DROITE (Avatar & Médecin associé) -->
+        <div class="col-span-12 lg:col-span-4 flex flex-col gap-8">
+            
+            <!-- Avatar Card -->
+            <div class="bg-gradient-to-br from-white to-slate-50 p-8 rounded-3xl border border-slate-200 flex flex-col items-center gap-6 text-center shadow-sm">
+                <div class="w-28 h-28 rounded-3xl flex items-center justify-center text-4xl font-black text-white shadow-xl rotate-3"
+                     style="background: linear-gradient(135deg, #6366f1, #8b5cf6);">
+                    {{ userInitials }}
+                </div>
+                <div>
+                    <div class="text-2xl font-black text-slate-800 tracking-tight">{{ profil.prenom }} {{ profil.nom }}</div>
+                    <div class="flex items-center justify-center gap-2 mt-3">
+                        <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                        <p-tag value="Secrétaire Médicale" severity="info" styleClass="text-[10px] font-black uppercase px-4 py-1.5 rounded-full tracking-widest"></p-tag>
+                    </div>
+                </div>
+                <div class="text-slate-400 text-xs font-bold bg-slate-100/50 px-4 py-2 rounded-lg border border-slate-100">{{ profil.email }}</div>
+            </div>
+
+            <!-- Médecin Associé Info -->
+            <div class="bg-blue-600 p-8 rounded-3xl text-white shadow-blue-200 shadow-xl relative overflow-hidden group">
+                <!-- Décoration -->
+                <div class="absolute -right-4 -bottom-4 opacity-10 group-hover:scale-110 transition-transform">
+                    <i class="pi pi-user-plus text-[120px]"></i>
+                </div>
+                
+                <div class="flex items-center gap-4 mb-8">
+                    <div class="w-12 h-12 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center shadow-lg">
+                        <i class="pi pi-star-fill text-xl"></i>
+                    </div>
+                    <div>
+                        <div class="text-[10px] font-black uppercase tracking-widest opacity-60">Mon Responsable</div>
+                        <div class="text-lg font-black leading-none">Médecin Associé</div>
+                    </div>
+                </div>
+
+                <div class="flex flex-col gap-6 relative z-10">
+                    <div>
+                        <div class="text-[9px] font-black uppercase tracking-widest opacity-60 mb-2">Nom Complet</div>
+                        <div class="text-base font-black">{{ medecinInfo.nom || 'Chargement…' }}</div>
+                    </div>
+
+                    <div>
+                        <div class="text-[9px] font-black uppercase tracking-widest opacity-60 mb-2">Coordonnées</div>
+                        <div class="text-sm font-medium opacity-90">{{ medecinInfo.email || '—' }}</div>
+                    </div>
+
+                    <div class="pt-4 border-t border-white/10">
+                        <div class="bg-white/10 px-4 py-2 rounded-xl text-[11px] font-black uppercase tracking-widest inline-block">
+                            {{ medecinInfo.specialite }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</div>

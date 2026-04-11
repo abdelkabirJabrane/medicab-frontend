@@ -1,0 +1,69 @@
+<p-toast></p-toast>
+<div class="page-header">
+    <div>
+        <h2 class="page-header__title">Mon Profil</h2>
+        <p class="page-header__subtitle">Gérez vos informations personnelles et votre sécurité</p>
+    </div>
+</div>
+
+<div class="profil-grid">
+    <div class="profil-card profil-card--info">
+        <div class="profil-card__header">
+            <i class="pi pi-user profil-card__icon"></i>
+            <h3 class="profil-card__title">Informations Générales</h3>
+        </div>
+        <div class="profil-card__body">
+            <div class="form-row">
+                <div class="form-field">
+                    <label class="form-label">Nom <span class="form-required">*</span></label>
+                    <input class="form-input" pInputText [(ngModel)]="user.nom" placeholder="Nom de famille"/>
+                </div>
+                <div class="form-field">
+                    <label class="form-label">Prénom <span class="form-required">*</span></label>
+                    <input class="form-input" pInputText [(ngModel)]="user.prenom" placeholder="Prénom"/>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-field">
+                    <label class="form-label">Email <span class="form-required">*</span></label>
+                    <input class="form-input" pInputText [(ngModel)]="user.email" placeholder="Email professionnel"/>
+                </div>
+                <div class="form-field">
+                    <label class="form-label">Téléphone</label>
+                    <input class="form-input" pInputText [(ngModel)]="user.telephone" placeholder="Numéro de téléphone"/>
+                </div>
+            </div>
+            <div class="form-field">
+                <label class="form-label">Nom d'utilisateur</label>
+                <input class="form-input" pInputText [(ngModel)]="user.username" disabled placeholder="Nom d'utilisateur" [style]="{opacity: 0.6}"/>
+            </div>
+        </div>
+    </div>
+
+    <div class="profil-card profil-card--security">
+        <div class="profil-card__header">
+            <i class="pi pi-shield profil-card__icon"></i>
+            <h3 class="profil-card__title">Sécurité du Compte</h3>
+        </div>
+        <div class="profil-card__body">
+            <div class="form-field">
+                <label class="form-label">Nouveau mot de passe</label>
+                <p-password [(ngModel)]="user.newPassword" 
+                          [toggleMask]="true" 
+                          [feedback]="true" 
+                          placeholder="Saisissez un nouveau MDP" 
+                          styleClass="w-full"
+                          inputStyleClass="w-full form-input">
+                </p-password>
+                <p class="form-hint">Laissez vide si vous ne souhaitez pas changer le mot de passe</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="profil-actions">
+    <button class="btn-primary btn-primary--lg" (click)="sauvegarderProfil()" [disabled]="loading">
+        <i class="pi" [ngClass]="loading ? 'pi-spin pi-spinner' : 'pi-check'"></i>
+        Enregistrer les modifications
+    </button>
+</div>

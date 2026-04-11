@@ -1,0 +1,208 @@
+<p-toast></p-toast>
+
+<!-- ── En-tête ─────────────────────────── -->
+<div class="page-header">
+    <div>
+        <h2 class="page-header__title">Facturation</h2>
+        <p class="page-header__subtitle">Gestion des factures</p>
+    </div>
+    
+    <div class="header-actions">
+        <!-- Input caché pour l'import Excel -->
+        <input type="file" #fileInput style="display: none" (change)="importExcel($event)" accept=".xlsx, .xls">
+        
+        <button class="btn-outline" (click)="triggerImport(fileInput)" pTooltip="Importer" tooltipPosition="bottom">
+            <i class="pi pi-upload"></i> Importer
+        </button>
+        
+        <button class="btn-outline" (click)="exportExcel()" pTooltip="Excel" tooltipPosition="bottom">
+            <i class="pi pi-file-excel"></i> Excel
+        </button>
+        
+        <button class="btn-outline" (click)="exportPDF()" pTooltip="PDF" tooltipPosition="bottom">
+            <i class="pi pi-file-pdf"></i> PDF
+        </button>
+    </div>
+</div>
+
+<!-- ── KPIs ────────────────────────────── -->
+<div class="stats-grid">
+
+    <div class="stat-card stat-card--green">
+        <div class="stat-card__icon"><i class="pi pi-check-circle"></i></div>
+        <div class="stat-card__body">
+            <div class="stat-card__label">Total Encaissé</div>
+            <div class="stat-card__value">{{ stats.totalEncaisse }} <span class="stat-card__unit">MAD</span></div>
+        </div>
+    </div>
+
+    <div class="stat-card stat-card--red">
+        <div class="stat-card__icon"><i class="pi pi-exclamation-circle"></i></div>
+        <div class="stat-card__body">
+            <div class="stat-card__label">Total Impayé</div>
+            <div class="stat-card__value">{{ stats.totalImpaye }} <span class="stat-card__unit">MAD</span></div>
+        </div>
+    </div>
+
+    <div class="stat-card stat-card--blue">
+        <div class="stat-card__icon"><i class="pi pi-file-invoice"></i></div>
+        <div class="stat-card__body">
+            <div class="stat-card__label">Total Factures</div>
+            <div class="stat-card__value">{{ stats.nbFactures }}</div>
+        </div>
+    </div>
+
+    <div class="stat-card stat-card--orange">
+        <div class="stat-card__icon"><i class="pi pi-clock"></i></div>
+        <div class="stat-card__body">
+            <div class="stat-card__label">En attente</div>
+            <div class="stat-card__value">{{ stats.nbImpayes }}</div>
+        </div>
+    </div>
+
+</div>
+
+<!-- ── Tableau ─────────────────────────── -->
+<div class="panel">
+    <p-table
+        [value]="facturesFiltres"
+        [paginator]="true"
+        [rows]="10"
+        [showCurrentPageReport]="true"
+        currentPageReportTemplate="{first}-{last} sur {totalRecords}"
+        responsiveLayout="scroll"
+        styleClass="mc-table">
+
+        <ng-template pTemplate="header">
+            <tr>
+                <th>N° Facture</th>
+                <th>Patient</th>
+                <th>Date</th>
+                <th>Montant TTC</th>
+                <th>Payé</th>
+                <th>Restant</th>
+                <th>Statut</th>
+                <th>Actions</th>
+            </tr>
+        </ng-template>
+
+        <ng-template pTemplate="body" let-f>
+            <tr class="table-row">
+
+                <td><span class="td-mono">{{ f.numeroFacture }}</span></td>
+
+                <td><span class="td-name">{{ f.patient }}</span></td>
+
+                <td><span class="td-muted">{{ f.date }}</span></td>
+
+                <td><span class="td-amount">{{ f.montantTTC }} MAD</span></td>
+
+                <td><span class="td-paid">{{ f.montantPaye }} MAD</span></td>
+
+                <td>
+          <span [class]="f.montantRestant > 0 ? 'td-due' : 'td-zero'">
+            {{ f.montantRestant }} MAD
+          </span>
+                </td>
+
+                <td>
+          <span class="badge badge--{{ f.statut | lowercase }}">
+            {{ getStatutLabel(f.statut) }}
+          </span>
+                </td>
+
+                <td>
+                    <div class="row-actions">
+                        @if (f.statut !== 'PAYEE' && f.statut !== 'ANNULEE') {
+                            <button class="btn-action btn-action--success"
+                                    title="Encaisser"
+                                    (click)="ouvrirPaiement(f)">
+                                <i class="pi pi-credit-card"></i>
+                            </button>
+                        }
+                        <button class="btn-action btn-action--neutral" title="Imprimer" (click)="imprimerFacture(f)">
+                            <i class="pi pi-print"></i>
+                        </button>
+                    </div>
+                </td>
+
+            </tr>
+        </ng-template>
+
+        <ng-template pTemplate="empty">
+            <tr>
+                <td colspan="8">
+                    <div class="table-empty">
+                        <i class="pi pi-file-invoice table-empty__icon"></i>
+                        <p>Aucune facture</p>
+                    </div>
+                </td>
+            </tr>
+        </ng-template>
+
+    </p-table>
+</div>
+
+<!-- ── Dialog Paiement ────────────────── -->
+<p-dialog
+    header="Enregistrer un Paiement"
+    [(visible)]="dialogPaiementVisible"
+    [modal]="true"
+    [style]="{width:'400px'}"
+    [draggable]="false"
+    styleClass="mc-dialog">
+
+    @if (factureSelectionnee) {
+
+        <div class="payment-summary">
+            <div class="payment-summary__row">
+                <span class="payment-summary__label">Facture</span>
+                <span class="payment-summary__value payment-summary__value--mono">
+          {{ factureSelectionnee.numeroFacture }}
+        </span>
+            </div>
+            <div class="payment-summary__row">
+                <span class="payment-summary__label">Patient</span>
+                <span class="payment-summary__value">{{ factureSelectionnee.patient }}</span>
+            </div>
+            <div class="payment-summary__divider"></div>
+            <div class="payment-summary__row">
+                <span class="payment-summary__label">Restant dû</span>
+                <span class="payment-summary__value payment-summary__value--due">
+          {{ factureSelectionnee.montantRestant }} MAD
+        </span>
+            </div>
+        </div>
+
+        <div class="dialog-form">
+            <div class="form-field">
+                <label class="form-label">Montant à encaisser <span class="form-unit">(MAD)</span></label>
+                <input class="form-input form-input--lg"
+                       pInputText
+                       type="number"
+                       [(ngModel)]="montantPaiement"
+                       [max]="factureSelectionnee.montantRestant"/>
+            </div>
+            <div class="form-field">
+                <label class="form-label">Mode de paiement</label>
+                <p-select [(ngModel)]="modePaiement"
+                          [options]="modePaiementOptions"
+                          optionLabel="label"
+                          optionValue="value"
+                          styleClass="w-full">
+                </p-select>
+            </div>
+        </div>
+
+    }
+
+    <ng-template pTemplate="footer">
+        <div class="dialog-footer">
+            <button class="btn-outline" (click)="dialogPaiementVisible = false">Annuler</button>
+            <button class="btn-success" (click)="enregistrerPaiement()">
+                <i class="pi pi-check"></i> Confirmer le paiement
+            </button>
+        </div>
+    </ng-template>
+
+</p-dialog>

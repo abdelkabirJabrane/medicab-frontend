@@ -1,0 +1,56 @@
+<div class="ai-layout">
+    <div class="ai-layout__left">
+        <!-- Formulaire de contexte si pas de session -->
+        <app-patient-context-form 
+            *ngIf="!context" 
+            (contextReady)="onContextReady($event)">
+        </app-patient-context-form>
+
+        <!-- Chat une fois le contexte prêt -->
+        <app-chat-box 
+            *ngIf="context"
+            [messages]="messages" 
+            [isRecording]="isRecording"
+            [connectionError]="connectionError"
+            (sendMessage)="onSendMessage($event)">
+            
+            <app-voice-dictation
+                (audioRecorded)="onAudioRecorded($event)"
+                (recordingStatus)="onRecordingStatusChange($event)">
+            </app-voice-dictation>
+
+        </app-chat-box>
+    </div>
+
+    <div class="ai-layout__right">
+        <!-- Dashboard live / Session Data -->
+        <app-session-data-panel style="flex:1; overflow: hidden;"
+            *ngIf="context"
+            [data]="sessionData"
+            [alerts]="activeAlerts">
+        </app-session-data-panel>
+
+        <!-- Empty state before session starts -->
+        <div class="session-placeholder" *ngIf="!context">
+            <div class="placeholder-content">
+                <i class="pi pi-user-plus"></i>
+                <h3>Prêt pour la Session</h3>
+                <p>Sélectionnez un patient à gauche pour initialiser l'assistant intelligent et commencer la consultation.</p>
+            </div>
+        </div>
+
+        <!-- Command Panel -->
+        <app-command-panel 
+            *ngIf="context"
+            [loading]="loadingAction"
+            (onCommand)="onCommand($event)">
+        </app-command-panel>
+    </div>
+</div>
+
+<app-result-modal
+    *ngIf="modalVisible"
+    [(visible)]="modalVisible"
+    [title]="modalTitle"
+    [content]="modalContent">
+</app-result-modal>

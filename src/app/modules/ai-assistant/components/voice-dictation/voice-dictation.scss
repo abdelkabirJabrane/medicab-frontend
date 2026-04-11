@@ -1,0 +1,70 @@
+.dictation-container {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0;
+}
+
+.mic-btn {
+    min-width: 3.5rem;
+    height: 3.5rem;
+    padding: 0 1.25rem;
+    border-radius: 3.5rem;
+    border: none;
+    background: var(--mc-surface-2);
+    color: var(--mc-text-2);
+    font-size: 1.25rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: var(--mc-shadow-md);
+    outline: none;
+    border: 1px solid var(--mc-border);
+
+    &:hover:not(.recording) {
+        background: var(--mc-border);
+        color: var(--mc-text-1);
+    }
+
+    &.recording {
+        background: var(--mc-red);
+        color: white;
+        animation: pulse 1.5s infinite;
+        border-color: var(--mc-red);
+    }
+}
+
+.visualizer-wrapper {
+    height: 40px;
+    width: 150px;
+    opacity: 0;
+    transition: opacity 0.3s;
+    
+    &.active {
+        opacity: 1;
+    }
+
+    canvas {
+        display: block;
+    }
+}
+
+.status-text {
+    font-size: 0.85rem;
+    color: var(--mc-red);
+    font-weight: 700;
+    animation: blink 1.5s infinite;
+}
+
+@keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.5); }
+    70% { box-shadow: 0 0 0 15px rgba(220, 38, 38, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0); }
+}
+
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}

@@ -1,0 +1,129 @@
+<p-toast></p-toast>
+<p-confirmDialog></p-confirmDialog>
+
+<div class="page-header">
+    <div>
+        <h2 class="page-header__title">Utilisateurs</h2>
+        <p class="page-header__subtitle">{{ usersFiltres.length }} utilisateurs sur la plateforme</p>
+    </div>
+    <button class="btn-primary" (click)="ouvrirNouveau()">
+        <i class="pi pi-user-plus"></i> Nouvel Utilisateur
+    </button>
+</div>
+
+<div class="search-bar">
+    <div class="search-bar__wrap">
+        <i class="pi pi-search search-bar__icon"></i>
+        <input class="search-bar__input" [(ngModel)]="searchQuery" (ngModelChange)="filtrer()" placeholder="Rechercher par nom, email, cabinet..."/>
+    </div>
+    <div class="filters">
+        @for (tab of tabs; track tab.value) {
+            <button class="filter-tab" [class.filter-tab--active]="filtreActif === tab.value" (click)="setFiltre(tab.value)">
+                {{ tab.label }} <span class="filter-tab__count">{{ tab.count }}</span>
+            </button>
+        }
+    </div>
+</div>
+
+<div class="panel">
+    <p-progressBar *ngIf="loading" mode="indeterminate" styleClass="mb-3" [style]="{'height': '4px'}"></p-progressBar>
+    <p-table [value]="usersFiltres" [paginator]="true" [rows]="10"
+             [showCurrentPageReport]="true" currentPageReportTemplate="{first}-{last} sur {totalRecords}"
+             responsiveLayout="scroll" styleClass="mc-table">
+
+        <ng-template pTemplate="header">
+            <tr>
+                <th>Utilisateur</th><th>Rôle</th><th>Cabinet</th>
+                <th>Dernière connexion</th><th>Statut</th><th>Actions</th>
+            </tr>
+        </ng-template>
+
+        <ng-template pTemplate="body" let-u>
+            <tr class="table-row">
+                <td>
+                    <div class="user-cell">
+                        <div class="user-cell__av user-cell__av--{{ u.role | lowercase }}">{{ u.initiales }}</div>
+                        <div>
+                            <div class="user-cell__name">{{ u.nom }}</div>
+                            <div class="user-cell__email">{{ u.email }}</div>
+                        </div>
+                    </div>
+                </td>
+                <td><span class="role-badge role-badge--{{ u.role | lowercase }}">{{ u.roleLabel }}</span></td>
+                <td><span class="td-muted">{{ u.cabinet }}</span></td>
+                <td><span class="td-muted">{{ u.derniereConnexion }}</span></td>
+                <td><span class="badge badge--{{ u.actif ? 'actif' : 'inactif' }}">{{ u.actif ? 'Actif' : 'Inactif' }}</span></td>
+                <td>
+                    <div class="row-actions">
+                        <button class="btn-action btn-action--info"    title="Modifier"     (click)="modifier(u)"><i class="pi pi-pencil"></i></button>
+                        <button class="btn-action btn-action--neutral" title="Réinitialiser MDP" (click)="resetMdp(u)"><i class="pi pi-key"></i></button>
+                        <button [class]="u.actif ? 'btn-action btn-action--danger' : 'btn-action btn-action--success'" 
+                                [title]="u.actif ? 'Désactiver' : 'Activer'" (click)="toggleStatus(u)">
+                            <i [class]="u.actif ? 'pi pi-ban' : 'pi pi-check-circle'"></i>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        </ng-template>
+
+        <ng-template pTemplate="empty">
+            <tr><td colspan="6"><div class="table-empty"><i class="pi pi-users table-empty__icon"></i><p>Aucun utilisateur trouvé</p></div></td></tr>
+        </ng-template>
+    </p-table>
+</div>
+
+<p-dialog [header]="form.id ? 'Modifier Utilisateur' : 'Nouvel Utilisateur'" [(visible)]="dialogVisible" [modal]="true" [style]="{width:'520px'}" [draggable]="false" styleClass="mc-dialog">
+    <div class="dialog-form">
+        <div class="form-row">
+            <div class="form-field">
+                <label class="form-label">Prénom <span class="form-required">*</span></label>
+                <input class="form-input" pInputText [(ngModel)]="form.firstName" placeholder="Prénom"/>
+            </div>
+            <div class="form-field">
+                <label class="form-label">Nom <span class="form-required">*</span></label>
+                <input class="form-input" pInputText [(ngModel)]="form.lastName" placeholder="NOM"/>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-field">
+                <label class="form-label">Nom d'utilisateur <span class="form-required">*</span></label>
+                <input class="form-input" pInputText [(ngModel)]="form.username" placeholder="j.doe"/>
+            </div>
+            <div class="form-field">
+                <label class="form-label">Email <span class="form-required">*</span></label>
+                <input class="form-input" pInputText type="email" [(ngModel)]="form.email" placeholder="email@medicab.ma"/>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-field">
+                <label class="form-label">Rôle</label>
+                <p-select [options]="roleOptions" [(ngModel)]="form.role" 
+                          optionLabel="label" optionValue="value" 
+                          placeholder="Choisir un rôle" [appendTo]="'body'"
+                          [fluid]="true"></p-select>
+            </div>
+            <div class="form-field">
+                <label class="form-label">Cabinet</label>
+                <p-select [options]="cabinetOptions" [(ngModel)]="form.cabinet" 
+                          optionLabel="label" optionValue="value" 
+                          placeholder="Choisir un cabinet" [appendTo]="'body'"
+                          [fluid]="true"></p-select>
+            </div>
+        </div>
+        <div class="form-row" *ngIf="!form.id">
+            <div class="form-field w-full">
+                <label class="form-label">Mot de passe <span class="form-required">*</span></label>
+                <input class="form-input" pInputText type="password" [(ngModel)]="form.password" placeholder="Le mot de passe de connexion"/>
+            </div>
+        </div>
+    </div>
+    <ng-template pTemplate="footer">
+        <div class="dialog-footer">
+            <button class="btn-outline" (click)="dialogVisible = false">Annuler</button>
+            <button class="btn-primary" (click)="sauvegarder()">
+                <i class="pi" [ngClass]="form.id ? 'pi-save' : 'pi-check'"></i> 
+                {{ form.id ? 'Enregistrer' : 'Créer' }}
+            </button>
+        </div>
+    </ng-template>
+</p-dialog>

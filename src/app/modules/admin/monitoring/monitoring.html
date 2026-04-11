@@ -1,0 +1,107 @@
+<p-toast></p-toast>
+
+<div class="page-header">
+    <div>
+        <h2 class="page-header__title">Monitoring Système</h2>
+        <p class="page-header__subtitle">État en temps réel — Dernière mise à jour {{ getHeure() }}</p>
+    </div>
+    <div class="page-header__actions">
+        <div class="live-badge"><span class="live-badge__dot"></span> Temps réel</div>
+        <button class="btn-outline" (click)="rafraichir()"><i class="pi pi-refresh"></i> Rafraîchir</button>
+    </div>
+</div>
+
+<!-- Serveurs -->
+<div class="serveurs-grid">
+    @for (s of serveurs; track s.id) {
+        <div class="serveur-card serveur-card--{{ s.statut }}">
+            <div class="serveur-card__header">
+                <div class="serveur-card__name">{{ s.nom }}</div>
+                <span class="status-dot status-dot--{{ s.statut }}"></span>
+            </div>
+            <div class="serveur-card__metrics">
+                <div class="metric">
+                    <div class="metric__label">CPU</div>
+                    <div class="metric__bar"><div class="metric__fill metric__fill--{{ getCpuClass(s.cpu) }}" [style.width]="s.cpu + '%'"></div></div>
+                    <div class="metric__val">{{ s.cpu }}%</div>
+                </div>
+                <div class="metric">
+                    <div class="metric__label">RAM</div>
+                    <div class="metric__bar"><div class="metric__fill metric__fill--{{ getCpuClass(s.ram) }}" [style.width]="s.ram + '%'"></div></div>
+                    <div class="metric__val">{{ s.ram }}%</div>
+                </div>
+                <div class="metric">
+                    <div class="metric__label">Disque</div>
+                    <div class="metric__bar"><div class="metric__fill metric__fill--{{ getCpuClass(s.disque) }}" [style.width]="s.disque + '%'"></div></div>
+                    <div class="metric__val">{{ s.disque }}%</div>
+                </div>
+            </div>
+            <div class="serveur-card__uptime">Uptime: {{ s.uptime }}</div>
+        </div>
+    }
+</div>
+
+<!-- Grille logs + stats -->
+<div class="monitor-grid">
+
+    <!-- Logs récents -->
+    <div class="panel">
+        <div class="panel__header">
+            <h3 class="panel__title">Logs Récents</h3>
+            <div class="log-filters">
+                @for (f of logFiltres; track f.value) {
+                    <button class="log-filter-btn" [class.log-filter-btn--active]="logFiltre === f.value" (click)="logFiltre = f.value">{{ f.label }}</button>
+                }
+            </div>
+        </div>
+        <div class="logs-list">
+            @for (log of getLogsFiltres(); track log.id) {
+                <div class="log-item log-item--{{ log.niveau }}">
+                    <span class="log-item__time">{{ log.time }}</span>
+                    <span class="log-item__niveau">{{ log.niveau | uppercase }}</span>
+                    <span class="log-item__msg">{{ log.message }}</span>
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- Stats API -->
+    <div class="right-col">
+
+        <div class="panel">
+            <div class="panel__header"><h3 class="panel__title">Statistiques API</h3></div>
+            <div class="api-stats">
+                @for (s of apiStats; track s.endpoint) {
+                    <div class="api-stat-item">
+                        <div class="api-stat-item__info">
+                            <div class="api-stat-item__method api-stat-item__method--{{ s.method | lowercase }}">{{ s.method }}</div>
+                            <div class="api-stat-item__endpoint">{{ s.endpoint }}</div>
+                        </div>
+                        <div class="api-stat-item__metrics">
+                            <div class="api-stat-item__calls">{{ s.calls }}</div>
+                            <div class="api-stat-item__time" [class.api-stat-item__time--slow]="s.avgMs > 200">{{ s.avgMs }}ms</div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <div class="panel">
+            <div class="panel__header"><h3 class="panel__title">Résumé 24h</h3></div>
+            <div class="summary-stats">
+                @for (s of resume24h; track s.label) {
+                    <div class="summary-stat">
+                        <div class="summary-stat__icon summary-stat__icon--{{ s.color }}">
+                            <i [class]="s.icon"></i>
+                        </div>
+                        <div class="summary-stat__info">
+                            <div class="summary-stat__value">{{ s.value }}</div>
+                            <div class="summary-stat__label">{{ s.label }}</div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+
+    </div>
+</div>

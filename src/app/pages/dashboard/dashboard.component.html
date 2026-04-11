@@ -1,0 +1,216 @@
+<div class="dashboard-header">
+  <div>
+    <h1>Bonjour, Dr. ALAMI 👋</h1>
+    <p>samedi 28 mars 2026 — Vous avez <strong>3 rendez-vous</strong> aujourd'hui</p>
+  </div>
+  <p-splitButton
+    label="Nouveau RDV"
+    icon="pi pi-plus"
+    [model]="newRdvItems">
+  </p-splitButton>
+</div>
+
+<!-- Loader Skeleton -->
+<ng-container *ngIf="loading">
+  <div class="grid grid-cols-12 gap-4 mb-4">
+    <div class="col-span-12 md:col-span-6 lg:col-span-3" *ngFor="let i of [1,2,3,4,5,6,7,8]">
+      <div class="p-card kpi-card p-4">
+        <p-skeleton width="52px" height="52px" borderRadius="12px" styleClass="mb-3"></p-skeleton>
+        <p-skeleton width="50%" height="2rem" styleClass="mb-2"></p-skeleton>
+        <p-skeleton width="80%" height="1rem" styleClass="mb-2"></p-skeleton>
+        <p-skeleton width="30%" height="1rem"></p-skeleton>
+      </div>
+    </div>
+  </div>
+</ng-container>
+
+<ng-container *ngIf="!loading">
+  <!-- SECTION 3: ALERTES -->
+  <p-messages [value]="messages" [enableService]="false" [closable]="true">
+    <ng-template pTemplate let-message>
+      <div class="flex items-center justify-between w-full">
+        <div class="flex items-center gap-2">
+          <i class="pi pi-{{ getMessageIcon(message.severity) }}"></i>
+          <span class="font-medium">{{ message.detail }}</span>
+        </div>
+        <p-button label="Voir &rarr;" [text]="true" size="small" [severity]="message.severity === 'error' ? 'danger' : message.severity" (onClick)="viewAlert(message)"></p-button>
+      </div>
+    </ng-template>
+  </p-messages>
+
+  <!-- SECTION 2: 8 CARTES KPI -->
+  <div class="grid grid-cols-12 gap-4 mb-4">
+    <div class="col-span-12 md:col-span-6 lg:col-span-3" *ngFor="let kpi of kpis">
+      <p-card styleClass="kpi-card">
+        <div class="kpi-icon" [style]="{'background': kpi.couleur + '20'}">
+          <i class="pi {{ kpi.icone }}" [style]="{'color': kpi.couleur}"></i>
+        </div>
+        <div class="kpi-value">{{ kpi.valeur }}</div>
+        <div class="kpi-label">{{ kpi.label }}</div>
+        
+        <div class="kpi-trend" *ngIf="kpi.tendance !== undefined" [ngClass]="kpi.tendance >= 0 ? 'text-green-500' : 'text-red-500'">
+          <i class="pi" [ngClass]="kpi.tendance >= 0 ? 'pi-arrow-up' : 'pi-arrow-down'"></i>
+          {{ kpi.tendance > 0 ? '+' : '' }}{{ kpi.tendance }}%
+        </div>
+        <div class="kpi-trend text-500 font-normal" *ngIf="kpi.sousLabel">
+          {{ kpi.sousLabel }}
+        </div>
+      </p-card>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-12 gap-4">
+    <!-- SECTION 4: AGENDA DU JOUR -->
+    <div class="col-span-12 lg:col-span-8">
+      <div class="section-header">
+        <h2>Rendez-vous du Jour</h2>
+        <a href="#" class="text-primary hover:underline font-medium text-sm">Voir agenda complet &rarr;</a>
+      </div>
+      <p-card>
+        <p-table [value]="rdvDuJour" responsiveLayout="scroll">
+          <ng-template pTemplate="header">
+            <tr>
+              <th>Heure</th>
+              <th>Patient</th>
+              <th>Type</th>
+              <th>Statut</th>
+              <th>Actions</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-rdv>
+            <tr>
+              <td>
+                <div class="flex items-center">
+                  <div class="w-1.5 h-6 mr-3 rounded" [style.backgroundColor]="getTypeColor(rdv.type)"></div>
+                  <strong>{{ rdv.heure }}</strong>
+                </div>
+              </td>
+              <td>
+                <div class="flex items-center">
+                  <p-avatar [label]="rdv.patient.initiales" shape="circle" styleClass="mr-2 bg-blue-100 text-blue-700"></p-avatar>
+                  <div>
+                    <div class="font-medium flex items-center gap-2">
+                       {{ rdv.patient.prenom }} {{ rdv.patient.nom }}
+                    </div>
+                    <div class="text-sm text-500">{{ rdv.patient.telephone }}</div>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <p-chip [label]="(rdv.type | titlecase)" [style]="{'background': getTypeColor(rdv.type) + '20', 'color': getTypeColor(rdv.type), 'font-size': '0.875rem'}"></p-chip>
+              </td>
+              <td>
+                <p-tag [value]="formatStatut(rdv.statut)" [severity]="getStatutSeverity(rdv.statut)"></p-tag>
+              </td>
+              <td>
+                <div class="flex gap-2">
+                  <p-button icon="pi pi-play" [outlined]="true" severity="success" size="small" (onClick)="showActionToast('success', 'Démarrer consultation')"></p-button>
+                  <p-button icon="pi pi-folder-open" [outlined]="true" severity="info" size="small" (onClick)="showActionToast('info', 'Ouvrir dossier')"></p-button>
+                  <p-button icon="pi pi-phone" [outlined]="true" severity="secondary" size="small" (onClick)="showActionToast('secondary', 'Appeler patient')"></p-button>
+                  <p-button icon="pi pi-times" [outlined]="true" severity="danger" size="small" (onClick)="showActionToast('error', 'Annuler RDV')"></p-button>
+                </div>
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </p-card>
+    </div>
+
+    <!-- SECTION 7: ACTIVITÉ RÉCENTE -->
+    <div class="col-span-12 lg:col-span-4">
+      <div class="section-header">
+        <h2>Activité Récente</h2>
+      </div>
+      <p-card>
+        <p-timeline [value]="activites" layout="vertical" align="left">
+          <ng-template pTemplate="marker" let-event>
+            <span class="flex w-6 h-6 items-center justify-center text-white rounded-full z-1 shadow-sm" [style.backgroundColor]="event.color">
+              <i class="pi {{event.icon}} text-xs"></i>
+            </span>
+          </ng-template>
+          <ng-template pTemplate="content" let-event>
+            <div class="mb-3">
+              <div class="text-xs text-500 mb-1">{{ event.date }}</div>
+              <div class="text-sm font-medium mb-1">{{ event.label }}</div>
+              <div class="text-sm text-700">{{ event.detail }}</div>
+            </div>
+          </ng-template>
+        </p-timeline>
+      </p-card>
+    </div>
+
+    <!-- SECTION 6: GRAPHIQUES FINANCE -->
+    <div class="col-span-12 lg:col-span-8">
+      <div class="section-header mt-4">
+        <h2>Évolution du Chiffre d'Affaires</h2>
+      </div>
+      <p-card>
+        <p-chart type="bar" [data]="chartCA.data" [options]="chartCA.options" height="300px"></p-chart>
+      </p-card>
+    </div>
+    
+    <div class="col-span-12 lg:col-span-4">
+      <div class="section-header mt-4">
+        <h2>Répartition des Actes</h2>
+      </div>
+      <p-card>
+        <p-chart type="doughnut" [data]="chartActes.data" [options]="chartActes.options" height="230px"></p-chart>
+        <div class="mt-4 pt-4 border-t border-gray-200">
+          <div class="flex justify-between text-sm mb-2">
+            <span class="font-medium">CA Mensuel</span>
+            <span class="text-500">12 500 / 20 000 MAD</span>
+          </div>
+          <p-progressBar [value]="62" [showValue]="true" class="h-2" [style]="{'height': '8px'}"></p-progressBar>
+        </div>
+      </p-card>
+    </div>
+
+    <!-- SECTION 5: PATIENTS À SUIVRE -->
+    <div class="col-span-12 mt-4">
+      <div class="section-header">
+        <h2>Patients à Suivre (Priorité)</h2>
+      </div>
+      <p-card>
+        <p-table #dt [value]="patientsASuivre" responsiveLayout="scroll" [globalFilterFields]="['nom', 'prenom', 'motif']">
+          <ng-template pTemplate="caption">
+            <div class="flex justify-end">
+              <span class="p-input-icon-left">
+                <i class="pi pi-search"></i>
+                <input pInputText type="text" (input)="dt.filterGlobal($any($event.target).value, 'contains')" placeholder="Rechercher un patient..." />
+              </span>
+            </div>
+          </ng-template>
+          <ng-template pTemplate="header">
+            <tr>
+              <th>Patient</th>
+              <th>Dernière visite</th>
+              <th>Motif</th>
+              <th>Priorité</th>
+              <th>Action</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-patient>
+            <tr>
+              <td>
+                <div class="flex items-center">
+                  <p-avatar [label]="patient.initiales" shape="circle" styleClass="mr-3 bg-purple-100 text-purple-700"></p-avatar>
+                  <div class="font-medium">{{ patient.prenom }} {{ patient.nom }}</div>
+                </div>
+              </td>
+              <td>{{ patient.derniereVisite | date:'dd/MM/yyyy' }}</td>
+              <td>{{ patient.motif }}</td>
+              <td>
+                <p-tag [value]="patient.priorite | titlecase" [severity]="getPrioriteSeverity(patient.priorite)"></p-tag>
+              </td>
+              <td>
+                <p-button label="Créer RDV" icon="pi pi-calendar-plus" [outlined]="true" size="small" (onClick)="showActionToast('success', 'Rendez-vous créé pour ' + patient.nom)"></p-button>
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </p-card>
+    </div>
+  </div>
+</ng-container>
+
+<p-toast position="top-right"></p-toast>

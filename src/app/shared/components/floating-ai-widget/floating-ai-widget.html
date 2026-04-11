@@ -1,0 +1,42 @@
+<div class="widget-container">
+    <div class="chatbot-popup" *ngIf="isOpen">
+        <div class="popup-header">
+            <div class="header-info">
+                <div class="avatar"><i class="pi pi-sparkles"></i></div>
+                <div>
+                    <h4>MedAgent Support</h4>
+                    <span class="status">En ligne</span>
+                </div>
+            </div>
+            <button class="close-btn" (click)="close()"><i class="pi pi-times"></i></button>
+        </div>
+
+        <div class="popup-messages" #scrollContainer>
+            <div class="message" *ngFor="let msg of messages" [ngClass]="msg.role === 'MEDECIN' ? 'msg-user' : 'msg-agent'">
+                <div class="msg-bubble">
+                    <span class="text">{{ msg.text }}</span>
+                    <span class="cursor" *ngIf="msg.isStreaming"></span>
+                </div>
+            </div>
+            
+            <div class="suggestions" *ngIf="messages.length === 1">
+                <button (click)="sendQuickQuestion('Posologie recommandée pour Amoxicilline ?')">Posologie Amoxicilline ?</button>
+                <button (click)="sendQuickQuestion('Créer un nouveau patient')">Nouveau patient</button>
+                <button (click)="sendQuickQuestion('Quelles sont les intéractions avec Ibuprofène ?')">Intéractions Ibuprofène ?</button>
+            </div>
+        </div>
+
+        <div class="popup-input">
+            <textarea [(ngModel)]="inputText" 
+                      (keydown)="onKeyDown($event)"
+                      placeholder="Posez votre question..."></textarea>
+            <button class="send-btn" (click)="onSubmit()" [disabled]="!inputText.trim()">
+                <i class="pi pi-send"></i>
+            </button>
+        </div>
+    </div>
+
+    <button class="fab-btn" (click)="toggleOpen()">
+        <i class="pi" [ngClass]="isOpen ? 'pi-times' : 'pi-sparkles'"></i>
+    </button>
+</div>

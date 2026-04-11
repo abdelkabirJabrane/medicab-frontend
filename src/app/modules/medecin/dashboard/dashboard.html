@@ -1,0 +1,130 @@
+<!-- ── En-tête ─────────────────────────── -->
+<div class="dash-header">
+    <div class="dash-header__left">
+        <h1 class="dash-header__title">Bonjour, {{ nomMedecin }} 👋</h1>
+        <p class="dash-header__subtitle">
+            {{ getDateAujourdhui() }} —
+            Vous avez <strong>{{ rdvDuJour.length }}</strong> rendez-vous aujourd'hui
+        </p>
+    </div>
+    <button class="btn-primary" routerLink="/medecin/agenda">
+        <i class="pi pi-plus"></i> Nouveau RDV
+    </button>
+</div>
+
+<!-- ── KPIs ────────────────────────────── -->
+<div class="kpi-grid">
+    @for (kpi of kpis; track kpi.titre) {
+        <div class="kpi-card kpi-card--{{ kpi.colorKey }}">
+            <div class="kpi-card__body">
+                <div class="kpi-card__label">{{ kpi.titre }}</div>
+                <div class="kpi-card__value">{{ kpi.valeur }}</div>
+                <div class="kpi-card__trend"
+                     [class.kpi-card__trend--up]="kpi.positif"
+                     [class.kpi-card__trend--down]="!kpi.positif">
+                    <i [class]="kpi.positif ? 'pi pi-arrow-up' : 'pi pi-arrow-down'"></i>
+                    {{ kpi.tendance }}
+                </div>
+            </div>
+            <div class="kpi-card__icon">
+                <i [class]="kpi.icon"></i>
+            </div>
+        </div>
+    }
+</div>
+
+<!-- ── RDV + Activité ──────────────────── -->
+<div class="content-grid">
+
+    <!-- RDV du jour -->
+    <div class="panel">
+        <div class="panel__header">
+            <div>
+                <h3 class="panel__title">Rendez-vous du Jour</h3>
+                <p class="panel__subtitle">{{ rdvDuJour.length }} RDV programmés</p>
+            </div>
+            <a routerLink="/medecin/agenda" class="panel__link">
+                Voir agenda <i class="pi pi-arrow-right"></i>
+            </a>
+        </div>
+        <div class="rdv-list">
+            @for (rdv of rdvDuJour; track rdv.id) {
+                <div class="rdv-item">
+                    <span class="rdv-item__time">{{ rdv.heure }}</span>
+                    <span class="rdv-item__bar rdv-item__bar--{{ rdv.statut | lowercase }}"></span>
+                    <div class="rdv-item__avatar">{{ rdv.initiales }}</div>
+                    <div class="rdv-item__info">
+                        <div class="rdv-item__name">{{ rdv.patient }}</div>
+                        <div class="rdv-item__meta">{{ rdv.type }} — {{ rdv.motif }}</div>
+                    </div>
+                    <span class="badge badge--{{ rdv.statut | lowercase }}">
+            {{ getStatutLabel(rdv.statut) }}
+          </span>
+                    <button class="btn-icon" routerLink="/medecin/consultations" title="Voir">
+                        <i class="pi pi-eye"></i>
+                    </button>
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- Activité récente -->
+    <div class="panel">
+        <div class="panel__header">
+            <h3 class="panel__title">Activité Récente</h3>
+        </div>
+        <div class="activity-list">
+            @for (item of activiteRecente; track item.texte; let last = $last) {
+                <div class="activity-item" [class.activity-item--last]="last">
+                    <div class="activity-item__icon" [style.background]="item.bg">
+                        <i [class]="item.icon" [style.color]="item.color"></i>
+                    </div>
+                    <div class="activity-item__content">
+                        <div class="activity-item__text">{{ item.texte }}</div>
+                        <div class="activity-item__time">{{ item.temps }}</div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+
+</div>
+
+<!-- ── Graphiques ───────────────────────── -->
+<div class="charts-grid">
+    <div class="panel panel--chart panel--ca">
+        <div class="panel__header">
+            <div>
+                <h3 class="panel__title">Chiffre d'Affaires</h3>
+                <p class="panel__subtitle">Évolution des 30 derniers jours</p>
+            </div>
+        </div>
+        <div class="chart-wrap">
+            <p-chart type="line" [data]="caChartData" [options]="caChartOptions" height="220px"></p-chart>
+        </div>
+    </div>
+
+    <div class="panel panel--chart panel--types">
+        <div class="panel__header">
+            <div>
+                <h3 class="panel__title">Consultations</h3>
+                <p class="panel__subtitle">Répartition par type</p>
+            </div>
+        </div>
+        <div class="chart-wrap">
+            <p-chart type="bar" [data]="typeChartData" [options]="typeChartOptions" height="220px"></p-chart>
+        </div>
+    </div>
+
+    <div class="panel panel--chart panel--taux">
+        <div class="panel__header">
+            <div>
+                <h3 class="panel__title">Agenda</h3>
+                <p class="panel__subtitle">Taux d'occupation actuel</p>
+            </div>
+        </div>
+        <div class="chart-wrap flex-center">
+            <p-chart type="doughnut" [data]="tauxChartData" [options]="tauxChartOptions" height="200px" width="200px"></p-chart>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,321 @@
+<p-toast></p-toast>
+<p-confirmDialog></p-confirmDialog>
+
+<!-- ── En-tête ─────────────────────────── -->
+<div class="page-header">
+    <div>
+        <h2 class="page-header__title">Patients</h2>
+        <p class="page-header__subtitle">{{ patientsFiltres.length }} patients enregistrés</p>
+    </div>
+    <div class="header-actions">
+        <input type="file" #fileInput style="display: none" (change)="importExcel($event)" accept=".xlsx, .xls">
+        
+        <button class="btn-outline" (click)="triggerImport(fileInput)" pTooltip="Importer" tooltipPosition="bottom">
+            <i class="pi pi-upload"></i> Importer
+        </button>
+        
+        <button class="btn-outline" (click)="exportExcel()" pTooltip="Excel" tooltipPosition="bottom">
+            <i class="pi pi-file-excel"></i> Excel
+        </button>
+        
+        <button class="btn-outline" (click)="exportPDF()" pTooltip="PDF" tooltipPosition="bottom">
+            <i class="pi pi-file-pdf"></i> PDF
+        </button>
+
+        <button class="btn-primary" (click)="ouvrirNouveauPatient()">
+            <i class="pi pi-user-plus"></i> Nouveau Patient
+        </button>
+    </div>
+</div>
+
+<!-- ── Recherche + Filtres ─────────────── -->
+<div class="filters-bar">
+    <div class="filters-bar__search">
+        <i class="pi pi-search filters-bar__icon"></i>
+        <input class="filters-bar__input"
+               [(ngModel)]="searchQuery"
+               (ngModelChange)="rechercher()"
+               placeholder="Rechercher par nom, CIN, téléphone..."/>
+    </div>
+    <div class="filters-bar__right">
+        <div class="filters-bar__tabs">
+            @for (tab of tabs; track tab.value) {
+                <button class="filter-tab"
+                        [class.filter-tab--active]="filtreActif === tab.value"
+                        (click)="setFiltre(tab.value)">
+                    {{ tab.label }}
+                    <span class="filter-tab__count">{{ tab.count }}</span>
+                </button>
+            }
+        </div>
+        <button class="btn-icon" (click)="loadPatients()" title="Rafraîchir">
+            <i class="pi pi-refresh"></i>
+        </button>
+    </div>
+</div>
+
+<!-- ── Tableau ─────────────────────────── -->
+<div class="panel">
+    <p-table
+        [value]="patientsFiltres"
+        [paginator]="true"
+        [rows]="10"
+        [showCurrentPageReport]="true"
+        currentPageReportTemplate="{first}-{last} sur {totalRecords}"
+        responsiveLayout="scroll"
+        styleClass="mc-table">
+
+        <ng-template pTemplate="header">
+            <tr>
+                <th>Patient</th>
+                <th>CIN</th>
+                <th>Contact</th>
+                <th>Âge</th>
+                <th>Groupe Sanguin</th>
+                <th>Assurance</th>
+                <th>Médecin référent</th>
+                <th>Dernier RDV</th>
+                <th>Statut</th>
+                <th>Actions</th>
+            </tr>
+        </ng-template>
+
+        <ng-template pTemplate="body" let-p>
+            <tr class="table-row">
+
+                <!-- Patient -->
+                <td>
+                    <div class="patient-cell">
+                        <div class="patient-cell__av">{{ p.initiales }}</div>
+                        <div>
+                            <div class="patient-cell__name">{{ p.prenom }} {{ p.nom }}</div>
+                            <div class="patient-cell__city">{{ p.ville }}</div>
+                        </div>
+                    </div>
+                </td>
+
+                <td><span class="td-mono">{{ p.cin }}</span></td>
+
+                <td>
+                    <div class="td-main">{{ p.telephone }}</div>
+                    <div class="td-sub">{{ p.email }}</div>
+                </td>
+
+                <td><span class="td-main">{{ p.age }} ans</span></td>
+
+                <td><span class="blood-badge">{{ p.groupeSanguin }}</span></td>
+
+                <td><span class="td-main">{{ p.typeAssurance }}</span></td>
+
+                <td>
+                    <div class="medecin-ref">
+                        <div class="medecin-ref__av">{{ p.medecinInitiales }}</div>
+                        <span class="medecin-ref__nom">{{ p.medecinRef }}</span>
+                    </div>
+                </td>
+
+                <td><span class="td-muted">{{ p.dernierRdv || '—' }}</span></td>
+
+                <td>
+          <span class="badge" [class.badge--actif]="p.actif" [class.badge--inactif]="!p.actif">
+            {{ p.actif ? 'Actif' : 'Inactif' }}
+          </span>
+                </td>
+
+                <td>
+                    <div class="row-actions">
+                        <button class="btn-action btn-action--neutral"
+                                title="Voir dossier" (click)="voirDetail(p)">
+                            <i class="pi pi-eye"></i>
+                        </button>
+                        <button class="btn-action btn-action--neutral"
+                                title="Modifier" (click)="editerPatient(p)">
+                            <i class="pi pi-pencil"></i>
+                        </button>
+                        <button class="btn-action btn-action--neutral"
+                                title="Nouveau RDV" (click)="nouveauRdv(p)">
+                            <i class="pi pi-calendar-plus"></i>
+                        </button>
+                        <button class="btn-action btn-action--danger"
+                                title="Désactiver" (click)="desactiverPatient(p)">
+                            <i class="pi pi-trash"></i>
+                        </button>
+                    </div>
+                </td>
+
+            </tr>
+        </ng-template>
+
+        <ng-template pTemplate="empty">
+            <tr>
+                <td colspan="10">
+                    <div class="table-empty">
+                        <i class="pi pi-users table-empty__icon"></i>
+                        <p>Aucun patient trouvé</p>
+                    </div>
+                </td>
+            </tr>
+        </ng-template>
+
+    </p-table>
+</div>
+
+<!-- ── Dialog Nouveau Patient ─────────── -->
+<p-dialog
+    [header]="isEditMode ? 'Modifier la Fiche Patient' : 'Enregistrer un Nouveau Patient'"
+    [(visible)]="dialogVisible"
+    [modal]="true"
+    [style]="{width:'600px'}"
+    [draggable]="false"
+    styleClass="mc-dialog">
+
+    <div class="dialog-form">
+
+        <div class="form-row">
+            <div class="form-field">
+                <label class="form-label">Nom <span class="form-required">*</span></label>
+                <input class="form-input" pInputText [(ngModel)]="nouveauPatient.nom" placeholder="BENALI"/>
+            </div>
+            <div class="form-field">
+                <label class="form-label">Prénom <span class="form-required">*</span></label>
+                <input class="form-input" pInputText [(ngModel)]="nouveauPatient.prenom" placeholder="Ahmed"/>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-field">
+                <label class="form-label">CIN <span class="form-required">*</span></label>
+                <input class="form-input" pInputText [(ngModel)]="nouveauPatient.cin" placeholder="AB123456"/>
+            </div>
+            <div class="form-field">
+                <label class="form-label">Date de naissance</label>
+                <input class="form-input" pInputText type="date" [(ngModel)]="nouveauPatient.dateNaissance"/>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-field">
+                <label class="form-label">Téléphone</label>
+                <input class="form-input" pInputText [(ngModel)]="nouveauPatient.telephone" placeholder="0612345678"/>
+            </div>
+            <div class="form-field">
+                <label class="form-label">Email</label>
+                <input class="form-input" pInputText type="email" [(ngModel)]="nouveauPatient.email" placeholder="email@gmail.com"/>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-field">
+                <label class="form-label">Sexe</label>
+                <p-select [(ngModel)]="nouveauPatient.sexe" [options]="sexeOptions"
+                          optionLabel="label" optionValue="value"
+                          placeholder="Choisir" styleClass="w-full"></p-select>
+            </div>
+            <div class="form-field">
+                <label class="form-label">Groupe Sanguin</label>
+                <p-select [(ngModel)]="nouveauPatient.groupeSanguin" [options]="groupeSanguinOptions"
+                          optionLabel="label" optionValue="value"
+                          placeholder="Choisir" styleClass="w-full"></p-select>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-field">
+                <label class="form-label">Assurance</label>
+                <p-select [(ngModel)]="nouveauPatient.typeAssurance" [options]="assuranceOptions"
+                          optionLabel="label" optionValue="value"
+                          placeholder="Choisir" styleClass="w-full"></p-select>
+            </div>
+            <div class="form-field">
+                <label class="form-label">Médecin référent</label>
+                <p-select [(ngModel)]="nouveauPatient.medecinRef" [options]="medecinOptions"
+                          optionLabel="label" optionValue="label"
+                          placeholder="Choisir" styleClass="w-full"></p-select>
+            </div>
+        </div>
+
+        <div class="form-field">
+            <label class="form-label">Ville</label>
+            <input class="form-input" pInputText [(ngModel)]="nouveauPatient.ville" placeholder="Casablanca"/>
+        </div>
+
+    </div>
+
+    <ng-template pTemplate="footer">
+        <div class="dialog-footer">
+            <button class="btn-outline" (click)="dialogVisible = false">Annuler</button>
+            <button class="btn-primary" (click)="sauvegarderPatient()">
+                <i class="pi pi-check"></i> Enregistrer
+            </button>
+        </div>
+    </ng-template>
+
+</p-dialog>
+
+<!-- ── Dialog Détail Patient ──────────── -->
+<p-dialog
+    header="Fiche Patient"
+    [(visible)]="detailVisible"
+    [modal]="true"
+    [style]="{width:'480px'}"
+    [draggable]="false"
+    styleClass="mc-dialog">
+
+    @if (patientSelectionne) {
+
+        <div class="detail-profile">
+            <div class="detail-profile__av">{{ patientSelectionne.initiales }}</div>
+            <div>
+                <h3 class="detail-profile__name">{{ patientSelectionne.prenom }} {{ patientSelectionne.nom }}</h3>
+                <p class="detail-profile__meta">CIN: {{ patientSelectionne.cin }} — {{ patientSelectionne.age }} ans</p>
+                <span class="badge" [class.badge--actif]="patientSelectionne.actif" [class.badge--inactif]="!patientSelectionne.actif">
+          {{ patientSelectionne.actif ? 'Actif' : 'Inactif' }}
+        </span>
+            </div>
+        </div>
+
+        <div class="detail-divider"></div>
+
+        <div class="detail-grid">
+            <div class="detail-field">
+                <div class="detail-field__label">Téléphone</div>
+                <div class="detail-field__value">{{ patientSelectionne.telephone }}</div>
+            </div>
+            <div class="detail-field">
+                <div class="detail-field__label">Email</div>
+                <div class="detail-field__value detail-field__value--sm">{{ patientSelectionne.email }}</div>
+            </div>
+            <div class="detail-field">
+                <div class="detail-field__label">Groupe Sanguin</div>
+                <span class="blood-badge blood-badge--lg">{{ patientSelectionne.groupeSanguin }}</span>
+            </div>
+            <div class="detail-field">
+                <div class="detail-field__label">Assurance</div>
+                <div class="detail-field__value">{{ patientSelectionne.typeAssurance }}</div>
+            </div>
+            <div class="detail-field">
+                <div class="detail-field__label">Médecin référent</div>
+                <div class="detail-field__value">{{ patientSelectionne.medecinRef }}</div>
+            </div>
+            <div class="detail-field">
+                <div class="detail-field__label">Ville</div>
+                <div class="detail-field__value">{{ patientSelectionne.ville }}</div>
+            </div>
+            <div class="detail-field detail-field--full">
+                <div class="detail-field__label">Dernier RDV</div>
+                <div class="detail-field__value">{{ patientSelectionne.dernierRdv || 'Aucun RDV' }}</div>
+            </div>
+        </div>
+
+    }
+
+    <ng-template pTemplate="footer">
+        <div class="dialog-footer">
+            <button class="btn-outline" (click)="detailVisible = false">Fermer</button>
+            <button class="btn-primary" (click)="nouveauRdv(patientSelectionne); detailVisible = false">
+                <i class="pi pi-calendar-plus"></i> Nouveau RDV
+            </button>
+        </div>
+    </ng-template>
+
+</p-dialog>

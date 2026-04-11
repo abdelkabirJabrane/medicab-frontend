@@ -1,0 +1,152 @@
+<p-toast></p-toast>
+
+<div class="app-shell">
+
+    <!-- ══ TOPBAR ══════════════════════════════ -->
+    <header class="topbar">
+
+        <!-- Gauche -->
+        <div class="topbar__left">
+            <button class="topbar__menu-btn" (click)="toggleSidebar()" title="Menu">
+                <i class="pi pi-bars"></i>
+            </button>
+
+            <div class="topbar__logo">
+                <div class="topbar__logo-icon">
+                    <i class="pi pi-plus"></i>
+                </div>
+                <div>
+                    <div class="topbar__logo-name">MediCab Pro</div>
+                    <div class="topbar__logo-sub">{{ lang.translate('header.espace_medecin') }}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Centre (Recherche Globale) -->
+        <div class="topbar__center">
+            <div class="global-search">
+                <i class="pi pi-search global-search__icon"></i>
+                <input type="text" class="global-search__input"
+                       [(ngModel)]="searchQuery"
+                       (ngModelChange)="onGlobalSearch($event)"
+                       [placeholder]="lang.translate('layout.recherche') || 'Rechercher patient, dossier...'"/>
+                <div class="global-search__shortcut">/</div>
+            </div>
+            
+            @if (globalSearchResults.length > 0) {
+            <div class="global-search__results">
+                @for (res of globalSearchResults; track res.id) {
+                    <div class="search-result-item" (click)="openResult(res)">
+                        <div class="search-result-item__icon"><i [class]="res.icon"></i></div>
+                        <div class="search-result-item__content">
+                            <div class="search-result-item__title">{{ res.title }}</div>
+                            <div class="search-result-item__desc">{{ res.desc }}</div>
+                        </div>
+                        <div class="search-result-item__type">{{ res.type }}</div>
+                    </div>
+                }
+            </div>
+            }
+        </div>
+
+        <!-- Droite -->
+        <div class="topbar__right">
+
+            <!-- Language toggle -->
+            <button class="topbar__btn topbar__btn--text"
+                    (click)="lang.toggleLang()"
+                    title="Changer de langue">
+                <i class="pi pi-globe"></i>
+                <span class="topbar__btn-label">{{ lang.translate('layout.langue') }}</span>
+            </button>
+
+            <!-- Theme toggle -->
+            <button class="topbar__btn topbar__btn--text"
+                    (click)="themeService.toggle()"
+                    [title]="themeService.isDark() ? lang.translate('layout.clair') : lang.translate('layout.sombre')">
+                <i [class]="themeService.isDark() ? 'pi pi-sun' : 'pi pi-moon'"></i>
+                <span class="topbar__btn-label">{{ themeService.isDark() ? lang.translate('layout.clair') : lang.translate('layout.sombre') }}</span>
+            </button>
+
+            <!-- Facturation Quick Access -->
+            <button class="topbar__btn" 
+                    routerLink="/medecin/factures" 
+                    [title]="lang.translate('menu.mes_factures') || 'Factures'">
+                <i class="pi pi-wallet"></i>
+            </button>
+
+            <!-- Notifications -->
+            <button class="topbar__btn topbar__notif" title="Notifications">
+                <i class="pi pi-bell"></i>
+                <span class="topbar__notif-dot">3</span>
+            </button>
+
+            <div class="topbar__sep"></div>
+
+            <!-- Médecin -->
+            <div class="topbar__doctor" (click)="goToProfile()" style="cursor: pointer;" title="Profil">
+                <div class="topbar__doctor-av">{{ userInitials }}</div>
+                <div class="topbar__doctor-info">
+                    <div class="topbar__doctor-name">{{ userNameFull }}</div>
+                    <div class="topbar__doctor-role">{{ lang.translate('header.medecin_gen') }}</div>
+                </div>
+            </div>
+
+        </div>
+    </header>
+
+    <!-- ══ BODY ════════════════════════════════ -->
+    <div class="app-body">
+
+        <!-- ── SIDEBAR ──────────────────────────── -->
+        <aside class="sidebar" [class.sidebar--closed]="!sidebarOpen">
+
+            <nav class="sidebar__nav">
+                @for (section of menuItems(); track section.label) {
+
+                    <div class="sidebar__section-label">{{ section.label }}</div>
+
+                    @for (item of section.items; track item.route) {
+                        <a class="sidebar__item"
+                           [class.sidebar__item--active]="isActive(item.route)"
+                           [routerLink]="item.route">
+                            <i [class]="item.icon"></i>
+                            <span>{{ item.label }}</span>
+                        </a>
+                    }
+
+                }
+            </nav>
+
+            <!-- Footer sidebar -->
+            <div class="sidebar__footer">
+
+                <div class="sidebar__doctor-card" (click)="goToProfile()" style="cursor: pointer;" title="Gérer mon compte">
+                    <div class="sidebar__doctor-av">{{ userInitials }}</div>
+                    <div class="sidebar__doctor-info">
+                        <div class="sidebar__doctor-name">{{ userNameShort }}</div>
+                        <div class="sidebar__doctor-status">
+                            <span class="sidebar__status-dot"></span> {{ lang.translate('sidebar.en_ligne') }}
+                        </div>
+                    </div>
+                </div>
+
+                <button class="sidebar__logout-btn" (click)="logout()">
+                    <i class="pi pi-sign-out"></i>
+                    {{ lang.translate('sidebar.deconnexion') }}
+                </button>
+
+            </div>
+        </aside>
+
+        <!-- ── CONTENU PRINCIPAL ──────────────── -->
+        <main class="main-content">
+            <router-outlet></router-outlet>
+        </main>
+
+    </div>
+
+</div>
+
+<!-- Chatbot Global Flottant -->
+<app-floating-ai-widget></app-floating-ai-widget>

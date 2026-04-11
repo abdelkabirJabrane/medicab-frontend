@@ -1,0 +1,15 @@
+<div class="dictation-container">
+    <button class="mic-btn" 
+            [class.recording]="isRecording" 
+            (click)="toggleRecording()"
+            [title]="isRecording ? 'Arrêter la dictée' : 'Démarrer la dictée vocale'">
+        <i class="pi" [ngClass]="isRecording ? 'pi-stop' : 'pi-microphone'"></i>
+        <span *ngIf="isRecording" style="font-weight: 700; font-size: 0.95rem;">Arrêter</span>
+    </button>
+    
+    <div class="visualizer-wrapper" [class.active]="isRecording">
+        <canvas #visualizer width="150" height="40"></canvas>
+    </div>
+    
+    <span class="status-text" *ngIf="isRecording">Écoute en cours...</span>
+</div>

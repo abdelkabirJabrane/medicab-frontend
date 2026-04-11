@@ -1,0 +1,194 @@
+<!-- ── En-tête ─────────────────────────── -->
+<div class="dash-header">
+    <div class="dash-header__left">
+        <h1 class="dash-header__title">Bonjour, Samira 👋</h1>
+        <p class="dash-header__subtitle">
+            {{ getDateAujourdhui() }} —
+            <strong>{{ rdvDuJour.length }}</strong> rendez-vous programmés aujourd'hui
+        </p>
+    </div>
+    <div class="dash-header__actions">
+        <button class="btn-outline" routerLink="/secretaire/salle-attente">
+            <i class="pi pi-users"></i> Salle d'attente
+        </button>
+        <button class="btn-primary" (click)="ouvrirNouveauRdv()">
+            <i class="pi pi-plus"></i> Nouveau RDV
+        </button>
+    </div>
+</div>
+
+<!-- ── KPIs ────────────────────────────── -->
+<div class="kpi-grid">
+    @for (kpi of kpis; track kpi.titre) {
+        <div class="kpi-card kpi-card--{{ kpi.colorKey }}">
+            <div class="kpi-card__body">
+                <div class="kpi-card__label">{{ kpi.titre }}</div>
+                <div class="kpi-card__value">{{ kpi.valeur }}</div>
+                <div class="kpi-card__trend"
+                     [class.kpi-card__trend--up]="kpi.positif"
+                     [class.kpi-card__trend--down]="!kpi.positif">
+                    <i [class]="kpi.positif ? 'pi pi-arrow-up' : 'pi pi-arrow-down'"></i>
+                    {{ kpi.tendance }}
+                </div>
+            </div>
+            <div class="kpi-card__icon"><i [class]="kpi.icon"></i></div>
+        </div>
+    }
+</div>
+
+<!-- ── RDV du jour + Salle attente ────── -->
+<div class="content-grid">
+
+    <!-- RDV du jour -->
+    <div class="panel">
+        <div class="panel__header">
+            <div>
+                <h3 class="panel__title">Rendez-vous du Jour</h3>
+                <p class="panel__subtitle">{{ rdvDuJour.length }} RDV programmés</p>
+            </div>
+            <a routerLink="/secretaire/rendez-vous" class="panel__link">
+                Voir tout <i class="pi pi-arrow-right"></i>
+            </a>
+        </div>
+
+        <div class="rdv-list">
+            @for (rdv of rdvDuJour; track rdv.id) {
+                <div class="rdv-item">
+                    <span class="rdv-item__time">{{ rdv.heure }}</span>
+                    <span class="rdv-item__bar rdv-item__bar--{{ rdv.statut | lowercase }}"></span>
+                    <div class="rdv-item__avatar">{{ rdv.initiales }}</div>
+                    <div class="rdv-item__info">
+                        <div class="rdv-item__name">{{ rdv.patient }}</div>
+                        <div class="rdv-item__meta">{{ rdv.type }} — Dr. {{ rdv.medecin }}</div>
+                    </div>
+                    <span class="badge badge--{{ rdv.statut | lowercase }}">
+            {{ getStatutLabel(rdv.statut) }}
+          </span>
+                    <div class="rdv-item__actions">
+                        @if (rdv.statut === 'EN_ATTENTE') {
+                            <button class="btn-action btn-action--success"
+                                    title="Confirmer" (click)="confirmerRdv(rdv)">
+                                <i class="pi pi-check"></i>
+                            </button>
+                        }
+                        @if (rdv.statut === 'CONFIRME') {
+                            <button class="btn-action btn-action--info"
+                                    title="Arrivée patient" (click)="marquerArrivee(rdv)">
+                                <i class="pi pi-sign-in"></i>
+                            </button>
+                        }
+                        <button class="btn-action btn-action--danger"
+                                title="Annuler" (click)="annulerRdv(rdv)">
+                            <i class="pi pi-times"></i>
+                        </button>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- Colonne droite -->
+    <div class="right-col">
+
+        <!-- Salle d'attente -->
+        <div class="panel panel--attente">
+            <div class="panel__header">
+                <div>
+                    <h3 class="panel__title">Salle d'Attente</h3>
+                    <p class="panel__subtitle">{{ salleAttente.length }} patient(s) présent(s)</p>
+                </div>
+                <a routerLink="/secretaire/salle-attente" class="panel__link">
+                    Gérer <i class="pi pi-arrow-right"></i>
+                </a>
+            </div>
+
+            <div class="attente-list">
+                @if (salleAttente.length === 0) {
+                    <div class="attente-empty">
+                        <i class="pi pi-users"></i> Salle vide
+                    </div>
+                }
+                @for (p of salleAttente; track p.id; let i = $index) {
+                    <div class="attente-item">
+                        <div class="attente-item__num">{{ i + 1 }}</div>
+                        <div class="attente-item__avatar">{{ p.initiales }}</div>
+                        <div class="attente-item__info">
+                            <div class="attente-item__name">{{ p.patient }}</div>
+                            <div class="attente-item__wait">
+                                <i class="pi pi-clock"></i> {{ p.attente }}
+                            </div>
+                        </div>
+                        <span class="urgence-badge" *ngIf="p.urgence">URGENT</span>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- Activité récente -->
+        <div class="panel">
+            <div class="panel__header">
+                <h3 class="panel__title">Activité Récente</h3>
+            </div>
+            <div class="activity-list">
+                @for (item of activiteRecente; track item.texte; let last = $last) {
+                    <div class="activity-item" [class.activity-item--last]="last">
+                        <div class="activity-item__icon" [style.background]="item.bg">
+                            <i [class]="item.icon" [style.color]="item.color"></i>
+                        </div>
+                        <div class="activity-item__content">
+                            <div class="activity-item__text">{{ item.texte }}</div>
+                            <div class="activity-item__time">{{ item.temps }}</div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+<!-- ── Stats du jour ────────────────────── -->
+<div class="stats-row">
+
+    <div class="stat-panel">
+        <div class="stat-panel__header">
+            <h3 class="panel__title">Répartition des RDV</h3>
+        </div>
+        <div class="stat-panel__body">
+            @for (s of repartitionRdv; track s.label) {
+                <div class="stat-bar-item">
+                    <div class="stat-bar-item__label">{{ s.label }}</div>
+                    <div class="stat-bar-item__bar-wrap">
+                        <div class="stat-bar-item__bar stat-bar-item__bar--{{ s.color }}"
+                             [style.width]="s.pct + '%'"></div>
+                    </div>
+                    <div class="stat-bar-item__count">{{ s.count }}</div>
+                </div>
+            }
+        </div>
+    </div>
+
+    <div class="stat-panel">
+        <div class="stat-panel__header">
+            <h3 class="panel__title">Médecins Disponibles</h3>
+        </div>
+        <div class="medecins-list">
+            @for (m of medecins; track m.nom) {
+                <div class="medecin-item">
+                    <div class="medecin-item__av">{{ m.initiales }}</div>
+                    <div class="medecin-item__info">
+                        <div class="medecin-item__nom">Dr. {{ m.nom }}</div>
+                        <div class="medecin-item__spec">{{ m.specialite }}</div>
+                    </div>
+                    <div class="medecin-item__status">
+                        <span class="status-dot status-dot--{{ m.statut }}"></span>
+                        {{ m.statutLabel }}
+                    </div>
+                    <div class="medecin-item__rdv">{{ m.rdvRestants }} RDV</div>
+                </div>
+            }
+        </div>
+    </div>
+
+</div>

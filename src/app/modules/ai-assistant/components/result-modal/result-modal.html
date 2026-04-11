@@ -1,0 +1,15 @@
+<p-dialog [header]="title" [(visible)]="visible" [modal]="true" [style]="{width: '60vw', minHeight: '500px'}" 
+          (onHide)="closeModal()" [draggable]="false" [resizable]="false" styleClass="dark-modal">
+    <div class="result-content print-area">
+        <pre>{{ content }}</pre>
+    </div>
+    
+    <ng-template pTemplate="footer">
+        <button class="btn-secondary" (click)="closeModal()">
+            <i class="pi pi-times"></i> Fermer
+        </button>
+        <button class="btn-primary" (click)="printDocument()">
+            <i class="pi pi-print"></i> Imprimer / PDF
+        </button>
+    </ng-template>
+</p-dialog>

@@ -1,0 +1,398 @@
+<p-toast></p-toast>
+
+<!-- ── En-tête ─────────────────────────── -->
+<div class="page-header">
+    <div>
+        <h2 class="page-header__title">Dossiers Médicaux</h2>
+        <p class="page-header__subtitle">{{ dossiersFiltres.length }} dossiers</p>
+    </div>
+</div>
+
+<!-- ── Grille principale ────────────────── -->
+<div class="dossiers-grid" [class.dossiers-grid--split]="dossierActif">
+
+    <!-- ── Colonne gauche : liste ──────────── -->
+    <div class="dossiers-left">
+
+        <!-- Recherche -->
+        <div class="search-box">
+            <i class="pi pi-search search-box__icon"></i>
+            <input class="search-box__input"
+                   [(ngModel)]="searchQuery"
+                   (ngModelChange)="rechercher()"
+                   placeholder="Rechercher patient..."/>
+        </div>
+
+        <!-- Cards -->
+        <div class="dossier-cards">
+            @for (d of dossiersFiltres; track d.id) {
+                <div class="dossier-card"
+                     [class.dossier-card--active]="dossierActif?.id === d.id"
+                     (click)="ouvrirDossier(d)">
+
+                    <div class="dossier-card__row">
+                        <div class="dossier-card__avatar">{{ d.initiales }}</div>
+                        <div class="dossier-card__info">
+                            <div class="dossier-card__name">{{ d.patient }}</div>
+                            <div class="dossier-card__meta">{{ d.age }} ans — {{ d.cin }}</div>
+                        </div>
+                        <div class="dossier-card__right">
+                            <span class="blood-badge">{{ d.groupeSanguin }}</span>
+                            <div class="dossier-card__date">{{ d.dernierRdv }}</div>
+                        </div>
+                    </div>
+
+                    @if (d.allergies.length > 0) {
+                        <div class="dossier-card__alert">
+                            <i class="pi pi-exclamation-triangle"></i>
+                            Allergies: {{ d.allergies.join(', ') }}
+                        </div>
+                    }
+
+                </div>
+            }
+        </div>
+
+    </div>
+
+    <!-- ── Colonne droite : détail ─────────── -->
+    @if (dossierActif) {
+        <div class="dossier-detail">
+            @if (!dossierActif.hasDossier) {
+                <div class="doc-empty" style="margin: 2rem; border: 1px dashed var(--mc-border); border-radius: var(--mc-radius-lg)">
+                    <i class="pi pi-folder"></i>
+                    <h3 style="margin-top: 1rem; margin-bottom: .5rem">Dossier médical non créé</h3>
+                    <p style="text-align: center; color: var(--mc-text-3);">
+                        Ce patient n'a pas encore de dossier médical enregistré.<br>
+                        Créez le dossier pour ajouter ses antécédents et constantes.
+                    </p>
+                    <button class="btn-primary mt-3" (click)="ouvrirEdit()">
+                        <i class="pi pi-plus"></i> Créer le dossier
+                    </button>
+                    <button class="btn-icon mt-2" (click)="fermerDossier()" title="Fermer">
+                        Retour
+                    </button>
+                </div>
+            } @else {
+
+            <!-- Header -->
+            <div class="dossier-detail__header">
+                <div class="dossier-detail__profile">
+                    <div class="dossier-detail__avatar">{{ dossierActif.initiales }}</div>
+                    <div>
+                        <h3 class="dossier-detail__name">{{ dossierActif.patient }}</h3>
+                        <p class="dossier-detail__meta">
+                            {{ dossierActif.age }} ans — CIN: {{ dossierActif.cin }} — {{ dossierActif.ville }}
+                        </p>
+                    </div>
+                </div>
+                <div style="display: flex; gap: .5rem">
+                    <button class="btn-outline btn-outline--sm text-blue" (click)="imprimerDossier()" title="Imprimer Dossier (PDF)">
+                        <i class="pi pi-print"></i>
+                    </button>
+                    <button class="btn-outline btn-outline--sm" (click)="ouvrirEdit()" title="Modifier Dossier">
+                        <i class="pi pi-pencil"></i>
+                    </button>
+                    <button class="btn-icon" (click)="fermerDossier()" title="Fermer">
+                        <i class="pi pi-times"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Constantes vitales -->
+            <div class="vitals-grid">
+
+                <div class="vital-card vital-card--blood">
+                    <div class="vital-card__label">Groupe Sanguin</div>
+                    <div class="vital-card__value vital-card__value--blood">{{ dossierActif.groupeSanguin }}</div>
+                </div>
+
+                <div class="vital-card">
+                    <div class="vital-card__label">Poids</div>
+                    <div class="vital-card__value">
+                        {{ dossierActif.poids || 'N/A' }}
+                        @if (dossierActif.poids) { <span class="vital-card__unit">kg</span> }
+                    </div>
+                </div>
+
+                <div class="vital-card">
+                    <div class="vital-card__label">Taille</div>
+                    <div class="vital-card__value">
+                        {{ dossierActif.taille || 'N/A' }}
+                        @if (dossierActif.taille) { <span class="vital-card__unit">cm</span> }
+                    </div>
+                </div>
+
+                <div class="vital-card">
+                    <div class="vital-card__label">IMC</div>
+                    <div class="vital-card__value">
+                        {{ dossierActif.imc || 'N/A' }}
+                    </div>
+                    @if (dossierActif.imc) {
+                        <span class="imc-badge imc-badge--{{ getImcClass(dossierActif.imc) }}">
+                            {{ getImcLabel(dossierActif.imc) }}
+                        </span>
+                    }
+                </div>
+
+            </div>
+
+            <!-- Sections médicales -->
+            <div class="medical-grid">
+
+                <!-- Antécédents médicaux -->
+                <div class="medical-section">
+                    <div class="medical-section__title">
+                        <i class="pi pi-heart medical-section__icon medical-section__icon--red"></i>
+                        Antécédents Médicaux
+                    </div>
+                    @if (dossierActif.antecedentsMedicaux.length === 0) {
+                        <div class="medical-section__empty">Aucun</div>
+                    }
+                    @for (a of dossierActif.antecedentsMedicaux; track a) {
+                        <div class="medical-item medical-item--red">
+                            <span class="medical-item__dot"></span> {{ a }}
+                        </div>
+                    }
+                </div>
+
+                <!-- Antécédents chirurgicaux -->
+                <div class="medical-section">
+                    <div class="medical-section__title">
+                        <i class="pi pi-plus-circle medical-section__icon medical-section__icon--blue"></i>
+                        Antécédents Chirurgicaux
+                    </div>
+                    @if (dossierActif.antecedentsChirurgicaux.length === 0) {
+                        <div class="medical-section__empty">Aucun</div>
+                    }
+                    @for (a of dossierActif.antecedentsChirurgicaux; track a) {
+                        <div class="medical-item medical-item--blue">
+                            <span class="medical-item__dot"></span> {{ a }}
+                        </div>
+                    }
+                </div>
+
+                <!-- Allergies -->
+                <div class="medical-section" [class.medical-section--alert]="dossierActif.allergies.length > 0">
+                    <div class="medical-section__title">
+                        <i class="pi pi-exclamation-triangle medical-section__icon"
+                           [class.medical-section__icon--orange]="dossierActif.allergies.length > 0"
+                           [class.medical-section__icon--muted]="dossierActif.allergies.length === 0"></i>
+                        Allergies
+                    </div>
+                    @if (dossierActif.allergies.length === 0) {
+                        <div class="medical-section__empty">Aucune allergie connue</div>
+                    }
+                    <div class="allergy-tags">
+                        @for (a of dossierActif.allergies; track a) {
+                            <span class="allergy-tag">{{ a }}</span>
+                        }
+                    </div>
+                </div>
+
+                <!-- Traitements -->
+                <div class="medical-section">
+                    <div class="medical-section__title">
+                        <i class="pi pi-tablets medical-section__icon medical-section__icon--green"></i>
+                        Traitements en cours
+                    </div>
+                    @if (dossierActif.traitementEnCours.length === 0) {
+                        <div class="medical-section__empty">Aucun traitement</div>
+                    }
+                    @for (t of dossierActif.traitementEnCours; track t) {
+                        <div class="medical-item medical-item--green">
+                            <span class="medical-item__dot"></span> {{ t }}
+                        </div>
+                    }
+                </div>
+
+                <!-- Documents -->
+                <div class="medical-section medical-section--full">
+                    <div class="medical-section__title-row">
+                        <div class="medical-section__title">
+                            <i class="pi pi-folder-open medical-section__icon medical-section__icon--blue"></i>
+                            Documents & Examens
+                        </div>
+                        <button class="btn-primary btn-primary--sm" (click)="ouvrirUpload()">
+                            <i class="pi pi-upload"></i> Ajouter
+                        </button>
+                    </div>
+
+                    @if (documents.length === 0) {
+                        <div class="doc-empty">
+                            <i class="pi pi-file-excel"></i>
+                            <p>Aucun document attaché à ce dossier</p>
+                        </div>
+                    }
+
+                    <div class="docs-grid">
+                        @for (doc of documents; track doc.id) {
+                            <div class="doc-item">
+                                <div class="doc-item__icon doc-item__icon--{{ doc.color }}">
+                                    <i [class]="doc.icon"></i>
+                                </div>
+                                <div class="doc-item__info">
+                                    <div class="doc-item__name">{{ doc.nom }}</div>
+                                    <div class="doc-item__meta">{{ doc.type }} — {{ doc.dateAjout | date:'dd/MM/yyyy' }}</div>
+                                </div>
+                                <div class="doc-item__actions">
+                                    <button class="btn-action" (click)="previewDoc(doc)" title="Visualiser">
+                                        <i class="pi pi-eye"></i>
+                                    </button>
+                                    <button class="btn-action" (click)="downloadDoc(doc)" title="Télécharger">
+                                        <i class="pi pi-download"></i>
+                                    </button>
+                                    <button class="btn-action text-red" (click)="supprimerDoc(doc)" title="Supprimer">
+                                        <i class="pi pi-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <!-- Historique consultations -->
+                <div class="medical-section medical-section--full">
+                    <div class="medical-section__title">
+                        <i class="pi pi-history medical-section__icon medical-section__icon--purple"></i>
+                        Historique Consultations
+                    </div>
+                    <div class="consult-history">
+                        @for (c of dossierActif.consultations; track c.date) {
+                            <div class="consult-history__item">
+                                <div class="consult-history__date">{{ c.date }}</div>
+                                <div class="consult-history__line"></div>
+                                <div class="consult-history__content">
+                                    <div class="consult-history__motif">{{ c.motif }}</div>
+                                    <div class="consult-history__diag">{{ c.diagnostic }}</div>
+                                </div>
+                                <button class="btn-action btn-action--neutral"
+                                        title="Voir consultation"
+                                        routerLink="/medecin/consultations">
+                                    <i class="pi pi-eye"></i>
+                                </button>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Actions -->
+            <div class="dossier-detail__actions">
+                <button class="btn-primary" routerLink="/medecin/consultations">
+                    <i class="pi pi-plus"></i> Nouvelle Consultation
+                </button>
+                <button class="btn-outline" routerLink="/medecin/ordonnances">
+                    <i class="pi pi-file-edit"></i> Ordonnance
+                </button>
+                <button class="btn-outline" routerLink="/medecin/agenda">
+                    <i class="pi pi-calendar-plus"></i> Prendre RDV
+                </button>
+            </div>
+            } <!-- fin de @else (hasDossier) -->
+        </div>
+    }
+
+</div>
+
+<!-- ── Dialog Upload Document ────────── -->
+<p-dialog header="Ajouter un document" [(visible)]="docDialogVisible" [modal]="true" [style]="{width: '450px'}">
+    <div class="dialog-form">
+        <div class="form-field">
+            <label class="form-label">Type de document</label>
+            <select class="form-input" [(ngModel)]="selectedDocType">
+                @for (opt of docTypeOptions; track opt.value) {
+                    <option [value]="opt.value">{{ opt.label }}</option>
+                }
+            </select>
+        </div>
+        <div class="form-field">
+            <label class="form-label">Sélectionner le fichier</label>
+            <div class="manual-upload">
+                <input type="file" #fileInput (change)="onFileSelect($event)" style="display: none">
+                <button class="btn-outline w-full" (click)="fileInput.click()">
+                    <i class="pi pi-file-import"></i> Parcourir...
+                </button>
+                @if (selectedFile) {
+                    <div class="selected-file-info">
+                        <i class="pi pi-file"></i>
+                        <span>{{ selectedFile.name }}</span>
+                    </div>
+                    <button class="btn-primary w-full mt-2" (click)="uploadSelected(dossierActif?.id)">
+                        Confirmer l'envoi
+                    </button>
+                }
+            </div>
+        </div>
+    </div>
+</p-dialog>
+
+<!-- ── Dialog Preview Document ────────── -->
+<p-dialog header="Prévisualisation" [(visible)]="previewVisible" [modal]="true" [style]="{width: '85vw'}" [contentStyle]="{height: '80vh', padding: '0'}">
+    <div class="preview-container" [class.preview-container--image]="currentPreviewType?.includes('image')">
+        @if (currentPreviewType && currentPreviewType.includes('image')) {
+            <img [src]="currentPreviewUrl" class="preview-img" alt="Document"/>
+        } @else {
+            <iframe [src]="currentPreviewUrl" width="100%" height="100%" frameborder="0"></iframe>
+        }
+    </div>
+</p-dialog>
+
+<!-- ── Dialog Edition Dossier ─────────── -->
+<p-dialog [header]="dossierForm?.id ? 'Modifier le Dossier Médical' : 'Créer le Dossier Médical'" 
+          [(visible)]="editDialogVisible" [modal]="true" [style]="{width: '600px'}">
+    <div class="dialog-form">
+        
+        <div class="form-row">
+            <div class="form-field">
+                <label class="form-label">Groupe Sanguin</label>
+                <select class="form-input" [(ngModel)]="dossierForm.groupeSanguin">
+                    <option value="">Non spécifié</option>
+                    <option value="A+">A+</option>
+                    <option value="A-">A-</option>
+                    <option value="B+">B+</option>
+                    <option value="B-">B-</option>
+                    <option value="AB+">AB+</option>
+                    <option value="AB-">AB-</option>
+                    <option value="O+">O+</option>
+                    <option value="O-">O-</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-field">
+                <label class="form-label">Poids (kg)</label>
+                <input class="form-input" type="number" [(ngModel)]="dossierForm.poids"/>
+            </div>
+            <div class="form-field">
+                <label class="form-label">Taille (cm)</label>
+                <input class="form-input" type="number" [(ngModel)]="dossierForm.taille"/>
+            </div>
+        </div>
+
+        <div class="form-field">
+            <label class="form-label">Antécédents (Séparés par des virgules)</label>
+            <textarea pTextarea rows="3" class="form-input" [(ngModel)]="dossierForm.antecedentsPersonnels" 
+                      placeholder="Ex: Asthme, Diabète type 2, Opération genou..."></textarea>
+        </div>
+
+        <div class="form-field">
+            <label class="form-label">Allergies (Séparées par des virgules)</label>
+            <textarea pTextarea rows="2" class="form-input" [(ngModel)]="dossierForm.allergies"
+                      placeholder="Ex: Pénicilline, Arachides..."></textarea>
+        </div>
+
+        <div class="form-field">
+            <label class="form-label">Traitements en cours (Séparés par des virgules)</label>
+            <textarea pTextarea rows="2" class="form-input" [(ngModel)]="dossierForm.medicamentsEnCours"
+                      placeholder="Ex: Doliprane 1000mg, Lévothyrox 50..."></textarea>
+        </div>
+
+        <div class="dialog-footer mt-3">
+            <button class="btn-outline" (click)="editDialogVisible = false">Annuler</button>
+            <button class="btn-primary" (click)="sauvegarderDossier()">Enregistrer</button>
+        </div>
+    </div>
+</p-dialog>

@@ -1,0 +1,12 @@
+<div class="cmd-panel">
+    <button class="cmd-btn" (click)="sendCommand('GENERER_CR')" [disabled]="loading">
+        <i class="pi" [ngClass]="loading ? 'pi-spin pi-spinner' : 'pi-file'"></i> 📋 Générer Compte-Rendu
+    </button>
+    <button class="cmd-btn btn-primary" (click)="sendCommand('GENERER_ORDONNANCE')" [disabled]="loading">
+        <i class="pi" [ngClass]="loading ? 'pi-spin pi-spinner' : 'pi-file-edit'"></i> 💊 Générer Ordonnance
+    </button>
+    <div class="divider"></div>
+    <button class="cmd-btn btn-danger" (click)="sendCommand('RESET')" [disabled]="loading">
+        <i class="pi" [ngClass]="loading ? 'pi-spin pi-spinner' : 'pi-refresh'"></i> 🔄 Nouvelle Consultation
+    </button>
+</div>

@@ -1,0 +1,202 @@
+<!-- ── En-tête ─────────────────────────── -->
+<div class="page-header">
+    <div>
+        <h2 class="page-header__title">Tableau de Bord Admin</h2>
+        <p class="page-header__subtitle">{{ getDateAujourdhui() }} — Vue d'ensemble de la plateforme</p>
+    </div>
+    <div class="page-header__actions">
+        <button class="btn-outline" routerLink="/admin/monitoring">
+            <i class="pi pi-chart-line"></i> Monitoring
+        </button>
+        <button class="btn-primary" routerLink="/admin/cabinets">
+            <i class="pi pi-plus"></i> Nouveau Cabinet
+        </button>
+    </div>
+</div>
+
+<!-- ── KPIs globaux ─────────────────────── -->
+<div class="kpi-grid">
+
+    <div class="kpi-card kpi-card--orange">
+        <div class="kpi-card__icon"><i class="pi pi-building"></i></div>
+        <div class="kpi-card__body">
+            <div class="kpi-card__label">Cabinets Actifs</div>
+            <div class="kpi-card__value">{{ stats.cabinetsActifs }}</div>
+            <div class="kpi-card__trend kpi-card__trend--up">
+                <i class="pi pi-arrow-up"></i> +{{ stats.nouveauxCabinets }} ce mois
+            </div>
+        </div>
+    </div>
+
+    <div class="kpi-card kpi-card--blue">
+        <div class="kpi-card__icon"><i class="pi pi-users"></i></div>
+        <div class="kpi-card__body">
+            <div class="kpi-card__label">Total Utilisateurs</div>
+            <div class="kpi-card__value">{{ stats.totalUtilisateurs }}</div>
+            <div class="kpi-card__trend kpi-card__trend--up">
+                <i class="pi pi-arrow-up"></i> +{{ stats.nouveauxUsers }} cette semaine
+            </div>
+        </div>
+    </div>
+
+    <div class="kpi-card kpi-card--green">
+        <div class="kpi-card__icon"><i class="pi pi-money-bill"></i></div>
+        <div class="kpi-card__body">
+            <div class="kpi-card__label">Revenus Mensuel</div>
+            <div class="kpi-card__value">{{ stats.revenusMensuel }} <span class="kpi-card__unit">MAD</span></div>
+            <div class="kpi-card__trend kpi-card__trend--up">
+                <i class="pi pi-arrow-up"></i> +{{ stats.croissanceRevenu }}% vs mois dernier
+            </div>
+        </div>
+    </div>
+
+    <div class="kpi-card kpi-card--red">
+        <div class="kpi-card__icon"><i class="pi pi-exclamation-triangle"></i></div>
+        <div class="kpi-card__body">
+            <div class="kpi-card__label">Alertes Système</div>
+            <div class="kpi-card__value">{{ stats.alertes }}</div>
+            <div class="kpi-card__trend kpi-card__trend--down">
+                <i class="pi pi-arrow-down"></i> {{ stats.alertesCritiques }} critiques
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- ── Graphiques de Croissance ────────────── -->
+<div class="charts-section">
+    <div class="panel panel--growth">
+        <div class="panel__header">
+            <div>
+                <h3 class="panel__title">Évolution de la Croissance</h3>
+                <p class="panel__subtitle">Revenus et Nouveaux Cabinets (6 derniers mois)</p>
+            </div>
+            <div class="chart-legend">
+                <span class="legend-item"><span class="dot dot--blue"></span> Revenu</span>
+                <span class="legend-item"><span class="dot dot--orange"></span> Cabinets</span>
+            </div>
+        </div>
+        <div class="chart-container">
+            <canvas id="growthChart"></canvas>
+        </div>
+    </div>
+
+    <div class="panel panel--plans">
+        <div class="panel__header">
+            <h3 class="panel__title">Distribution des Plans</h3>
+            <p class="panel__subtitle">Part de marché par type d'abonnement</p>
+        </div>
+        <div class="chart-container chart-container--doughnut">
+            <canvas id="plansChart"></canvas>
+        </div>
+    </div>
+</div>
+
+<!-- ── Contenu principal ─────────────────── -->
+<div class="content-grid">
+
+    <!-- Cabinets récents -->
+    <div class="panel">
+        <div class="panel__header">
+            <div>
+                <h3 class="panel__title">Cabinets Récents</h3>
+                <p class="panel__subtitle">Dernières inscriptions</p>
+            </div>
+            <a routerLink="/admin/cabinets" class="panel__link">
+                Voir tout <i class="pi pi-arrow-right"></i>
+            </a>
+        </div>
+        <div class="cabinet-list">
+            @for (c of cabinetsRecents; track c.id) {
+                <div class="cabinet-item">
+                    <div class="cabinet-item__av">{{ c.initiales }}</div>
+                    <div class="cabinet-item__info">
+                        <div class="cabinet-item__name">{{ c.nom }}</div>
+                        <div class="cabinet-item__meta">{{ c.ville }} — {{ c.medecins }} médecin(s)</div>
+                    </div>
+                    <div class="cabinet-item__right">
+                        <span class="badge badge--{{ c.statut | lowercase }}">{{ c.statutLabel }}</span>
+                        <div class="cabinet-item__plan">{{ c.plan }}</div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- Activité système + Abonnements -->
+    <div class="right-col">
+
+        <!-- Abonnements expirant -->
+        <div class="panel">
+            <div class="panel__header">
+                <div>
+                    <h3 class="panel__title">Abonnements Expirant</h3>
+                    <p class="panel__subtitle">Dans les 30 prochains jours</p>
+                </div>
+                <a routerLink="/admin/abonnements" class="panel__link">
+                    Gérer <i class="pi pi-arrow-right"></i>
+                </a>
+            </div>
+            <div class="abon-list">
+                @for (a of abonnementsExpirants; track a.id) {
+                    <div class="abon-item" [class.abon-item--urgent]="a.joursRestants <= 7">
+                        <div class="abon-item__info">
+                            <div class="abon-item__cabinet">{{ a.cabinet }}</div>
+                            <div class="abon-item__plan">{{ a.plan }}</div>
+                        </div>
+                        <div class="abon-item__days" [class.abon-item__days--urgent]="a.joursRestants <= 7">
+                            {{ a.joursRestants }}j
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- Alertes système -->
+        <div class="panel">
+            <div class="panel__header">
+                <h3 class="panel__title">Alertes Système</h3>
+            </div>
+            <div class="alerts-list">
+                @for (alert of alertesSysteme; track alert.id) {
+                    <div class="alert-item alert-item--{{ alert.niveau }}">
+                        <div class="alert-item__icon">
+                            <i [class]="alert.icon"></i>
+                        </div>
+                        <div class="alert-item__content">
+                            <div class="alert-item__msg">{{ alert.message }}</div>
+                            <div class="alert-item__time">{{ alert.temps }}</div>
+                        </div>
+                        <span class="alert-badge alert-badge--{{ alert.niveau }}">{{ alert.niveauLabel }}</span>
+                    </div>
+                }
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+<!-- ── Stats revenus par plan ────────────── -->
+<div class="plans-grid">
+    @for (plan of statsPlans; track plan.nom) {
+        <div class="plan-card">
+            <div class="plan-card__header" [style.color]="plan.color">
+                <div class="plan-card__icon-box" [style.background-color]="plan.color + '15'">
+                    <i [class]="plan.icon"></i>
+                </div>
+                <span>{{ plan.nom }}</span>
+                <span class="plan-card__pct ml-auto">{{ plan.pct }}%</span>
+            </div>
+            <div class="plan-card__value">{{ plan.cabinets }}</div>
+            <div class="plan-card__label">cabinets actifs</div>
+            <div class="plan-card__revenue">{{ plan.revenu }} <span class="text-[10px] opacity-60 uppercase">mad / mois</span></div>
+            <div class="plan-card__bar">
+                <div class="plan-card__bar-fill"
+                     [style.width]="plan.pct + '%'"
+                     [style.background-color]="plan.color"></div>
+            </div>
+        </div>
+    }
+</div>
+

@@ -1,0 +1,353 @@
+<p-toast></p-toast>
+<p-confirmDialog></p-confirmDialog>
+<!-- ── En-tête ─────────────────────────── -->
+<div class="page-header">
+    <div>
+        <h2 class="page-header__title">Ordonnances</h2>
+        <p class="page-header__subtitle">{{ ordonnances.length }} ordonnance(s)</p>
+    </div>
+    <div class="header-actions">
+        <input type="file" #fileInput style="display: none" (change)="importExcel($event)" accept=".xlsx, .xls">
+        
+        <button class="btn-outline" (click)="triggerImport(fileInput)" pTooltip="Importer" tooltipPosition="bottom">
+            <i class="pi pi-upload"></i> Importer
+        </button>
+        
+        <button class="btn-outline" (click)="exportExcel()" pTooltip="Excel" tooltipPosition="bottom">
+            <i class="pi pi-file-excel"></i> Excel
+        </button>
+        
+        <button class="btn-outline" (click)="exportPDF()" pTooltip="PDF" tooltipPosition="bottom">
+            <i class="pi pi-file-pdf"></i> PDF
+        </button>
+
+        <button class="btn-primary" (click)="nouvelleOrdonnance()">
+            <i class="pi pi-file-edit"></i> Nouvelle Ordonnance
+        </button>
+    </div>
+</div>
+
+<!-- ── Grille principale ────────────────── -->
+<div class="ord-grid" [class.ord-grid--split]="ordonnanceActive">
+
+    <!-- ── Liste ───────────────────────────── -->
+    <div class="panel">
+        <p-table
+            [value]="ordonnances"
+            [loading]="loading"
+            responsiveLayout="scroll"
+            styleClass="mc-table">
+
+            <ng-template pTemplate="header">
+                <tr>
+                    <th>ID</th>
+                    <th>Patient</th>
+                    <th>Date émission</th>
+                    <th>Médicaments</th>
+                    <th>Statut</th>
+                    <th>Actions</th>
+                </tr>
+            </ng-template>
+
+            <ng-template pTemplate="body" let-ord>
+                <tr class="table-row" [class.table-row--active]="ordonnanceActive?.id === ord.id">
+
+                    <td><span class="td-mono">#{{ ord.id }}</span></td>
+
+                    <td>
+                        <div class="patient-cell">
+                            <div class="patient-cell__avatar">{{ getInitiales(ord.patientId) }}</div>
+                            <span class="patient-cell__name">{{ getPatientNom(ord.patientId) }}</span>
+                        </div>
+                    </td>
+
+                    <td><span class="td-muted">{{ formatDate(ord.dateEmission) }}</span></td>
+
+                    <td>
+                        <span class="med-count">
+                            <i class="pi pi-tablets"></i>
+                            {{ ord.lignes?.length ?? 0 }} médicament(s)
+                        </span>
+                    </td>
+
+                    <td>
+                        <span class="badge badge--{{ (ord.statut ?? 'active') | lowercase }}">
+                            {{ getStatutLabel(ord.statut) }}
+                        </span>
+                    </td>
+
+                    <td>
+                        <div class="row-actions">
+                            <button class="btn-action btn-action--neutral" title="Voir" (click)="voirOrdonnance(ord)">
+                                <i class="pi pi-eye"></i>
+                            </button>
+                            <button class="btn-action btn-action--neutral" title="Imprimer" (click)="imprimerOrdonnance(ord)">
+                                <i class="pi pi-print"></i>
+                            </button>
+                            <button class="btn-action btn-action--danger" title="Supprimer" (click)="supprimerOrdonnance(ord)">
+                                <i class="pi pi-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+
+                </tr>
+            </ng-template>
+
+            <ng-template pTemplate="empty">
+                <tr>
+                    <td colspan="6">
+                        <div class="table-empty">
+                            <i class="pi pi-file table-empty__icon"></i>
+                            <p>Aucune ordonnance</p>
+                        </div>
+                    </td>
+                </tr>
+            </ng-template>
+
+        </p-table>
+    </div>
+
+    <!-- ── Aperçu ordonnance ───────────────── -->
+    @if (ordonnanceActive) {
+        <div class="ord-preview">
+
+            <div class="ord-preview__header">
+                <div class="ord-preview__clinic">
+                    <div class="ord-preview__clinic-icon">
+                        <i class="pi pi-heart-fill"></i>
+                    </div>
+                    <div>
+                        <div class="ord-preview__clinic-name">MediCab Pro</div>
+                        <div class="ord-preview__clinic-sub">Cabinet Médical</div>
+                    </div>
+                </div>
+                <div class="ord-preview__meta">
+                    <div class="ord-preview__num">#{{ ordonnanceActive.id }}</div>
+                    <div class="ord-preview__date">{{ formatDate(ordonnanceActive.dateEmission) }}</div>
+                    <button class="btn-icon" (click)="ordonnanceActive = null" title="Fermer">
+                        <i class="pi pi-times"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="ord-preview__body">
+
+                <div class="ord-section">
+                    <div class="ord-section__label">Médecin</div>
+                    <div class="ord-section__value">Médecin #{{ ordonnanceActive.medecinId }}</div>
+                </div>
+
+                <div class="ord-divider"></div>
+
+                <div class="ord-section">
+                    <div class="ord-section__label">Patient</div>
+                    <div class="ord-section__value ord-section__value--lg">{{ getPatientNom(ordonnanceActive.patientId) }}</div>
+                    @if (ordonnanceActive.consultationId) {
+                        <div class="ord-section__diag">
+                            <i class="pi pi-tag"></i> Consultation #{{ ordonnanceActive.consultationId }}
+                        </div>
+                    }
+                </div>
+
+                <div class="ord-divider"></div>
+
+                <div class="ord-section">
+                    <div class="ord-section__label">Prescription</div>
+                    <div class="ord-meds">
+                        @for (ligne of ordonnanceActive.lignes; track $index; let i = $index) {
+                            <div class="ord-med">
+                                <div class="ord-med__num">{{ i + 1 }}</div>
+                                <div class="ord-med__body">
+                                    <div class="ord-med__name">{{ ligne.medicament }}</div>
+                                    @if (ligne.dosage) {
+                                        <div class="ord-med__posologie">{{ ligne.dosage }}</div>
+                                    }
+                                    @if (ligne.posologie) {
+                                        <div class="ord-med__posologie">{{ ligne.posologie }}</div>
+                                    }
+                                    <div class="ord-med__duree">
+                                        <i class="pi pi-clock"></i>
+                                        {{ ligne.dureeTraitement }} {{ ligne.unite }}
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                @if (ordonnanceActive.instructions) {
+                    <div class="ord-divider"></div>
+                    <div class="ord-section">
+                        <div class="ord-section__label">Recommandations</div>
+                        <div class="ord-notes">{{ ordonnanceActive.instructions }}</div>
+                    </div>
+                }
+
+                <div class="ord-divider"></div>
+
+                <div class="ord-section">
+                    <div class="ord-section__label">Changer statut</div>
+                    <div class="row-actions">
+                        <button class="btn-action btn-action--neutral" title="Activer"
+                                (click)="changerStatut(ordonnanceActive, 'ACTIVE')">
+                            <i class="pi pi-check-circle"></i>
+                        </button>
+                        <button class="btn-action btn-action--neutral" title="Expirer"
+                                (click)="changerStatut(ordonnanceActive, 'EXPIREE')">
+                            <i class="pi pi-clock"></i>
+                        </button>
+                        <button class="btn-action btn-action--danger" title="Annuler"
+                                (click)="changerStatut(ordonnanceActive, 'ANNULEE')">
+                            <i class="pi pi-times-circle"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="ord-divider"></div>
+
+                <div class="ord-footer">
+                    <div class="ord-footer__sig">
+                        <div class="ord-footer__sig-line"></div>
+                        <div class="ord-footer__sig-label">Signature du médecin</div>
+                    </div>
+                    <button class="btn-primary" (click)="imprimerOrdonnance(ordonnanceActive)">
+                        <i class="pi pi-print"></i> Imprimer
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    }
+
+</div>
+
+<!-- ── Dialog Nouvelle Ordonnance ─────── -->
+<p-dialog
+    header="Nouvelle Ordonnance"
+    [(visible)]="dialogVisible"
+    [modal]="true"
+    [style]="{width:'660px'}"
+    [draggable]="false"
+    styleClass="mc-dialog">
+
+    <div class="dialog-form">
+
+        <!-- 🔹 Sélection patient via p-select -->
+        <div class="form-field">
+            <label class="form-label">Patient <span class="form-required">*</span></label>
+            <p-select
+                [options]="patientsOptions"
+                [(ngModel)]="selectedPatientId"
+                optionLabel="label"
+                optionValue="value"
+                placeholder="Rechercher un patient..."
+                [filter]="true"
+                filterBy="label"
+                [showClear]="true"
+                styleClass="w-full form-input">
+            </p-select>
+        </div>
+
+        <!-- 🔹 Sélection consultation (auto-remplit le patient) -->
+        <div class="form-field">
+            <label class="form-label">
+                <i class="pi pi-calendar"></i> Consultation
+                <span class="form-hint">— le patient sera rempli automatiquement</span>
+            </label>
+            <p-select
+                [options]="consultationsOptions"
+                [(ngModel)]="selectedConsultationId"
+                (ngModelChange)="onConsultationChange($event)"
+                optionLabel="label"
+                optionValue="value"
+                placeholder="Choisir une consultation..."
+                [filter]="true"
+                filterBy="label"
+                [showClear]="true"
+                styleClass="w-full form-input">
+            </p-select>
+        </div>
+
+        <div class="form-row">
+            <div class="form-field">
+                <label class="form-label">Date émission</label>
+                <input class="form-input" pInputText type="date" [(ngModel)]="dateEmission"/>
+            </div>
+            <div class="form-field">
+                <label class="form-label">Date validité</label>
+                <input class="form-input" pInputText type="date" [(ngModel)]="dateValidite"/>
+            </div>
+        </div>
+
+        <div class="form-divider"></div>
+
+        <!-- 🔹 Ajouter un médicament -->
+        <div class="form-field">
+            <label class="form-label">Ajouter un médicament</label>
+            <div class="med-add-grid">
+                <input class="form-input" pInputText [(ngModel)]="nouvelleLigne.medicament" placeholder="Médicament *"/>
+                <input class="form-input" pInputText [(ngModel)]="nouvelleLigne.dosage" placeholder="Dosage (ex: 500mg)"/>
+                <input class="form-input" pInputText [(ngModel)]="nouvelleLigne.posologie" placeholder="Posologie"/>
+                <div class="duree-row">
+                    <input class="form-input duree-input" type="number" min="1" max="365"
+                           [(ngModel)]="nouvelleLigne.dureeTraitementNum" placeholder="Durée"/>
+                    <p-select
+                        [options]="uniteOptions"
+                        [(ngModel)]="nouvelleLigne.unite"
+                        optionLabel="label"
+                        optionValue="value"
+                        styleClass="unite-select">
+                    </p-select>
+                </div>
+                <button class="btn-primary btn-add" (click)="ajouterLigne()" title="Ajouter">
+                    <i class="pi pi-plus"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Liste médicaments ajoutés -->
+        @if (lignes.length > 0) {
+            <div class="med-list">
+                @for (ligne of lignes; track $index; let i = $index) {
+                    <div class="med-item">
+                        <div class="med-item__num">{{ i + 1 }}</div>
+                        <div class="med-item__info">
+                            <span class="med-item__name">{{ ligne.medicament }}</span>
+                            <span class="med-item__detail">
+                                {{ ligne.dosage || '' }}
+                                @if (ligne.dosage && ligne.posologie) { — }
+                                {{ ligne.posologie || '' }}
+                                @if (ligne.dureeTraitement) {
+                                    <span class="med-item__duree">{{ ligne.dureeTraitement }} {{ ligne.unite }}</span>
+                                }
+                            </span>
+                        </div>
+                        <button class="btn-action btn-action--danger" (click)="supprimerLigne(i)">
+                            <i class="pi pi-trash"></i>
+                        </button>
+                    </div>
+                }
+            </div>
+        } @else {
+            <div class="med-empty">
+                <i class="pi pi-inbox"></i> Aucun médicament ajouté
+            </div>
+        }
+
+        <div class="form-field">
+            <label class="form-label">Recommandations / Instructions</label>
+            <input class="form-input" pInputText [(ngModel)]="instructions" placeholder="Repos, régime, hydratation..."/>
+        </div>
+
+    </div>
+
+    <ng-template pTemplate="footer">
+        <div class="dialog-footer">
+            <button class="btn-outline" (click)="dialogVisible = false">Annuler</button>
+            <button class="btn-primary" (click)="sauvegarder()">
+                <i class="pi pi-check"></i> Créer Ordonnance
+            </button>
+        </div>
+    </ng-template>
+
+</p-dialog>

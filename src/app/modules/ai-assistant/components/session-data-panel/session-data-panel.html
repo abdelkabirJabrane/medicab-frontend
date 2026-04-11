@@ -1,0 +1,75 @@
+<div class="session-panel" *ngIf="data">
+  <!-- Patient -->
+  <div class="block block-patient">
+    <h4>Patient</h4>
+    <p><strong>Nom:</strong> {{ data.patient?.nom || 'N/A' }}</p>
+    <p><strong>Âge:</strong> {{ data.patient?.age || 'N/A' }} <strong>Sexe:</strong> {{ data.patient?.sexe || 'N/A' }}</p>
+    <p class="tag-list"><strong>Allergies:</strong> 
+        <span class="tag tag-red" *ngFor="let a of data.patient?.allergies">{{a}}</span>
+        <span *ngIf="!data.patient?.allergies?.length">--</span>
+    </p>
+    <p class="tag-list"><strong>Médicaments:</strong> 
+        <span class="tag tag-blue" *ngFor="let m of data.patient?.medicaments">{{m}}</span>
+        <span *ngIf="!data.patient?.medicaments?.length">--</span>
+    </p>
+  </div>
+
+  <!-- Vitals -->
+  <div class="block block-vital">
+    <h4>Paramètres Vitaux</h4>
+    <div class="vital-grid">
+      <div class="vital-item"><span>TA</span> <span class="val">{{data.vitaux?.ta || '--' }}</span></div>
+      <div class="vital-item"><span>FC</span> <span class="val">{{data.vitaux?.fc || '--' }}</span></div>
+      <div class="vital-item"><span>Temp</span> <span class="val">{{data.vitaux?.temp || '--' }}</span></div>
+      <div class="vital-item"><span>SpO2</span> <span class="val">{{data.vitaux?.spo2 || '--' }}</span></div>
+      <div class="vital-item"><span>Poids</span> <span class="val">{{data.vitaux?.poids || '--' }}</span></div>
+    </div>
+  </div>
+
+  <!-- Motif -->
+  <div class="block">
+    <h4>Motif & Symptômes</h4>
+    <p><strong>Motif:</strong> {{ data.motif }}</p>
+    <ul>
+      <li *ngFor="let sym of data.symptomes">{{ sym }}</li>
+    </ul>
+  </div>
+
+  <!-- Diagnostic -->
+  <div class="block">
+    <h4>Évaluation & Diagnostic</h4>
+    <p>{{ data.diagnostic }}</p>
+  </div>
+
+  <!-- Médicaments Prescrits -->
+  <div class="block block-prescription">
+    <h4>Prescriptions (Brouillon)</h4>
+    <ul>
+      <li *ngFor="let rx of data.prescriptions">
+        <strong>{{ rx.nom }}</strong> - {{ rx.posologie }}
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="alerts-panel" *ngIf="alerts && alerts.length > 0">
+    <h4>Alertes Médicales</h4>
+    <div *ngFor="let al of alerts" class="alert-box" [ngClass]="al.level === 'ROUGE' ? 'alert-red' : 'alert-orange'">
+      <div class="alert-header">
+        <i class="pi pi-exclamation-triangle"></i>
+        <span>{{ al.type }}</span>
+      </div>
+      <p>{{ al.description }}</p>
+      <div class="alert-action">
+        <strong>Action Recommandée: </strong> {{ al.action_required }}
+      </div>
+      <div class="alert-alt" *ngIf="al.alternative">
+        <strong>Alternative: </strong> {{ al.alternative }}
+      </div>
+    </div>
+</div>
+
+<div *ngIf="!data && (!alerts || alerts.length === 0)" class="empty-state">
+  <i class="pi pi-inbox"></i>
+  <p>Aucune donnée de consultation extraite pour le moment. La synthèse s'affichera ici en temps réel au fur et à mesure que l'agent diagnostique.</p>
+</div>

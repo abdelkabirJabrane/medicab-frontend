@@ -1,0 +1,293 @@
+<p-toast></p-toast>
+
+<!-- ── En-tête ─────────────────────────── -->
+<div class="page-header">
+    <div>
+        <h2 class="page-header__title">Salle d'Attente</h2>
+        <p class="page-header__subtitle">{{ getHeure() }} — {{ patients.length }} patient(s) en attente</p>
+    </div>
+    <div class="page-header__actions">
+        <div class="live-indicator">
+            <span class="live-indicator__dot"></span>
+            Temps réel
+        </div>
+        <button class="btn-primary" (click)="ouvrirAjout()">
+            <i class="pi pi-user-plus"></i> Enregistrer Arrivée
+        </button>
+    </div>
+</div>
+
+<!-- ── Stats rapides ────────────────────── -->
+<div class="stats-row">
+
+    <div class="stat-card stat-card--blue">
+        <div class="stat-card__icon"><i class="pi pi-users"></i></div>
+        <div class="stat-card__body">
+            <div class="stat-card__label">En Attente</div>
+            <div class="stat-card__value">{{ patients.length }}</div>
+        </div>
+    </div>
+
+    <div class="stat-card stat-card--red">
+        <div class="stat-card__icon"><i class="pi pi-exclamation-triangle"></i></div>
+        <div class="stat-card__body">
+            <div class="stat-card__label">Urgences</div>
+            <div class="stat-card__value">{{ getNbUrgences() }}</div>
+        </div>
+    </div>
+
+    <div class="stat-card stat-card--orange">
+        <div class="stat-card__icon"><i class="pi pi-clock"></i></div>
+        <div class="stat-card__body">
+            <div class="stat-card__label">Attente Moy.</div>
+            <div class="stat-card__value">{{ getAttentemoyenne() }}<span class="stat-card__unit">min</span></div>
+        </div>
+    </div>
+
+    <div class="stat-card stat-card--green">
+        <div class="stat-card__icon"><i class="pi pi-check-circle"></i></div>
+        <div class="stat-card__body">
+            <div class="stat-card__label">Consultés Aujourd'hui</div>
+            <div class="stat-card__value">{{ consultes.length }}</div>
+        </div>
+    </div>
+
+</div>
+
+<!-- ── Grille principale ────────────────── -->
+<div class="main-grid">
+
+    <!-- ── File d'attente ──────────────────── -->
+    <div class="panel">
+        <div class="panel__header">
+            <div>
+                <h3 class="panel__title">File d'Attente</h3>
+                <p class="panel__subtitle">Ordre d'appel — glisser pour réorganiser</p>
+            </div>
+        </div>
+
+        <div class="queue-list">
+
+            @if (patients.length === 0) {
+                <div class="queue-empty">
+                    <i class="pi pi-check-circle queue-empty__icon"></i>
+                    <p>Salle d'attente vide</p>
+                    <span>Tous les patients ont été consultés</span>
+                </div>
+            }
+
+            @for (p of patients; track p.id; let i = $index) {
+                <div class="queue-item" [class.queue-item--urgence]="p.urgence">
+
+                    <!-- Numéro d'ordre -->
+                    <div class="queue-item__order" [class.queue-item__order--first]="i === 0">
+                        {{ i + 1 }}
+                    </div>
+
+                    <!-- Avatar -->
+                    <div class="queue-item__avatar" [class.queue-item__avatar--urgence]="p.urgence">
+                        {{ p.initiales }}
+                    </div>
+
+                    <!-- Infos -->
+                    <div class="queue-item__info">
+                        <div class="queue-item__name">
+                            {{ p.nom }}
+                            @if (p.urgence) {
+                                <span class="urgence-tag">URGENT</span>
+                            }
+                        </div>
+                        <div class="queue-item__meta">
+                            Dr. {{ p.medecin }} — {{ p.type }}
+                        </div>
+                        <div class="queue-item__motif">{{ p.motif }}</div>
+                    </div>
+
+                    <!-- Timer -->
+                    <div class="queue-item__timer" [class.queue-item__timer--long]="p.minutesAttente > 30">
+                        <i class="pi pi-clock"></i>
+                        <span>{{ p.minutesAttente }} min</span>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="queue-item__actions">
+
+                        @if (i > 0) {
+                            <button class="btn-action btn-action--up"
+                                    title="Monter" (click)="monterPatient(i)">
+                                <i class="pi pi-chevron-up"></i>
+                            </button>
+                        }
+
+                        @if (i < patients.length - 1) {
+                            <button class="btn-action btn-action--down"
+                                    title="Descendre" (click)="descendrePatient(i)">
+                                <i class="pi pi-chevron-down"></i>
+                            </button>
+                        }
+
+                        <button class="btn-action btn-action--call"
+                                title="Appeler le patient" (click)="appelerPatient(p, i)">
+                            <i class="pi pi-bell"></i>
+                        </button>
+
+                        <button class="btn-action btn-action--done"
+                                title="Marquer consulté" (click)="marquerConsulte(p, i)">
+                            <i class="pi pi-check"></i>
+                        </button>
+
+                        <button class="btn-action btn-action--out"
+                                title="Patient parti" (click)="marquerSorti(p, i)">
+                            <i class="pi pi-sign-out"></i>
+                        </button>
+
+                    </div>
+
+                </div>
+            }
+
+        </div>
+    </div>
+
+    <!-- ── Colonne droite ──────────────────── -->
+    <div class="right-col">
+
+        <!-- Appel en cours -->
+        @if (appelEnCours) {
+            <div class="appel-card">
+                <div class="appel-card__header">
+                    <i class="pi pi-bell appel-card__icon"></i>
+                    <span>Patient appelé</span>
+                </div>
+                <div class="appel-card__name">{{ appelEnCours.nom }}</div>
+                <div class="appel-card__meta">Dr. {{ appelEnCours.medecin }}</div>
+                <button class="appel-card__dismiss" (click)="appelEnCours = null">
+                    <i class="pi pi-times"></i> Fermer
+                </button>
+            </div>
+        }
+
+        <!-- Consultés aujourd'hui -->
+        <div class="panel">
+            <div class="panel__header">
+                <div>
+                    <h3 class="panel__title">Consultés Aujourd'hui</h3>
+                    <p class="panel__subtitle">{{ consultes.length }} patient(s)</p>
+                </div>
+            </div>
+            <div class="consultes-list">
+                @if (consultes.length === 0) {
+                    <div class="consultes-empty">Aucun patient consulté pour l'instant</div>
+                }
+                @for (p of consultes; track p.id) {
+                    <div class="consulte-item">
+                        <div class="consulte-item__av">{{ p.initiales }}</div>
+                        <div class="consulte-item__info">
+                            <div class="consulte-item__name">{{ p.nom }}</div>
+                            <div class="consulte-item__time">
+                                <i class="pi pi-check-circle"></i> Consulté à {{ p.heureConsulte }}
+                            </div>
+                        </div>
+                        <span class="consulte-item__medecin">Dr. {{ p.medecin }}</span>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- Médecins & disponibilité -->
+        <div class="panel">
+            <div class="panel__header">
+                <h3 class="panel__title">Médecins</h3>
+            </div>
+            <div class="medecins-status">
+                @for (m of medecins; track m.nom) {
+                    <div class="medecin-status-item">
+                        <div class="medecin-status-item__av">{{ m.initiales }}</div>
+                        <div class="medecin-status-item__info">
+                            <div class="medecin-status-item__nom">Dr. {{ m.nom }}</div>
+                            <div class="medecin-status-item__patient">
+                                @if (m.patientEnCours) {
+                                    <span>avec {{ m.patientEnCours }}</span>
+                                } @else {
+                                    <span class="text-available">Disponible</span>
+                                }
+                            </div>
+                        </div>
+                        <div class="status-pill status-pill--{{ m.statut }}">
+                            <span class="status-pill__dot"></span>
+                            {{ m.statutLabel }}
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+<!-- ── Dialog Enregistrer Arrivée ─────── -->
+<p-dialog
+    header="Enregistrer une Arrivée"
+    [(visible)]="dialogVisible"
+    [modal]="true"
+    [style]="{width:'460px'}"
+    [draggable]="false"
+    styleClass="mc-dialog">
+
+    <div class="dialog-form">
+
+        <div class="form-field">
+            <label class="form-label">Nom du patient <span class="form-required">*</span></label>
+            <input class="form-input" pInputText [(ngModel)]="formArrivee.nom" placeholder="Nom complet"/>
+        </div>
+
+        <div class="form-row">
+            <div class="form-field">
+                <label class="form-label">Médecin <span class="form-required">*</span></label>
+                <p-select [(ngModel)]="formArrivee.medecin"
+                          [options]="medecinOptions"
+                          optionLabel="label" optionValue="value"
+                          placeholder="Choisir" styleClass="w-full"></p-select>
+            </div>
+            <div class="form-field">
+                <label class="form-label">Type</label>
+                <p-select [(ngModel)]="formArrivee.type"
+                          [options]="typeOptions"
+                          optionLabel="label" optionValue="value"
+                          placeholder="Choisir" styleClass="w-full"></p-select>
+            </div>
+        </div>
+
+        <div class="form-field">
+            <label class="form-label">Motif</label>
+            <input class="form-input" pInputText [(ngModel)]="formArrivee.motif" placeholder="Motif de consultation"/>
+        </div>
+
+        <!-- Toggle urgence -->
+        <div class="urgence-toggle" (click)="formArrivee.urgence = !formArrivee.urgence"
+             [class.urgence-toggle--active]="formArrivee.urgence">
+            <div class="urgence-toggle__left">
+                <i class="pi pi-exclamation-triangle"></i>
+                <div>
+                    <div class="urgence-toggle__label">Cas urgent</div>
+                    <div class="urgence-toggle__sub">Passe en priorité dans la file</div>
+                </div>
+            </div>
+            <div class="urgence-toggle__switch" [class.urgence-toggle__switch--on]="formArrivee.urgence">
+                <div class="urgence-toggle__knob"></div>
+            </div>
+        </div>
+
+    </div>
+
+    <ng-template pTemplate="footer">
+        <div class="dialog-footer">
+            <button class="btn-outline" (click)="dialogVisible = false">Annuler</button>
+            <button class="btn-primary" (click)="enregistrerArrivee()">
+                <i class="pi pi-sign-in"></i> Enregistrer Arrivée
+            </button>
+        </div>
+    </ng-template>
+
+</p-dialog>

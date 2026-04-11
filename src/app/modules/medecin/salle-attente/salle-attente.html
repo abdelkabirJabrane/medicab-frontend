@@ -1,0 +1,256 @@
+<p-toast></p-toast>
+
+<!-- ── En-tête ───────────────────────── -->
+<div class="sa-header">
+    <div class="sa-header__left">
+        <div class="sa-header__icon">
+            <i class="pi pi-users"></i>
+        </div>
+        <div>
+            <h1 class="sa-header__title">Salle d'Attente</h1>
+            <p class="sa-header__date">{{ dateActuelle }}</p>
+        </div>
+    </div>
+
+    <div class="sa-clock">
+        <i class="pi pi-clock sa-clock__icon"></i>
+        <span class="sa-clock__time">{{ heureActuelle }}</span>
+    </div>
+
+    <button class="btn-primary" (click)="loadData()" title="Actualiser">
+        <i class="pi pi-refresh"></i> Actualiser
+    </button>
+</div>
+
+<!-- ── KPIs ──────────────────────────── -->
+<div class="sa-kpis">
+    <div class="sa-kpi sa-kpi--orange">
+        <div class="sa-kpi__icon"><i class="pi pi-clock"></i></div>
+        <div class="sa-kpi__body">
+            <div class="sa-kpi__value">{{ nbEnAttente }}</div>
+            <div class="sa-kpi__label">En attente</div>
+        </div>
+    </div>
+    <div class="sa-kpi sa-kpi--blue">
+        <div class="sa-kpi__icon"><i class="pi pi-heart"></i></div>
+        <div class="sa-kpi__body">
+            <div class="sa-kpi__value">{{ nbEnConsultation }}</div>
+            <div class="sa-kpi__label">En consultation</div>
+        </div>
+    </div>
+    <div class="sa-kpi sa-kpi--green">
+        <div class="sa-kpi__icon"><i class="pi pi-check-circle"></i></div>
+        <div class="sa-kpi__body">
+            <div class="sa-kpi__value">{{ nbTermines }}</div>
+            <div class="sa-kpi__label">Terminés aujourd'hui</div>
+        </div>
+    </div>
+    <div class="sa-kpi sa-kpi--purple">
+        <div class="sa-kpi__icon"><i class="pi pi-stopwatch"></i></div>
+        <div class="sa-kpi__body">
+            <div class="sa-kpi__value">{{ attenteMaxMins > 0 ? formatAttente(attenteMaxMins) : '—' }}</div>
+            <div class="sa-kpi__label">Attente max</div>
+        </div>
+    </div>
+</div>
+
+<!-- ── Grille principale ─────────────── -->
+<div class="sa-grid">
+
+    <!-- ── Colonne 1 : RDV attendus (non arrivés) ── -->
+    <div class="sa-panel">
+        <div class="sa-panel__header">
+            <i class="pi pi-calendar sa-panel__header-icon sa-panel__header-icon--gray"></i>
+            <div>
+                <div class="sa-panel__title">RDV Attendus</div>
+                <div class="sa-panel__subtitle">{{ rdvAttendus.length }} patient(s) prévu(s)</div>
+            </div>
+        </div>
+
+        @if (loading) {
+            <div class="sa-empty">
+                <i class="pi pi-spin pi-spinner"></i>
+                <p>Chargement...</p>
+            </div>
+        } @else if (rdvAttendus.length === 0) {
+            <div class="sa-empty">
+                <i class="pi pi-check-circle" style="color: var(--mc-green)"></i>
+                <p>Tous les patients sont arrivés</p>
+            </div>
+        }
+
+        <div class="sa-cards">
+            @for (p of rdvAttendus; track p.rdvId) {
+                <div class="sa-card sa-card--attente" [class.sa-card--urgence]="p.priorite === 'URGENT'">
+                    <div class="sa-card__top">
+                        <div class="sa-card__avatar sa-card__avatar--{{ p.couleur }}">{{ p.initiales }}</div>
+                        <div class="sa-card__info">
+                            <div class="sa-card__name">
+                                {{ p.patient }}
+                                @if (p.priorite === 'URGENT') {
+                                    <span class="badge-urgent">URGENT</span>
+                                }
+                            </div>
+                            <div class="sa-card__meta">
+                                <i class="pi pi-clock"></i> {{ p.heure }}
+                                &nbsp;·&nbsp;
+                                <span class="type-badge type-badge--{{ p.couleur }}">{{ p.typeLabel }}</span>
+                            </div>
+                            @if (p.motif) {
+                                <div class="sa-card__motif">{{ p.motif }}</div>
+                            }
+                        </div>
+                    </div>
+                    <div class="sa-card__actions">
+                        <button class="btn-arrive" (click)="marquerArrive(p)" title="Marquer comme arrivé">
+                            <i class="pi pi-sign-in"></i> Arrivé
+                        </button>
+                        <button class="btn-icon-sm btn-icon-sm--red" (click)="annulerRdv(p)" title="Annuler">
+                            <i class="pi pi-times"></i>
+                        </button>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- ── Colonne 2 : File d'attente ── -->
+    <div class="sa-panel sa-panel--main">
+        <div class="sa-panel__header">
+            <i class="pi pi-list sa-panel__header-icon sa-panel__header-icon--orange"></i>
+            <div>
+                <div class="sa-panel__title">File d'Attente</div>
+                <div class="sa-panel__subtitle">{{ fileAttente.length }} patient(s) en salle</div>
+            </div>
+        </div>
+
+        @if (fileAttente.length === 0) {
+            <div class="sa-empty">
+                <i class="pi pi-users" style="color: var(--mc-text-3)"></i>
+                <p>Aucun patient en salle d'attente</p>
+                <p class="sa-empty__sub">Marquez un patient « Arrivé » pour l'ajouter ici</p>
+            </div>
+        }
+
+        <div class="sa-queue">
+            @for (p of fileAttente; track p.rdvId) {
+                <div class="sa-queue-item" [class.sa-queue-item--urgent]="p.priorite === 'URGENT'">
+
+                    <!-- Numéro d'ordre -->
+                    <div class="sa-queue-item__number" [class.sa-queue-item__number--urgent]="p.priorite === 'URGENT'">
+                        N°{{ p.numeroAttente }}
+                    </div>
+
+                    <div class="sa-queue-item__avatar sa-queue-item__avatar--{{ p.couleur }}">
+                        {{ p.initiales }}
+                    </div>
+
+                    <div class="sa-queue-item__info">
+                        <div class="sa-queue-item__name">
+                            {{ p.patient }}
+                            @if (p.priorite === 'URGENT') {
+                                <span class="badge-urgent">URGENT</span>
+                            }
+                        </div>
+                        <div class="sa-queue-item__meta">
+                            <span class="type-badge type-badge--{{ p.couleur }}">{{ p.typeLabel }}</span>
+                            &nbsp;·&nbsp;{{ p.motif }}
+                        </div>
+                    </div>
+
+                    <!-- Timer attente -->
+                    <div class="sa-queue-item__timer" [class]="'timer--' + getAttenteClass(p.attenteMins)">
+                        <i class="pi pi-stopwatch"></i>
+                        {{ formatAttente(p.attenteMins) }}
+                    </div>
+
+                    <div class="sa-queue-item__actions">
+                        <button class="btn-call" (click)="demarrerConsultation(p)" title="Appeler en consultation">
+                            <i class="pi pi-send"></i> Appeler
+                        </button>
+                        <button class="btn-icon-sm" (click)="marquerUrgent(p)"
+                                [class.btn-icon-sm--orange]="p.priorite === 'URGENT'"
+                                title="Marquer urgent">
+                            <i class="pi pi-exclamation-triangle"></i>
+                        </button>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- ── Colonne 3 : En consultation + Terminés ── -->
+    <div class="sa-panel-stack">
+
+        <!-- En consultation -->
+        <div class="sa-panel sa-panel--active">
+            <div class="sa-panel__header">
+                <div class="sa-pulse-dot"></div>
+                <div>
+                    <div class="sa-panel__title">En Consultation</div>
+                    <div class="sa-panel__subtitle">{{ nbEnConsultation }} consultation(s) active(s)</div>
+                </div>
+            </div>
+
+            @if (enConsultation.length === 0) {
+                <div class="sa-empty sa-empty--sm">
+                    <p>Aucune consultation en cours</p>
+                </div>
+            }
+
+            <div class="sa-cards">
+                @for (p of enConsultation; track p.rdvId) {
+                    <div class="sa-card sa-card--encours">
+                        <div class="sa-card__top">
+                            <div class="sa-card__avatar sa-card__avatar--{{ p.couleur }}">{{ p.initiales }}</div>
+                            <div class="sa-card__info">
+                                <div class="sa-card__name">{{ p.patient }}</div>
+                                <div class="sa-card__meta">
+                                    <span class="type-badge type-badge--{{ p.couleur }}">{{ p.typeLabel }}</span>
+                                </div>
+                            </div>
+                            <div class="en-cours-dot"></div>
+                        </div>
+                        <div class="sa-card__actions">
+                            <button class="btn-terminer" (click)="terminerConsultation(p)">
+                                <i class="pi pi-check"></i> Terminer
+                            </button>
+                            <a class="btn-icon-sm btn-icon-sm--blue"
+                               routerLink="/medecin/consultations"
+                               title="Saisir consultation">
+                                <i class="pi pi-file-edit"></i>
+                            </a>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- Terminés aujourd'hui -->
+        <div class="sa-panel sa-panel--done">
+            <div class="sa-panel__header">
+                <i class="pi pi-check-circle sa-panel__header-icon sa-panel__header-icon--green"></i>
+                <div>
+                    <div class="sa-panel__title">Terminés</div>
+                    <div class="sa-panel__subtitle">{{ nbTermines }} aujourd'hui</div>
+                </div>
+            </div>
+
+            <div class="sa-done-list">
+                @for (p of termines; track p.rdvId) {
+                    <div class="sa-done-item">
+                        <div class="sa-done-item__check"><i class="pi pi-check"></i></div>
+                        <div class="sa-done-item__name">{{ p.patient }}</div>
+                        <div class="sa-done-item__type">{{ p.typeLabel }}</div>
+                        <div class="sa-done-item__heure">{{ p.heure }}</div>
+                    </div>
+                }
+                @if (termines.length === 0) {
+                    <div class="sa-done-item sa-done-item--empty">Aucune consultation terminée</div>
+                }
+            </div>
+        </div>
+
+    </div>
+
+</div>

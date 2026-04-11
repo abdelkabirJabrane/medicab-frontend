@@ -1,0 +1,357 @@
+<p-toast></p-toast>
+
+<!-- ── En-tête ─────────────────────────── -->
+<div class="page-header">
+    <div>
+        <h2 class="page-header__title">Consultations</h2>
+        <p class="page-header__subtitle">{{ consultations.length }} consultations</p>
+    </div>
+    <div class="header-actions">
+        <input type="file" #fileInput style="display: none" (change)="importExcel($event)" accept=".xlsx, .xls">
+        
+        <button class="btn-outline" (click)="triggerImport(fileInput)" pTooltip="Importer" tooltipPosition="bottom">
+            <i class="pi pi-upload"></i> Importer
+        </button>
+        
+        <button class="btn-outline" (click)="exportExcel()" pTooltip="Excel" tooltipPosition="bottom">
+            <i class="pi pi-file-excel"></i> Excel
+        </button>
+        
+        <button class="btn-outline" (click)="exportPDF()" pTooltip="PDF" tooltipPosition="bottom">
+            <i class="pi pi-file-pdf"></i> PDF
+        </button>
+
+        <button class="btn-primary" (click)="nouvelleConsultation()">
+            <i class="pi pi-plus"></i> Nouvelle Consultation
+        </button>
+    </div>
+</div>
+
+<!-- ── Grille principale ────────────────── -->
+<div class="consult-grid" [class.consult-grid--with-detail]="consultationActive">
+
+    <!-- ── Liste ───────────────────────────── -->
+    <div class="panel">
+        <p-table
+            [value]="consultations"
+            [paginator]="true"
+            [rows]="8"
+            responsiveLayout="scroll"
+            styleClass="mc-table">
+
+            <ng-template pTemplate="header">
+                <tr>
+                    <th>Patient</th>
+                    <th>Date</th>
+                    <th>Type</th>
+                    <th>Motif</th>
+                    <th>Diagnostic</th>
+                    <th>Montant</th>
+                    <th>Statut</th>
+                    <th>Actions</th>
+                </tr>
+            </ng-template>
+
+            <ng-template pTemplate="body" let-c>
+                <tr class="table-row" [class.table-row--active]="consultationActive?.id === c.id">
+
+                    <!-- Patient -->
+                    <td>
+                        <div class="patient-cell">
+                            <div class="patient-cell__avatar">{{ c.initiales }}</div>
+                            <span class="patient-cell__name">{{ c.patient }}</span>
+                        </div>
+                    </td>
+
+                    <!-- Date -->
+                    <td>
+                        <div class="td-main">{{ c.date }}</div>
+                        <div class="td-sub">{{ c.heure }}</div>
+                    </td>
+
+                    <!-- Type -->
+                    <td>
+                        <span class="type-badge type-badge--{{ c.type | lowercase }}">{{ c.typeLabel }}</span>
+                    </td>
+
+                    <!-- Motif -->
+                    <td><span class="td-muted">{{ c.motif }}</span></td>
+
+                    <!-- Diagnostic -->
+                    <td><span class="td-main">{{ c.diagnostic }}</span></td>
+
+                    <!-- Montant -->
+                    <td><span class="amount">{{ c.montant }} MAD</span></td>
+
+                    <!-- Statut -->
+                    <td>
+            <span class="badge badge--{{ c.statut | lowercase }}">
+              {{ getStatutLabel(c.statut) }}
+            </span>
+                    </td>
+
+                    <!-- Actions -->
+                    <td>
+                        <div class="row-actions">
+                            <button class="btn-action btn-action--neutral" title="Voir" (click)="voirConsultation(c)">
+                                <i class="pi pi-eye"></i>
+                            </button>
+                            <button class="btn-action"
+                                    [class.btn-action--neutral]="c.hasOrdonnance"
+                                    [class.btn-action--disabled]="!c.hasOrdonnance"
+                                    [disabled]="!c.hasOrdonnance"
+                                    title="Ordonnance">
+                                <i class="pi pi-file"></i>
+                            </button>
+                            <button class="btn-action btn-action--neutral" title="Facturer" routerLink="/medecin/factures">
+                                <i class="pi pi-money-bill"></i>
+                            </button>
+                        </div>
+                    </td>
+
+                </tr>
+            </ng-template>
+
+            <ng-template pTemplate="empty">
+                <tr>
+                    <td colspan="8">
+                        <div class="table-empty">
+                            <i class="pi pi-calendar-times table-empty__icon"></i>
+                            <p>Aucune consultation</p>
+                        </div>
+                    </td>
+                </tr>
+            </ng-template>
+
+        </p-table>
+    </div>
+
+    <!-- ── Détail ──────────────────────────── -->
+    @if (consultationActive) {
+        <div class="detail-panel">
+
+            <div class="detail-panel__header">
+                <h3 class="detail-panel__title">Détail</h3>
+                <button class="btn-icon" (click)="consultationActive = null" title="Fermer">
+                    <i class="pi pi-times"></i>
+                </button>
+            </div>
+
+            <div class="detail-patient">
+                <div class="detail-patient__avatar">{{ consultationActive.initiales }}</div>
+                <div>
+                    <div class="detail-patient__name">{{ consultationActive.patient }}</div>
+                    <div class="detail-patient__date">{{ consultationActive.date }} à {{ consultationActive.heure }}</div>
+                </div>
+            </div>
+
+            <div class="detail-divider"></div>
+
+            <div class="detail-fields">
+
+                <div class="detail-field">
+                    <div class="detail-field__label">Type</div>
+                    <div class="detail-field__value">{{ consultationActive.typeLabel }}</div>
+                </div>
+
+                <div class="detail-field">
+                    <div class="detail-field__label">Motif</div>
+                    <div class="detail-field__value">{{ consultationActive.motif }}</div>
+                </div>
+
+                <div class="detail-field">
+                    <div class="detail-field__label">Diagnostic</div>
+                    <div class="detail-field__value">{{ consultationActive.diagnostic }}</div>
+                </div>
+
+                <div class="detail-field">
+                    <div class="detail-field__label">Montant</div>
+                    <div class="detail-field__value detail-field__value--amount">{{ consultationActive.montant }} MAD</div>
+                </div>
+
+                <div class="detail-field">
+                    <div class="detail-field__label">Ordonnance</div>
+                    <span class="badge" [class.badge--termine]="consultationActive.hasOrdonnance"
+                          [class.badge--inactif]="!consultationActive.hasOrdonnance">
+            {{ consultationActive.hasOrdonnance ? 'Oui' : 'Non' }}
+          </span>
+                </div>
+
+            </div>
+
+        </div>
+    }
+
+</div>
+
+<!-- ── Dialog Nouvelle Consultation ────── -->
+<p-dialog
+    header="Nouvelle Consultation"
+    [(visible)]="dialogVisible"
+    [modal]="true"
+    [style]="{width:'720px'}"
+    [draggable]="false"
+    styleClass="mc-dialog">
+
+    <!-- Étapes -->
+    <div class="stepper">
+        @for (etape of etapes; track etape; let i = $index) {
+            <div class="stepper__step"
+                 [class.stepper__step--active]="activeStep === i"
+                 [class.stepper__step--done]="activeStep > i"
+                 (click)="activeStep = i">
+                <div class="stepper__num">{{ activeStep > i ? '✓' : (i + 1) }}</div>
+                <span class="stepper__label">{{ etape }}</span>
+            </div>
+            @if (i < etapes.length - 1) {
+                <div class="stepper__line" [class.stepper__line--done]="activeStep > i"></div>
+            }
+        }
+    </div>
+
+    <!-- ── Étape 1 : Anamnèse ─────────────── -->
+    @if (activeStep === 0) {
+        <div class="step-content">
+            <div class="form-row">
+                <div class="form-field">
+                    <label class="form-label">Dossier / Patient <span class="form-required">*</span></label>
+                    <p-select [(ngModel)]="consultation.dossierId"
+                              [options]="dossiersOptions"
+                              optionLabel="label"
+                              optionValue="id"
+                              placeholder="Sélectionner un dossier"
+                              [filter]="true"
+                              filterBy="label"
+                              styleClass="w-full">
+                    </p-select>
+                </div>
+                <div class="form-field">
+                    <label class="form-label">Type</label>
+                    <p-select [(ngModel)]="consultation.typeConsultation" [options]="typeOptions"
+                              optionLabel="label" optionValue="value" styleClass="w-full"></p-select>
+                </div>
+            </div>
+            <div class="form-field">
+                <label class="form-label">Motif <span class="form-required">*</span></label>
+                <input class="form-input" pInputText [(ngModel)]="consultation.motif" placeholder="Motif de consultation"/>
+            </div>
+            <div class="form-field">
+                <label class="form-label">Anamnèse</label>
+                <textarea class="form-textarea" pTextarea [(ngModel)]="consultation.anamnese"
+                          rows="3" placeholder="Histoire de la maladie..."></textarea>
+            </div>
+        </div>
+        <div class="step-footer step-footer--right">
+            <button class="btn-primary" (click)="activeStep = 1">
+                Suivant <i class="pi pi-arrow-right"></i>
+            </button>
+        </div>
+    }
+
+    <!-- ── Étape 2 : Examen Clinique ──────── -->
+    @if (activeStep === 1) {
+        <div class="step-content">
+
+            <div class="constantes-section">
+                <div class="constantes-section__title">Constantes Vitales</div>
+                <div class="constantes-grid">
+                    <div class="constante-field">
+                        <label class="constante-field__label">Tension Sys <span class="constante-field__unit">mmHg</span></label>
+                        <input class="form-input" pInputText type="number" [(ngModel)]="consultation.tensionSystolique" placeholder="120"/>
+                    </div>
+                    <div class="constante-field">
+                        <label class="constante-field__label">Tension Dia <span class="constante-field__unit">mmHg</span></label>
+                        <input class="form-input" pInputText type="number" [(ngModel)]="consultation.tensionDiastolique" placeholder="80"/>
+                    </div>
+                    <div class="constante-field">
+                        <label class="constante-field__label">FC <span class="constante-field__unit">bpm</span></label>
+                        <input class="form-input" pInputText type="number" [(ngModel)]="consultation.frequenceCardiaque"/>
+                    </div>
+                    <div class="constante-field">
+                        <label class="constante-field__label">Temp <span class="constante-field__unit">°C</span></label>
+                        <input class="form-input" pInputText type="number" step="0.1" [(ngModel)]="consultation.temperature"/>
+                    </div>
+                    <div class="constante-field">
+                        <label class="constante-field__label">SpO2 <span class="constante-field__unit">%</span></label>
+                        <input class="form-input" pInputText type="number" [(ngModel)]="consultation.saturationO2"/>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-field">
+                <label class="form-label">Examen Clinique</label>
+                <textarea class="form-textarea" pTextarea [(ngModel)]="consultation.examenClinique"
+                          rows="3" placeholder="Résultats de l'examen clinique..."></textarea>
+            </div>
+
+            <div class="form-field">
+                <label class="form-label">Diagnostic</label>
+                <input class="form-input" pInputText [(ngModel)]="consultation.diagnostic" placeholder="Diagnostic principal"/>
+            </div>
+
+        </div>
+        <div class="step-footer step-footer--between">
+            <button class="btn-outline" (click)="activeStep = 0"><i class="pi pi-arrow-left"></i> Précédent</button>
+            <button class="btn-primary" (click)="activeStep = 2">Suivant <i class="pi pi-arrow-right"></i></button>
+        </div>
+    }
+
+    <!-- ── Étape 3 : Ordonnance ───────────── -->
+    @if (activeStep === 2) {
+        <div class="step-content">
+
+            <!-- Ajouter médicament -->
+            <div class="med-add-row">
+                <input class="form-input" pInputText [(ngModel)]="nouvelleLigne.medicament" placeholder="Médicament *"/>
+                <input class="form-input" pInputText [(ngModel)]="nouvelleLigne.dosage" placeholder="Dosage"/>
+                <input class="form-input" pInputText [(ngModel)]="nouvelleLigne.posologie" placeholder="Posologie"/>
+                <button class="btn-primary btn-add" (click)="ajouterLigne()">
+                    <i class="pi pi-plus"></i>
+                </button>
+            </div>
+
+            <!-- Liste médicaments -->
+            @if (lignesOrdonnance.length > 0) {
+                <div class="med-list">
+                    @for (ligne of lignesOrdonnance; track $index; let i = $index) {
+                        <div class="med-item">
+                            <div class="med-item__info">
+                                <span class="med-item__name">{{ ligne.medicament }}</span>
+                                <span class="med-item__detail">{{ ligne.dosage }} — {{ ligne.posologie }}</span>
+                            </div>
+                            <button class="btn-action btn-action--danger" (click)="supprimerLigne(i)">
+                                <i class="pi pi-trash"></i>
+                            </button>
+                        </div>
+                    }
+                </div>
+            } @else {
+                <div class="med-empty">
+                    <i class="pi pi-inbox"></i> Aucun médicament ajouté
+                </div>
+            }
+
+            <div class="detail-divider"></div>
+
+            <div class="form-row">
+                <div class="form-field">
+                    <label class="form-label">Conclusion</label>
+                    <textarea class="form-textarea" pTextarea [(ngModel)]="consultation.conclusion"
+                              rows="2" placeholder="Conclusion et recommandations..."></textarea>
+                </div>
+                <div class="form-field form-field--sm">
+                    <label class="form-label">Montant (MAD)</label>
+                    <input class="form-input" pInputText type="number" [(ngModel)]="consultation.montantTotal"/>
+                </div>
+            </div>
+
+        </div>
+        <div class="step-footer step-footer--between">
+            <button class="btn-outline" (click)="activeStep = 1"><i class="pi pi-arrow-left"></i> Précédent</button>
+            <button class="btn-primary" (click)="sauvegarderConsultation()">
+                <i class="pi pi-check"></i> Sauvegarder
+            </button>
+        </div>
+    }
+
+</p-dialog>

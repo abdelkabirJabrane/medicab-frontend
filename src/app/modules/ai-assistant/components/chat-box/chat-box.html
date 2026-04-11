@@ -1,0 +1,50 @@
+<div class="chat-container">
+    <div class="chat-header">
+        <h3 class="title">
+           <i class="pi pi-sparkles"></i> MedAgent
+        </h3>
+        <span class="status-badge" [class.error]="connectionError">
+            {{ connectionError ? 'Déconnecté' : 'En Ligne' }}
+        </span>
+    </div>
+
+    <div class="chat-messages" #scrollContainer>
+        <div class="message" *ngFor="let msg of messages" [ngClass]="msg.role === 'MEDECIN' ? 'msg-right' : 'msg-left'">
+            <div class="msg-avatar">
+                {{ msg.role === 'MEDECIN' ? '👨‍⚕️' : '🤖' }}
+            </div>
+            <div class="msg-content-wrapper">
+                <div class="msg-bubble" [class.is-transcription]="msg.isTranscription">
+                    <span class="text">{{ msg.text }}</span>
+                    <span class="cursor" *ngIf="msg.isStreaming"></span>
+                </div>
+                <div class="msg-time">{{ msg.timestamp | date:'shortTime' }}</div>
+            </div>
+        </div>
+        
+        <div class="empty-chat" *ngIf="messages.length === 0">
+            Commencez la consultation en dictant ou en tapant votre texte.
+        </div>
+    </div>
+
+    <div class="chat-input-area" [class.recording-mode]="isRecording">
+        <!-- Microphone Slot (Always present, but changes position/style via CSS when recording) -->
+        <div class="dictation-slot">
+            <ng-content></ng-content>
+        </div>
+
+        <!-- Text area and Send button (Only visible when NOT recording) -->
+        <textarea *ngIf="!isRecording"
+                  [(ngModel)]="inputText" 
+                  (keydown)="onKeyDown($event)"
+                  placeholder="Tapez votre message ou notes cliniques..."
+                  [disabled]="connectionError"></textarea>
+        
+        <button *ngIf="!isRecording" 
+                class="send-btn" 
+                (click)="onSubmit()" 
+                [disabled]="!inputText.trim() || connectionError">
+            <i class="pi pi-send"></i>
+        </button>
+    </div>
+</div>

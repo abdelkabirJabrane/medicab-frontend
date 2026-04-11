@@ -1,0 +1,97 @@
+::ng-deep .dark-modal {
+    background: var(--mc-surface);
+    border: 1px solid var(--mc-border);
+    border-radius: 16px;
+    overflow: hidden;
+    color: var(--mc-text-1);
+    font-family: 'Inter', sans-serif;
+    box-shadow: var(--mc-shadow-md);
+
+    .p-dialog-header {
+        background: var(--mc-bg);
+        color: var(--mc-text-1);
+        border-bottom: 1px solid var(--mc-border);
+        padding: 1.25rem 1.5rem;
+        
+        .p-dialog-title {
+            font-size: 1.15rem;
+            font-weight: 800;
+        }
+
+        .p-dialog-header-icons button {
+            color: var(--mc-text-2);
+            &:hover { background: var(--mc-surface); color: var(--mc-text-1); }
+        }
+    }
+
+    .p-dialog-content {
+        background: var(--mc-surface);
+        padding: 1.5rem;
+        color: var(--mc-text-1);
+    }
+
+    .p-dialog-footer {
+        background: var(--mc-bg);
+        border-top: 1px solid var(--mc-border);
+        padding: 1rem 1.5rem;
+        display: flex;
+        justify-content: flex-end;
+        gap: 0.75rem;
+    }
+}
+
+.result-content {
+    pre {
+        white-space: pre-wrap;
+        font-family: inherit;
+        font-size: 0.95rem;
+        line-height: 1.6;
+        color: var(--mc-text-2);
+        margin: 0;
+    }
+}
+
+.btn-secondary, .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.7rem 1.25rem;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: 1px solid transparent;
+}
+
+.btn-secondary {
+    background: var(--mc-surface-2);
+    color: var(--mc-text-2);
+    border-color: var(--mc-border);
+    &:hover { background: var(--mc-border); color: var(--mc-text-1); }
+}
+
+.btn-primary {
+    background: var(--mc-blue);
+    color: white;
+    border-color: var(--mc-blue);
+    &:hover { background: var(--mc-primary-dark); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(37,99,235,0.2); }
+}
+
+@media print {
+    body * {
+        visibility: hidden;
+    }
+    .print-area, .print-area * {
+        visibility: visible;
+        color: black !important;
+        background: white !important;
+    }
+    .print-area {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        padding: 2cm;
+    }
+}

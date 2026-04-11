@@ -1,0 +1,491 @@
+// ================================================
+//  ordonnances.scss  —  MediCab Pro
+// ================================================
+
+:host {
+    --mc-primary:        #2563EB;
+    --mc-primary-dark:   #1D4ED8;
+    --mc-primary-light:  #EFF4FF;
+
+    --mc-bg:             #F1F5FA;
+    --mc-surface:        #FFFFFF;
+    --mc-surface-2:      #F8FAFD;
+
+    --mc-border:         #E5EAF4;
+    --mc-border-hover:   #C9D4E8;
+
+    --mc-text-1:         #0D1B3E;
+    --mc-text-2:         #4A5878;
+    --mc-text-3:         #8A95B0;
+
+    --mc-green:          #059669;
+    --mc-green-bg:       #ECFDF5;
+    --mc-red:            #DC2626;
+    --mc-red-bg:         #FEF2F2;
+    --mc-orange:         #D97706;
+    --mc-orange-bg:      #FFFBEB;
+    --mc-blue:           #2563EB;
+    --mc-blue-bg:        #EFF6FF;
+
+    --mc-radius:         12px;
+    --mc-radius-sm:      8px;
+    --mc-radius-lg:      16px;
+
+    --mc-shadow-sm:      0 1px 4px rgba(13,27,62,.07), 0 1px 2px rgba(13,27,62,.04);
+    --mc-shadow-md:      0 4px 16px rgba(13,27,62,.08), 0 1px 4px rgba(13,27,62,.04);
+
+    display: block;
+    padding: 1.75rem 2rem;
+    background: var(--mc-bg);
+    min-height: 100%;
+}
+
+// ── Page Header ──────────────────────────────
+.page-header {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 1rem; margin-bottom: 1.5rem;
+
+    &__title   { font-size: 1.55rem; font-weight: 800; color: var(--mc-text-1); letter-spacing: -.4px; }
+    &__subtitle { margin-top: .3rem; font-size: .875rem; color: var(--mc-text-3); }
+
+    .header-actions {
+        display: flex;
+        align-items: center;
+        gap: .75rem;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+    }
+}
+
+// ── Buttons ──────────────────────────────────
+.btn-primary {
+    display: inline-flex; align-items: center; gap: .45rem;
+    padding: .6rem 1.2rem; background: var(--mc-primary); color: #fff;
+    border: none; border-radius: var(--mc-radius-sm);
+    font-size: .875rem; font-weight: 600; font-family: inherit;
+    cursor: pointer; white-space: nowrap;
+    box-shadow: 0 2px 8px rgba(37,99,235,.28);
+    transition: background .15s, transform .1s;
+
+    &:hover { background: var(--mc-primary-dark); transform: translateY(-1px); }
+    &:active { transform: none; }
+    i { font-size: .78rem; }
+    &.btn-add { padding: .55rem .875rem; flex-shrink: 0; }
+}
+
+.btn-outline {
+    display: inline-flex; align-items: center; gap: .4rem;
+    padding: .55rem 1.1rem; background: transparent; color: var(--mc-text-2);
+    border: 1px solid var(--mc-border); border-radius: var(--mc-radius-sm);
+    font-size: .875rem; font-weight: 600; font-family: inherit; cursor: pointer;
+    transition: all .15s;
+
+    &:hover { border-color: var(--mc-border-hover); background: var(--mc-surface-2); color: var(--mc-text-1); }
+    i { font-size: .78rem; }
+}
+
+.btn-icon {
+    width: 28px; height: 28px;
+    border: 1px solid var(--mc-border); border-radius: var(--mc-radius-sm);
+    background: transparent; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--mc-text-3); transition: all .15s;
+
+    &:hover { border-color: var(--mc-primary); color: var(--mc-primary); background: var(--mc-primary-light); }
+    i { font-size: .72rem; }
+}
+
+.btn-action {
+    width: 30px; height: 30px;
+    border-radius: var(--mc-radius-sm); border: 1px solid var(--mc-border);
+    background: var(--mc-surface); cursor: pointer;
+    display: flex; align-items: center; justify-content: center; transition: all .15s;
+    i { font-size: .78rem; }
+
+    &--neutral { color: var(--mc-text-3); &:hover { background: var(--mc-primary-light); border-color: var(--mc-primary); color: var(--mc-primary); } }
+    &--danger  { color: var(--mc-red);    &:hover { background: var(--mc-red-bg); border-color: var(--mc-red); } }
+}
+
+// ── Main Grid ────────────────────────────────
+.ord-grid {
+    display: grid; grid-template-columns: 1fr;
+    gap: 1.25rem; align-items: start;
+
+    &--split {
+        grid-template-columns: 1fr 380px;
+        @media (max-width: 1100px) { grid-template-columns: 1fr; }
+    }
+}
+
+// ── Panel / Table ────────────────────────────
+.panel {
+    background: var(--mc-surface);
+    border: 1px solid var(--mc-border);
+    border-radius: var(--mc-radius-lg);
+    box-shadow: var(--mc-shadow-sm);
+    overflow: hidden;
+}
+
+::ng-deep .mc-table {
+    .p-datatable-thead > tr > th {
+        background: var(--mc-surface-2);
+        border-bottom: 1px solid var(--mc-border) !important;
+        border-top: none !important;
+        padding: .75rem 1rem;
+        font-size: .7rem; font-weight: 700;
+        text-transform: uppercase; letter-spacing: .6px;
+        color: var(--mc-text-3); white-space: nowrap;
+    }
+
+    .p-datatable-tbody > tr {
+        transition: background .12s;
+        &:hover > td { background: var(--mc-primary-light); }
+        > td {
+            padding: .875rem 1rem;
+            border-bottom: 1px solid var(--mc-border) !important;
+            border-top: none !important;
+        }
+        &:last-child > td { border-bottom: none !important; }
+    }
+}
+
+.table-row--active > td { background: var(--mc-primary-light) !important; }
+
+// ── Table Cells ──────────────────────────────
+.patient-cell {
+    display: flex; align-items: center; gap: .625rem;
+
+    &__avatar {
+        width: 32px; height: 32px; border-radius: var(--mc-radius-sm);
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: #fff; font-size: .66rem; font-weight: 700;
+        display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+
+    &__name { font-weight: 600; font-size: .8375rem; color: var(--mc-text-1); }
+}
+
+.td-mono   { font-size: .8rem; font-weight: 600; color: var(--mc-text-2); font-variant-numeric: tabular-nums; letter-spacing: .2px; }
+.td-muted  { font-size: .8rem; color: var(--mc-text-3); }
+
+.med-count {
+    display: inline-flex; align-items: center; gap: .375rem;
+    font-size: .8rem; font-weight: 600; color: var(--mc-text-2);
+    i { font-size: .75rem; color: var(--mc-text-3); }
+}
+
+// ── Badges ───────────────────────────────────
+.badge {
+    display: inline-flex; align-items: center;
+    padding: .22rem .6rem; border-radius: 20px;
+    font-size: .68rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: .45px;
+
+    &--active  { background: var(--mc-green-bg);  color: var(--mc-green);  }
+    &--expiree { background: var(--mc-surface-2); color: var(--mc-text-3); border: 1px solid var(--mc-border); }
+    &--annulee { background: var(--mc-orange-bg); color: var(--mc-orange); }
+}
+
+// ── Row Actions ──────────────────────────────
+.row-actions { display: flex; gap: .25rem; }
+
+// ── Table Empty ──────────────────────────────
+.table-empty {
+    display: flex; flex-direction: column; align-items: center;
+    padding: 3rem; color: var(--mc-text-3); font-size: .875rem; gap: .75rem;
+    &__icon { font-size: 2.5rem; color: var(--mc-border); }
+}
+
+// ── Ordonnance Preview ───────────────────────
+.ord-preview {
+    background: var(--mc-surface);
+    border: 1px solid var(--mc-border);
+    border-radius: var(--mc-radius-lg);
+    box-shadow: var(--mc-shadow-sm);
+    overflow: hidden;
+
+    &__header {
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 1.125rem 1.375rem;
+        background: var(--mc-primary);
+        color: #fff;
+    }
+
+    &__clinic {
+        display: flex; align-items: center; gap: .75rem;
+    }
+
+    &__clinic-icon {
+        width: 36px; height: 36px; border-radius: var(--mc-radius-sm);
+        background: rgba(255,255,255,.2);
+        display: flex; align-items: center; justify-content: center;
+        i { font-size: .9rem; color: #fff; }
+    }
+
+    &__clinic-name { font-weight: 800; font-size: .95rem; color: #fff; letter-spacing: -.2px; }
+    &__clinic-sub  { font-size: .7rem; color: rgba(255,255,255,.7); margin-top: 1px; }
+
+    &__meta { display: flex; align-items: center; gap: .75rem; }
+    &__num  { font-size: .8rem; font-weight: 700; color: rgba(255,255,255,.9); font-variant-numeric: tabular-nums; }
+    &__date { font-size: .75rem; color: rgba(255,255,255,.65); }
+
+    &__body { padding: 1.25rem 1.375rem; }
+}
+
+// ── Ordonnance Sections ───────────────────────
+.ord-section {
+    padding: .75rem 0;
+
+    &__label {
+        font-size: .65rem; font-weight: 700; text-transform: uppercase;
+        letter-spacing: .7px; color: var(--mc-text-3); margin-bottom: .4rem;
+    }
+
+    &__value {
+        font-size: .875rem; font-weight: 600; color: var(--mc-text-1);
+        &--lg { font-size: 1.05rem; font-weight: 800; letter-spacing: -.2px; }
+    }
+
+    &__diag {
+        display: flex; align-items: center; gap: .375rem;
+        margin-top: .375rem; font-size: .78rem; color: var(--mc-text-2);
+        i { font-size: .72rem; color: var(--mc-text-3); }
+    }
+}
+
+.ord-divider { height: 1px; background: var(--mc-border); }
+
+// ── Medications List ─────────────────────────
+.ord-meds {
+    display: flex; flex-direction: column; gap: .5rem; margin-top: .25rem;
+}
+
+.ord-med {
+    display: flex; align-items: flex-start; gap: .875rem;
+    padding: .875rem 1rem;
+    background: var(--mc-surface-2);
+    border: 1px solid var(--mc-border);
+    border-radius: var(--mc-radius);
+    border-left: 3px solid var(--mc-primary);
+    transition: background .15s;
+
+    &:hover { background: var(--mc-primary-light); }
+
+    &__num {
+        width: 24px; height: 24px; border-radius: 50%;
+        background: var(--mc-primary); color: #fff;
+        font-size: .72rem; font-weight: 800;
+        display: flex; align-items: center; justify-content: center;
+        flex-shrink: 0; margin-top: 1px;
+    }
+
+    &__body { flex: 1; }
+
+    &__name { font-weight: 700; font-size: .875rem; color: var(--mc-text-1); }
+
+    &__posologie {
+        font-size: .78rem; color: var(--mc-text-2); margin-top: .2rem;
+    }
+
+    &__duree {
+        display: inline-flex; align-items: center; gap: .3rem;
+        margin-top: .35rem; font-size: .7rem; color: var(--mc-text-3);
+        i { font-size: .65rem; }
+    }
+}
+
+// ── Recommendations ──────────────────────────
+.ord-notes {
+    background: var(--mc-orange-bg);
+    border: 1px solid #FDE68A;
+    border-left: 3px solid var(--mc-orange);
+    border-radius: var(--mc-radius-sm);
+    padding: .75rem 1rem;
+    font-size: .8375rem; color: var(--mc-text-1); line-height: 1.5;
+}
+
+// ── Footer Signature ─────────────────────────
+.ord-footer {
+    display: flex; align-items: flex-end; justify-content: space-between;
+    padding-top: .75rem;
+
+    &__sig { flex: 1; }
+
+    &__sig-line {
+        width: 160px; height: 1px; background: var(--mc-border-hover);
+        margin-bottom: .375rem;
+    }
+
+    &__sig-label { font-size: .7rem; color: var(--mc-text-3); }
+}
+
+// ── Dialog Form ──────────────────────────────
+.dialog-form { display: flex; flex-direction: column; gap: 1rem; padding: .5rem 0 .25rem; }
+
+.form-field  { display: flex; flex-direction: column; gap: .35rem; }
+.form-label  { font-size: .8125rem; font-weight: 600; color: var(--mc-text-2); }
+.form-required { color: var(--mc-red); margin-left: 2px; }
+
+.form-input {
+    width: 100%; padding: .55rem .875rem;
+    border: 1px solid var(--mc-border); border-radius: var(--mc-radius-sm);
+    font-size: .875rem; font-family: inherit; color: var(--mc-text-1);
+    background: var(--mc-surface); outline: none;
+    transition: border-color .15s, box-shadow .15s;
+
+    &:focus { border-color: var(--mc-primary); box-shadow: 0 0 0 3px rgba(37,99,235,.08); }
+    &::placeholder { color: var(--mc-text-3); }
+}
+
+.med-add-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr auto auto;
+    gap: .5rem; align-items: end;
+
+    .duree-row {
+        display: flex; gap: .375rem; align-items: center;
+        .duree-input { width: 70px; }
+        .unite-select { min-width: 90px; }
+    }
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: .625rem;
+}
+
+.form-divider {
+    height: 1px; background: var(--mc-border); margin: .25rem 0;
+}
+
+
+.med-list {
+    background: var(--mc-surface-2);
+    border: 1px solid var(--mc-border);
+    border-radius: var(--mc-radius); overflow: hidden;
+}
+
+.med-item {
+    display: flex; align-items: center; gap: .75rem;
+    padding: .7rem 1rem; border-bottom: 1px solid var(--mc-border);
+    &:last-child { border-bottom: none; }
+
+    &__num {
+        width: 22px; height: 22px; border-radius: 50%;
+        background: var(--mc-primary-light); color: var(--mc-primary);
+        font-size: .68rem; font-weight: 800;
+        display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+
+    &__info { flex: 1; display: flex; flex-direction: column; gap: .15rem; }
+    &__name { font-weight: 600; font-size: .8125rem; color: var(--mc-text-1); }
+    &__detail { font-size: .72rem; color: var(--mc-text-3); }
+    &__duree {
+        display: inline-flex; align-items: center; gap: .25rem;
+        background: var(--mc-primary-light); color: var(--mc-primary);
+        font-size: .67rem; font-weight: 700; padding: .1rem .4rem;
+        border-radius: 20px; margin-left: .375rem;
+    }
+
+}
+
+.med-empty {
+    display: flex; align-items: center; justify-content: center; gap: .5rem;
+    padding: 1.25rem; font-size: .8rem; color: var(--mc-text-3);
+    background: var(--mc-surface-2); border: 1px dashed var(--mc-border);
+    border-radius: var(--mc-radius);
+    i { font-size: .9rem; }
+}
+
+.dialog-footer {
+    display: flex; justify-content: flex-end; gap: .625rem; padding-top: .25rem;
+}
+
+// ── Print Styles ─────────────────────────────
+.print-only { display: none; }
+
+@media print {
+    // Masquer tout ce qui est dans le DOM sauf notre partie à imprimer
+    body * { visibility: hidden; }
+    #printable-ordonnance, #printable-ordonnance * { visibility: visible; }
+    #printable-ordonnance {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        display: block !important;
+        background: white !important;
+        padding: 40px !important;
+        min-height: 100vh;
+        z-index: 99999;
+        font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    .print-header {
+        display: flex; justify-content: space-between; align-items: flex-start;
+        border-bottom: 2px solid #E5E7EB; padding-bottom: 20px; margin-bottom: 40px;
+
+        .doctor-name { font-size: 28pt; font-weight: 800; color: #1E40AF; margin: 0; }
+        .doctor-specialty { font-size: 14pt; color: #4B5563; font-weight: 600; margin-top: 5px; text-transform: uppercase; letter-spacing: 1px; }
+        .doctor-cert { font-size: 10pt; color: #9CA3AF; margin-top: 20px; }
+    }
+
+    .print-patient {
+        margin-bottom: 40px;
+        .patient-info-row {
+            display: flex; gap: 10px; margin-bottom: 12px; border-bottom: 1px solid #F3F4F6; padding-bottom: 4px;
+            .info-label { width: 130px; font-weight: 600; color: #6B7280; font-size: 11pt; }
+            .info-value { border-bottom: 1px solid #1E40AF; flex: 1; font-weight: 500; font-size: 12pt; }
+        }
+        .patient-info-grid {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 40px;
+        }
+    }
+
+    .rx-symbol {
+        font-size: 48pt; font-weight: 900; color: #1E40AF; margin-bottom: 20px; font-family: serif;
+    }
+
+    .print-meds {
+        min-height: 350px;
+        .print-med {
+            margin-bottom: 25px;
+            &__header { display: flex; align-items: baseline; gap: 8px; }
+            &__num { font-weight: 700; color: #1E40AF; }
+            &__name { font-size: 14pt; font-weight: 700; color: #111827; }
+            &__dosage { font-size: 12pt; color: #4B5563; font-weight: 600; }
+            &__details { padding-left: 25px; margin-top: 5px; }
+            &__poso { font-size: 11pt; color: #374151; font-style: italic; margin-bottom: 2px; }
+            &__duree { font-size: 10pt; color: #6B7280; font-weight: 600; }
+        }
+    }
+
+    .print-instructions {
+        margin-top: 40px; padding: 15px; background: #F9FAFB; border-left: 4px solid #1E40AF;
+        .instructions-title { font-size: 11pt; font-weight: 700; color: #374151; margin-bottom: 5px; }
+        p { font-size: 10pt; color: #4B5563; line-height: 1.5; }
+    }
+
+    .print-signature {
+        position: absolute; bottom: 150px; right: 40px; text-align: center;
+        .signature-line { width: 200px; border-bottom: 2px solid #D1D5DB; margin-bottom: 5px; }
+        p { font-size: 9pt; font-weight: 700; color: #9CA3AF; letter-spacing: 1px; }
+    }
+
+    .print-footer-bar {
+        position: absolute; bottom: 40px; left: 40px; right: 40px;
+        display: flex; justify-content: space-between; align-items: flex-end;
+        padding-top: 20px; border-top: 3px solid #1E40AF;
+
+        .footer-clinic {
+            .footer-clinic-name { display: block; font-size: 16pt; font-weight: 800; color: #1E40AF; }
+            .footer-clinic-slogan { font-size: 8pt; color: #6B7280; font-weight: 600; letter-spacing: 1px; }
+        }
+
+        .footer-contacts, .footer-web {
+            font-size: 9pt; color: #4B5563;
+            .contact-item { display: flex; align-items: center; gap: 8px; margin-top: 4px; i { color: #1E40AF; } }
+        }
+    }
+}

@@ -1,0 +1,444 @@
+// ================================================
+//  dashboard.scss  —  MediCab Pro
+//  Design : clean clinical SaaS, Plus Jakarta Sans
+// ================================================
+
+// ── Design Tokens ────────────────────────────────
+:host {
+    --mc-primary:        #2563EB;
+    --mc-primary-dark:   #1D4ED8;
+    --mc-primary-light:  #EFF4FF;
+
+    --mc-bg:             #F1F5FA;
+    --mc-surface:        #FFFFFF;
+    --mc-surface-2:      #F8FAFD;
+
+    --mc-border:         #E5EAF4;
+    --mc-border-hover:   #C9D4E8;
+
+    --mc-text-1:         #0D1B3E;
+    --mc-text-2:         #4A5878;
+    --mc-text-3:         #8A95B0;
+
+    --mc-green:          #059669;
+    --mc-green-bg:       #ECFDF5;
+    --mc-red:            #DC2626;
+    --mc-red-bg:         #FEF2F2;
+    --mc-orange:         #D97706;
+    --mc-orange-bg:      #FFFBEB;
+    --mc-blue:           #2563EB;
+    --mc-blue-bg:        #EFF6FF;
+
+    --mc-radius:         12px;
+    --mc-radius-sm:      8px;
+    --mc-radius-lg:      16px;
+
+    --mc-shadow-sm:      0 1px 4px rgba(13,27,62,.07), 0 1px 2px rgba(13,27,62,.04);
+    --mc-shadow-md:      0 4px 16px rgba(13,27,62,.08), 0 1px 4px rgba(13,27,62,.04);
+
+    display: block;
+    padding: 1.75rem 2rem;
+    background: var(--mc-bg);
+    min-height: 100%;
+}
+
+// ── Utility ──────────────────────────────────────
+%panel-base {
+    background: var(--mc-surface);
+    border: 1px solid var(--mc-border);
+    border-radius: var(--mc-radius-lg);
+    box-shadow: var(--mc-shadow-sm);
+}
+
+// ── Page Header ──────────────────────────────────
+.dash-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1.75rem;
+
+    &__title {
+        font-size: 1.55rem;
+        font-weight: 800;
+        color: var(--mc-text-1);
+        letter-spacing: -0.4px;
+        line-height: 1.15;
+    }
+
+    &__subtitle {
+        margin-top: 0.3rem;
+        font-size: 0.875rem;
+        color: var(--mc-text-3);
+        font-weight: 400;
+
+        strong {
+            color: var(--mc-primary);
+            font-weight: 700;
+        }
+    }
+}
+
+// ── Primary Button ───────────────────────────────
+.btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.6rem 1.2rem;
+    background: var(--mc-primary);
+    color: #fff;
+    border: none;
+    border-radius: var(--mc-radius-sm);
+    font-size: 0.875rem;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    white-space: nowrap;
+    text-decoration: none;
+    transition: background .15s, box-shadow .15s, transform .1s;
+    box-shadow: 0 2px 8px rgba(37,99,235,.28);
+
+    &:hover {
+        background: var(--mc-primary-dark);
+        box-shadow: 0 4px 14px rgba(37,99,235,.35);
+        transform: translateY(-1px);
+    }
+    &:active { transform: none; }
+
+    i { font-size: 0.78rem; }
+}
+
+// ── KPI Grid ─────────────────────────────────────
+.kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+
+    @media (max-width: 1280px) { grid-template-columns: repeat(2, 1fr); }
+    @media (max-width: 600px)  { grid-template-columns: 1fr; }
+}
+
+// ── KPI Card ─────────────────────────────────────
+.kpi-card {
+    @extend %panel-base;
+    padding: 1.25rem 1.375rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.875rem;
+    border-top: 3px solid transparent;
+    transition: box-shadow .2s, transform .2s;
+
+    &:hover {
+        box-shadow: var(--mc-shadow-md);
+        transform: translateY(-2px);
+    }
+
+    // ── Colour variants
+    &--blue   { border-top-color: var(--mc-blue);
+        .kpi-card__icon { background: var(--mc-blue-bg);   i { color: var(--mc-blue);   } } }
+    &--orange { border-top-color: var(--mc-orange);
+        .kpi-card__icon { background: var(--mc-orange-bg); i { color: var(--mc-orange); } } }
+    &--green  { border-top-color: var(--mc-green);
+        .kpi-card__icon { background: var(--mc-green-bg);  i { color: var(--mc-green);  } } }
+    &--purple { border-top-color: var(--mc-purple);
+        .kpi-card__icon { background: var(--mc-purple-bg); i { color: var(--mc-purple); } } }
+
+    &__body { flex: 1; min-width: 0; }
+
+    &__label {
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.65px;
+        color: var(--mc-text-3);
+        margin-bottom: 0.375rem;
+    }
+
+    &__value {
+        font-size: 1.6rem;
+        font-weight: 800;
+        color: var(--mc-text-1);
+        letter-spacing: -0.5px;
+        line-height: 1;
+        margin-bottom: 0.45rem;
+    }
+
+    &__trend {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.22rem;
+        font-size: 0.7rem;
+        font-weight: 600;
+        padding: 0.2rem 0.5rem;
+        border-radius: 20px;
+
+        i { font-size: 0.6rem; }
+
+        &--up   { background: var(--mc-green-bg);  color: var(--mc-green);  }
+        &--down { background: var(--mc-red-bg);    color: var(--mc-red);    }
+    }
+
+    &__icon {
+        width: 46px;
+        height: 46px;
+        border-radius: var(--mc-radius);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+
+        i { font-size: 1.15rem; }
+    }
+}
+
+// ── Content Grid ─────────────────────────────────
+.content-grid {
+    display: grid;
+    grid-template-columns: 1fr 340px;
+    gap: 1.25rem;
+    margin-bottom: 1.25rem;
+    align-items: start;
+
+    @media (max-width: 1100px) { grid-template-columns: 1fr; }
+}
+
+// ── Charts Grid ──────────────────────────────────
+.charts-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: 1.25rem;
+    margin-bottom: 1.25rem;
+
+    @media (max-width: 1200px) {
+        grid-template-columns: 1fr 1fr;
+        .panel--ca { grid-column: 1 / -1; }
+    }
+    @media (max-width: 768px) {
+        grid-template-columns: 1fr;
+    }
+}
+
+.flex-center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-top: 1rem;
+}
+
+// ── Panel ────────────────────────────────────────
+.panel {
+    @extend %panel-base;
+    overflow: hidden;
+
+    &__header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        padding: 1.125rem 1.375rem;
+        border-bottom: 1px solid var(--mc-border);
+    }
+
+    &__title {
+        font-size: 0.9375rem;
+        font-weight: 700;
+        color: var(--mc-text-1);
+        letter-spacing: -0.15px;
+    }
+
+    &__subtitle {
+        margin-top: 0.15rem;
+        font-size: 0.72rem;
+        color: var(--mc-text-3);
+    }
+
+    &__link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3rem;
+        font-size: 0.78rem;
+        font-weight: 600;
+        color: var(--mc-primary);
+        text-decoration: none;
+        white-space: nowrap;
+        transition: gap .15s;
+
+        &:hover { gap: 0.5rem; }
+        i { font-size: 0.7rem; }
+    }
+
+    &--chart .chart-wrap {
+        padding: 1rem 1.25rem 1.25rem;
+    }
+}
+
+// ── RDV List ─────────────────────────────────────
+.rdv-list {
+    padding: 0.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.rdv-item {
+    display: flex;
+    align-items: center;
+    gap: 0.875rem;
+    padding: 0.8rem 0.875rem;
+    border-radius: var(--mc-radius);
+    border: 1px solid var(--mc-border);
+    background: var(--mc-surface-2);
+    transition: border-color .15s, background .15s, box-shadow .15s;
+    cursor: default;
+
+    &:hover {
+        border-color: var(--mc-primary);
+        background: var(--mc-primary-light);
+        box-shadow: 0 2px 8px rgba(37,99,235,.07);
+    }
+
+    &__time {
+        min-width: 46px;
+        text-align: center;
+        font-weight: 800;
+        font-size: 0.875rem;
+        color: var(--mc-primary);
+        letter-spacing: -0.3px;
+        flex-shrink: 0;
+    }
+
+    &__bar {
+        width: 3px;
+        height: 34px;
+        border-radius: 3px;
+        flex-shrink: 0;
+
+        &--confirme   { background: var(--mc-green);  }
+        &--annule     { background: var(--mc-red);    }
+        &--en_cours   { background: var(--mc-blue);   }
+        &--en_attente { background: var(--mc-orange); }
+        &--termine    { background: var(--mc-text-3); }
+    }
+
+    &__avatar {
+        width: 34px;
+        height: 34px;
+        border-radius: var(--mc-radius-sm);
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: #fff;
+        font-size: 0.68rem;
+        font-weight: 700;
+        letter-spacing: 0.3px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    &__info { flex: 1; min-width: 0; }
+
+    &__name {
+        font-weight: 600;
+        font-size: 0.8375rem;
+        color: var(--mc-text-1);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    &__meta {
+        margin-top: 2px;
+        font-size: 0.7rem;
+        color: var(--mc-text-3);
+    }
+}
+
+// ── Badge ────────────────────────────────────────
+.badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.22rem 0.6rem;
+    border-radius: 20px;
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.45px;
+    white-space: nowrap;
+    flex-shrink: 0;
+
+    &--confirme   { background: var(--mc-green-bg);  color: var(--mc-green);  }
+    &--annule     { background: var(--mc-red-bg);    color: var(--mc-red);    }
+    &--en_cours   { background: var(--mc-blue-bg);   color: var(--mc-blue);   }
+    &--en_attente { background: var(--mc-orange-bg); color: var(--mc-orange); }
+    &--termine    {
+        background: var(--mc-surface-2);
+        color: var(--mc-text-3);
+        border: 1px solid var(--mc-border);
+    }
+}
+
+// ── Icon Button ──────────────────────────────────
+.btn-icon {
+    width: 30px;
+    height: 30px;
+    border: 1px solid var(--mc-border);
+    border-radius: var(--mc-radius-sm);
+    background: var(--mc-surface);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--mc-text-3);
+    transition: all .15s;
+    flex-shrink: 0;
+
+    &:hover {
+        border-color: var(--mc-primary);
+        color: var(--mc-primary);
+        background: var(--mc-primary-light);
+    }
+
+    i { font-size: 0.78rem; }
+}
+
+// ── Activity List ────────────────────────────────
+.activity-list {
+    padding: 0.25rem 1.375rem 0.75rem;
+}
+
+.activity-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--mc-border);
+
+    &--last { border-bottom: none; }
+
+    &__icon {
+        width: 32px;
+        height: 32px;
+        border-radius: var(--mc-radius-sm);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+
+        i { font-size: 0.82rem; }
+    }
+
+    &__text {
+        font-size: 0.8rem;
+        font-weight: 500;
+        color: var(--mc-text-1);
+        line-height: 1.4;
+    }
+
+    &__time {
+        margin-top: 3px;
+        font-size: 0.68rem;
+        color: var(--mc-text-3);
+    }
+}
