@@ -1,6 +1,5 @@
 @import "primeicons/primeicons.css";
 @import "primeflex/primeflex.css";
-@import './dark-mode';
 
 /* ── Variables MediCab Pro ───────────── */
 :root {
@@ -29,19 +28,7 @@
     --mc-radius-sm:     8px;
 }
 
-/* ── Dark Theme ──────────────────────── */
-.medicab-dark {
-    --mc-bg:            #0f172a;
-    --mc-surface:       #1e293b;
-    --mc-surface-2:     #1a2744;
-    --mc-border:        #334155;
-    --mc-text-primary:  #f1f5f9;
-    --mc-text-secondary:#94a3b8;
-    --mc-text-muted:    #64748b;
-    --mc-sidebar-bg:    #1e293b;
-    --mc-topbar-bg:     #1e293b;
-    color-scheme: dark;
-}
+
 
 /* ── Global ──────────────────────────── */
 * { box-sizing: border-box; }
@@ -203,10 +190,7 @@ body {
     }
 }
 
-.medicab-dark .mc-menu-item:hover {
-    background: rgba(37,99,235,0.15);
-    color: #60a5fa;
-}
+
 
 /* ── Badges ──────────────────────────── */
 .mc-badge {
@@ -323,67 +307,7 @@ body {
     padding: 0.2rem 0.65rem !important;
 }
 
-/* ── Dark PrimeNG ────────────────────── */
-.medicab-dark {
-    .p-datatable {
-        .p-datatable-thead > tr > th {
-            background: #1a2744 !important;
-            color: #64748b !important;
-            border-color: #334155 !important;
-        }
-        .p-datatable-tbody > tr {
-            background: #1e293b !important;
-            color: #f1f5f9 !important;
-            border-color: #334155 !important;
-            &:hover {
-                background: #1a2744 !important;
-            }
-            td { border-color: #334155 !important; }
-        }
-        .p-paginator {
-            background: #1e293b !important;
-            border-color: #334155 !important;
-            color: #f1f5f9 !important;
-        }
-    }
 
-    .p-inputtext {
-        background: #1a2744 !important;
-        border-color: #334155 !important;
-        color: #f1f5f9 !important;
-    }
-
-    .p-dialog {
-        background: #1e293b !important;
-        border: 1px solid #334155 !important;
-
-        .p-dialog-header {
-            background: #1e293b !important;
-            color: #f1f5f9 !important;
-            border-bottom: 1px solid #334155 !important;
-        }
-        .p-dialog-content {
-            background: #1e293b !important;
-            color: #f1f5f9 !important;
-        }
-        .p-dialog-footer {
-            background: #1e293b !important;
-            border-top: 1px solid #334155 !important;
-        }
-    }
-
-    .p-select, .p-dropdown {
-        background: #1a2744 !important;
-        border-color: #334155 !important;
-        color: #f1f5f9 !important;
-    }
-
-    .p-select-panel, .p-dropdown-panel {
-        background: #1e293b !important;
-        border: 1px solid #334155 !important;
-        color: #f1f5f9 !important;
-    }
-}
 
 /* ── Scrollbar ───────────────────────── */
 ::-webkit-scrollbar { width: 5px; height: 5px; }
