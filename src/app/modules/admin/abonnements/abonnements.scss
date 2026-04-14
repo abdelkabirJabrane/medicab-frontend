@@ -1,31 +1,8 @@
-// ================================================
-//  abonnements.scss — Admin Abonnements — MediCab Pro
+﻿// ================================================
+//  abonnements.scss â€” Admin Abonnements â€” MediCab Pro
 // ================================================
 
 :host {
-    --mc-primary:        #2563EB;
-    --mc-primary-dark:   #1D4ED8;
-    --mc-primary-light:  #EFF4FF;
-    --mc-bg:             #F1F5FA;
-    --mc-surface:        #FFFFFF;
-    --mc-surface-2:      #F8FAFD;
-    --mc-border:         #E5EAF4;
-    --mc-border-hover:   #C9D4E8;
-    --mc-text-1:         #0D1B3E;
-    --mc-text-2:         #4A5878;
-    --mc-text-3:         #8A95B0;
-    --mc-green:          #059669;
-    --mc-green-bg:       #ECFDF5;
-    --mc-red:            #DC2626;
-    --mc-red-bg:         #FEF2F2;
-    --mc-orange:         #D97706;
-    --mc-orange-bg:      #FFFBEB;
-    --mc-blue:           #2563EB;
-    --mc-blue-bg:        #EFF6FF;
-    --mc-radius:         12px;
-    --mc-radius-sm:      8px;
-    --mc-shadow-sm:      0 1px 4px rgba(13,27,62,.07), 0 1px 2px rgba(13,27,62,.04);
-    --mc-shadow-md:      0 4px 16px rgba(13,27,62,.08), 0 1px 4px rgba(13,27,62,.04);
     --adm-accent:        #EA580C;
     --adm-accent-dark:   #C2410C;
     --adm-accent-light:  #FFF7ED;
@@ -36,7 +13,7 @@
     min-height: 100%;
 }
 
-// ── Plan Preview (in dialog) ─────────────────────
+// â”€â”€ Plan Preview (in dialog) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 .plan-preview {
     background: var(--mc-surface-2);
     border: 1px solid var(--mc-border);
@@ -46,7 +23,7 @@
     margin-top: .5rem;
 }
 
-// ── Page Header ─────────────────────────────────
+// â”€â”€ Page Header â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 .page-header {
     display: flex;
     align-items: center;
@@ -67,7 +44,7 @@
     }
 }
 
-// ── Buttons ─────────────────────────────────────
+// â”€â”€ Buttons â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 .btn-primary {
     display: inline-flex;
     align-items: center;
@@ -107,7 +84,7 @@
     i { font-size: .78rem; }
 }
 
-// ── Plans Grid ──────────────────────────────────
+// â”€â”€ Plans Grid â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 .plans-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
@@ -272,7 +249,7 @@
     }
 }
 
-// ── Stats chips ─────────────────────────────────
+// â”€â”€ Stats chips â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 .stats-row {
     display: flex;
     gap: .75rem;
@@ -298,7 +275,7 @@
     i { font-size: .75rem; }
 }
 
-// ── Panels ──────────────────────────────────────
+// â”€â”€ Panels â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 .panel {
     background: var(--mc-surface);
     border: 1px solid var(--mc-border);
@@ -351,7 +328,7 @@
     &::placeholder { color: var(--mc-text-3); }
 }
 
-// ── Renewal rows ────────────────────────────────
+// â”€â”€ Renewal rows â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 .renewal-row {
     display: flex;
     align-items: center;
@@ -395,7 +372,7 @@
     &:hover { background: var(--mc-primary-dark); }
 }
 
-// ── Table ───────────────────────────────────────
+// â”€â”€ Table â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 .cabinet-cell {
     display: flex;
     align-items: center;
@@ -491,7 +468,7 @@
     p { font-size: .875rem; color: var(--mc-text-3); margin: 0; }
 }
 
-// ── PrimeNG Table overrides ──────────────────────
+// â”€â”€ PrimeNG Table overrides â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 ::ng-deep .mc-table {
     .p-datatable-thead > tr > th {
         background: var(--mc-surface-2);
@@ -526,7 +503,7 @@
     }
 }
 
-// ── Dialog ──────────────────────────────────────
+// â”€â”€ Dialog â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 ::ng-deep .mc-dialog {
     .p-dialog-header {
         padding: 1.125rem 1.375rem;

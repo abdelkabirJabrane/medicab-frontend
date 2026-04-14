@@ -1,38 +1,8 @@
-// ================================================
-//  ordonnances.scss  —  MediCab Pro
+﻿// ================================================
+//  ordonnances.scss  â€”  MediCab Pro
 // ================================================
 
 :host {
-    --mc-primary:        #2563EB;
-    --mc-primary-dark:   #1D4ED8;
-    --mc-primary-light:  #EFF4FF;
-
-    --mc-bg:             #F1F5FA;
-    --mc-surface:        #FFFFFF;
-    --mc-surface-2:      #F8FAFD;
-
-    --mc-border:         #E5EAF4;
-    --mc-border-hover:   #C9D4E8;
-
-    --mc-text-1:         #0D1B3E;
-    --mc-text-2:         #4A5878;
-    --mc-text-3:         #8A95B0;
-
-    --mc-green:          #059669;
-    --mc-green-bg:       #ECFDF5;
-    --mc-red:            #DC2626;
-    --mc-red-bg:         #FEF2F2;
-    --mc-orange:         #D97706;
-    --mc-orange-bg:      #FFFBEB;
-    --mc-blue:           #2563EB;
-    --mc-blue-bg:        #EFF6FF;
-
-    --mc-radius:         12px;
-    --mc-radius-sm:      8px;
-    --mc-radius-lg:      16px;
-
-    --mc-shadow-sm:      0 1px 4px rgba(13,27,62,.07), 0 1px 2px rgba(13,27,62,.04);
-    --mc-shadow-md:      0 4px 16px rgba(13,27,62,.08), 0 1px 4px rgba(13,27,62,.04);
 
     display: block;
     padding: 1.75rem 2rem;
@@ -40,7 +10,7 @@
     min-height: 100%;
 }
 
-// ── Page Header ──────────────────────────────
+// â”€â”€ Page Header â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 .page-header {
     display: flex; align-items: center; justify-content: space-between;
     gap: 1rem; margin-bottom: 1.5rem;
@@ -57,7 +27,7 @@
     }
 }
 
-// ── Buttons ──────────────────────────────────
+// â”€â”€ Buttons â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 .btn-primary {
     display: inline-flex; align-items: center; gap: .45rem;
     padding: .6rem 1.2rem; background: var(--mc-primary); color: #fff;
@@ -106,7 +76,7 @@
     &--danger  { color: var(--mc-red);    &:hover { background: var(--mc-red-bg); border-color: var(--mc-red); } }
 }
 
-// ── Main Grid ────────────────────────────────
+// â”€â”€ Main Grid â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 .ord-grid {
     display: grid; grid-template-columns: 1fr;
     gap: 1.25rem; align-items: start;
@@ -117,7 +87,7 @@
     }
 }
 
-// ── Panel / Table ────────────────────────────
+// â”€â”€ Panel / Table â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 .panel {
     background: var(--mc-surface);
     border: 1px solid var(--mc-border);
@@ -151,7 +121,7 @@
 
 .table-row--active > td { background: var(--mc-primary-light) !important; }
 
-// ── Table Cells ──────────────────────────────
+// â”€â”€ Table Cells â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 .patient-cell {
     display: flex; align-items: center; gap: .625rem;
 
@@ -174,7 +144,7 @@
     i { font-size: .75rem; color: var(--mc-text-3); }
 }
 
-// ── Badges ───────────────────────────────────
+// â”€â”€ Badges â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 .badge {
     display: inline-flex; align-items: center;
     padding: .22rem .6rem; border-radius: 20px;
@@ -186,17 +156,17 @@
     &--annulee { background: var(--mc-orange-bg); color: var(--mc-orange); }
 }
 
-// ── Row Actions ──────────────────────────────
+// â”€â”€ Row Actions â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 .row-actions { display: flex; gap: .25rem; }
 
-// ── Table Empty ──────────────────────────────
+// â”€â”€ Table Empty â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 .table-empty {
     display: flex; flex-direction: column; align-items: center;
     padding: 3rem; color: var(--mc-text-3); font-size: .875rem; gap: .75rem;
     &__icon { font-size: 2.5rem; color: var(--mc-border); }
 }
 
-// ── Ordonnance Preview ───────────────────────
+// â”€â”€ Ordonnance Preview â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 .ord-preview {
     background: var(--mc-surface);
     border: 1px solid var(--mc-border);
@@ -232,7 +202,7 @@
     &__body { padding: 1.25rem 1.375rem; }
 }
 
-// ── Ordonnance Sections ───────────────────────
+// â”€â”€ Ordonnance Sections â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 .ord-section {
     padding: .75rem 0;
 
@@ -255,7 +225,7 @@
 
 .ord-divider { height: 1px; background: var(--mc-border); }
 
-// ── Medications List ─────────────────────────
+// â”€â”€ Medications List â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 .ord-meds {
     display: flex; flex-direction: column; gap: .5rem; margin-top: .25rem;
 }
@@ -294,7 +264,7 @@
     }
 }
 
-// ── Recommendations ──────────────────────────
+// â”€â”€ Recommendations â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 .ord-notes {
     background: var(--mc-orange-bg);
     border: 1px solid #FDE68A;
@@ -304,7 +274,7 @@
     font-size: .8375rem; color: var(--mc-text-1); line-height: 1.5;
 }
 
-// ── Footer Signature ─────────────────────────
+// â”€â”€ Footer Signature â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 .ord-footer {
     display: flex; align-items: flex-end; justify-content: space-between;
     padding-top: .75rem;
@@ -319,7 +289,7 @@
     &__sig-label { font-size: .7rem; color: var(--mc-text-3); }
 }
 
-// ── Dialog Form ──────────────────────────────
+// â”€â”€ Dialog Form â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 .dialog-form { display: flex; flex-direction: column; gap: 1rem; padding: .5rem 0 .25rem; }
 
 .form-field  { display: flex; flex-direction: column; gap: .35rem; }
@@ -358,7 +328,6 @@
 .form-divider {
     height: 1px; background: var(--mc-border); margin: .25rem 0;
 }
-
 
 .med-list {
     background: var(--mc-surface-2);
@@ -402,11 +371,11 @@
     display: flex; justify-content: flex-end; gap: .625rem; padding-top: .25rem;
 }
 
-// ── Print Styles ─────────────────────────────
+// â”€â”€ Print Styles â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 .print-only { display: none; }
 
 @media print {
-    // Masquer tout ce qui est dans le DOM sauf notre partie à imprimer
+    // Masquer tout ce qui est dans le DOM sauf notre partie Ã  imprimer
     body * { visibility: hidden; }
     #printable-ordonnance, #printable-ordonnance * { visibility: visible; }
     #printable-ordonnance {

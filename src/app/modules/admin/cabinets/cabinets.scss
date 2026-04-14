@@ -1,45 +1,15 @@
-// ================================================
-//  cabinets.scss — Admin Cabinets — MediCab Pro
+﻿// ================================================
+//  cabinets.scss â€” Admin Cabinets â€” MediCab Pro
 //  Redesigned to match monitoring.scss visual style
 // ================================================
 
 :host {
-    --mc-primary:        #2563EB;
-    --mc-primary-dark:   #1D4ED8;
-    --mc-primary-light:  #EFF4FF;
-
-    --mc-bg:             #F1F5FA;
-    --mc-surface:        #FFFFFF;
-    --mc-surface-2:      #F8FAFD;
-
-    --mc-border:         #E5EAF4;
-    --mc-border-hover:   #C9D4E8;
-
-    --mc-text-1:         #0D1B3E;
-    --mc-text-2:         #4A5878;
-    --mc-text-3:         #8A95B0;
-
-    --mc-green:          #059669;
-    --mc-green-bg:       #ECFDF5;
-    --mc-red:            #DC2626;
-    --mc-red-bg:         #FEF2F2;
-    --mc-orange:         #D97706;
-    --mc-orange-bg:      #FFFBEB;
-    --mc-blue:           #2563EB;
-    --mc-blue-bg:        #EFF6FF;
-
-    --mc-radius:         12px;
-    --mc-radius-sm:      8px;
-    --mc-radius-lg:      16px;
-
-    --mc-shadow-sm:      0 1px 4px rgba(13,27,62,.07), 0 1px 2px rgba(13,27,62,.04);
-    --mc-shadow-md:      0 4px 16px rgba(13,27,62,.08), 0 1px 4px rgba(13,27,62,.04);
 
     display: block; padding: 1.75rem 2rem; background: var(--mc-bg); min-height: 100%;
     --adm-accent:#EA580C; --adm-accent-dark:#C2410C; --adm-accent-light:#FFF7ED; --mc-surface:#fff; --mc-surface-2:#F8FAFD; --mc-border-hover:#C9D4E8; --mc-text-2:#4A5878; --mc-text-3:#8A95B0; --mc-green-bg:#ECFDF5; --mc-red:#DC2626; --mc-red-bg:#FEF2F2; --mc-orange-bg:#FFFBEB; --mc-blue:#2563EB; --mc-blue-bg:#EFF6FF; --mc-purple-bg:#F5F3FF; --mc-shadow-md:0 4px 16px rgba(13,27,62,.08);
 }
 
-// ── Page Header ────────────────────────────────
+// â”€â”€ Page Header â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 .page-header {
     display:flex; align-items:center; justify-content:space-between; gap:1rem; margin-bottom:1.5rem;
     &__title    { font-size:1.55rem; font-weight:800; color:var(--mc-text-1); letter-spacing:-.4px; }
@@ -64,7 +34,7 @@
     i { font-size:.78rem; }
 }
 
-// ── Search Bar + Filters ───────────────────────
+// â”€â”€ Search Bar + Filters â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 .search-bar {
     display:flex; align-items:center; gap:1rem; margin-bottom:1.25rem; flex-wrap:wrap;
 
@@ -105,13 +75,13 @@
     }
 }
 
-// ── Panel ──────────────────────────────────────
+// â”€â”€ Panel â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 .panel {
     background:var(--mc-surface); border:1px solid var(--mc-border);
     border-radius:16px; box-shadow:var(--mc-shadow-sm); overflow:hidden;
 }
 
-// ── Table ─────────────────────────────────────
+// â”€â”€ Table â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 ::ng-deep .mc-table {
     .p-datatable-thead > tr > th {
         background:var(--mc-surface-2); border-bottom:1px solid var(--mc-border);
@@ -135,7 +105,7 @@
     }
 }
 
-// ── Table Cells ────────────────────────────────
+// â”€â”€ Table Cells â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 .cabinet-cell {
     display:flex; align-items:center; gap:.625rem;
     &__av {
@@ -152,7 +122,7 @@
 .td-muted { font-size:.8rem; color:var(--mc-text-3); }
 .td-count { font-size:.875rem; font-weight:800; color:var(--mc-text-1); }
 
-// ── Plan Badges ────────────────────────────────
+// â”€â”€ Plan Badges â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 .plan-badge {
     display:inline-flex; align-items:center; padding:.22rem .65rem;
     border-radius:20px; font-size:.65rem; font-weight:800; letter-spacing:.3px;
@@ -162,7 +132,7 @@
     &--enterprise { background:var(--mc-green-bg);      color:var(--mc-green);   }
 }
 
-// ── Status Badges ──────────────────────────────
+// â”€â”€ Status Badges â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 .badge {
     display:inline-flex; align-items:center; padding:.22rem .6rem;
     border-radius:20px; font-size:.62rem; font-weight:800;
@@ -172,7 +142,7 @@
     &--essai    { background:var(--mc-blue-bg);  color:var(--mc-blue); }
 }
 
-// ── Row Actions ────────────────────────────────
+// â”€â”€ Row Actions â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 .row-actions { display:flex; align-items:center; gap:.375rem; }
 
 .btn-action {
@@ -195,7 +165,7 @@
     }
 }
 
-// ── Table Empty State ──────────────────────────
+// â”€â”€ Table Empty State â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 .table-empty {
     display:flex; flex-direction:column; align-items:center; justify-content:center;
     padding:3rem 1rem; gap:.5rem;
@@ -203,7 +173,7 @@
     p { font-size:.875rem; color:var(--mc-text-3); margin:0; }
 }
 
-// ── Dialog Form ────────────────────────────────
+// â”€â”€ Dialog Form â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 ::ng-deep .mc-dialog {
     .p-dialog-header {
         padding:1.125rem 1.375rem; border-bottom:1px solid var(--mc-border);
@@ -239,7 +209,7 @@
     display:flex; align-items:center; justify-content:flex-end; gap:.625rem;
 }
 
-// ── Detail View ────────────────────────────────
+// â”€â”€ Detail View â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 .detail-view {
     display:flex; flex-direction:column; gap:1.5rem;
 }

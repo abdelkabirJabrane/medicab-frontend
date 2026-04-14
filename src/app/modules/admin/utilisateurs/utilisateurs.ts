@@ -12,6 +12,7 @@ import { MessageService, ConfirmationService } from 'primeng/api';
 import { UserAdminService, User } from '../../../core/services/user-admin';
 import { CabinetService } from '../../../core/services/cabinet';
 import { ProgressBar } from 'primeng/progressbar';
+import { AuthService } from '../../../core/services/auth';
 
 @Component({
     selector: 'app-admin-utilisateurs',
@@ -50,7 +51,8 @@ export class AdminUtilisateursComponent implements OnInit {
         private confirmService: ConfirmationService,
         private userAdminService: UserAdminService,
         private cabinetService: CabinetService,
-        private datePipe: DatePipe
+        private datePipe: DatePipe,
+        private authService: AuthService
     ) {}
 
     ngOnInit() {
@@ -84,6 +86,9 @@ export class AdminUtilisateursComponent implements OnInit {
 
     private mapUser(u: User): any {
         const primaryRole = u.roles?.[0] || 'ROLE_PATIENT';
+        const currentUser = this.authService.getCurrentUser();
+        const isSelf = currentUser && currentUser.email === u.email;
+
         return {
             ...u,
             nom: `${u.firstName} ${u.lastName}`,
@@ -91,7 +96,7 @@ export class AdminUtilisateursComponent implements OnInit {
             role: primaryRole,
             roleLabel: this.getRoleLabel(primaryRole),
             cabinet: u.tenantId ? `Cabinet #${u.tenantId}` : '—',
-            derniereConnexion: this.getLastLoginDate(u),
+            derniereConnexion: isSelf ? 'Maintenant (En ligne)' : this.getLastLoginDate(u),
             actif: u.active
         };
     }
