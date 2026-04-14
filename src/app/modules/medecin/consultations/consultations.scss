@@ -1,8 +1,38 @@
-﻿// ================================================
-//  consultations.scss  â€”  MediCab Pro
+// ================================================
+//  consultations.scss  —  MediCab Pro
 // ================================================
 
 :host {
+    --mc-primary:        #2563EB;
+    --mc-primary-dark:   #1D4ED8;
+    --mc-primary-light:  #EFF4FF;
+
+    --mc-bg:             #F1F5FA;
+    --mc-surface:        #FFFFFF;
+    --mc-surface-2:      #F8FAFD;
+
+    --mc-border:         #E5EAF4;
+    --mc-border-hover:   #C9D4E8;
+
+    --mc-text-1:         #0D1B3E;
+    --mc-text-2:         #4A5878;
+    --mc-text-3:         #8A95B0;
+
+    --mc-green:          #059669;
+    --mc-green-bg:       #ECFDF5;
+    --mc-red:            #DC2626;
+    --mc-red-bg:         #FEF2F2;
+    --mc-orange:         #D97706;
+    --mc-orange-bg:      #FFFBEB;
+    --mc-blue:           #2563EB;
+    --mc-blue-bg:        #EFF6FF;
+
+    --mc-radius:         12px;
+    --mc-radius-sm:      8px;
+    --mc-radius-lg:      16px;
+
+    --mc-shadow-sm:      0 1px 4px rgba(13,27,62,.07), 0 1px 2px rgba(13,27,62,.04);
+    --mc-shadow-md:      0 4px 16px rgba(13,27,62,.08), 0 1px 4px rgba(13,27,62,.04);
 
     display: block;
     padding: 1.75rem 2rem;
@@ -10,7 +40,7 @@
     min-height: 100%;
 }
 
-// â”€â”€ Page Header â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Page Header ──────────────────────────────
 .page-header {
     display: flex;
     align-items: center;
@@ -30,7 +60,7 @@
     }
 }
 
-// â”€â”€ Buttons â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Buttons ──────────────────────────────────
 .btn-primary {
     display: inline-flex; align-items: center; gap: .45rem;
     padding: .6rem 1.2rem; background: var(--mc-primary); color: #fff;
@@ -69,7 +99,7 @@
     i { font-size: .75rem; }
 }
 
-// â”€â”€ Main Grid â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Main Grid ────────────────────────────────
 .consult-grid {
     display: grid;
     grid-template-columns: 1fr;
@@ -82,7 +112,7 @@
     }
 }
 
-// â”€â”€ Panel â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Panel ────────────────────────────────────
 .panel {
     background: var(--mc-surface);
     border: 1px solid var(--mc-border);
@@ -91,7 +121,7 @@
     overflow: hidden;
 }
 
-// â”€â”€ Table â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Table ────────────────────────────────────
 ::ng-deep .mc-table {
     .p-datatable-thead > tr > th {
         background: var(--mc-surface-2);
@@ -126,7 +156,7 @@
 
 .table-row--active > td { background: var(--mc-primary-light) !important; }
 
-// â”€â”€ Table Cells â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Table Cells ──────────────────────────────
 .patient-cell {
     display: flex; align-items: center; gap: .625rem;
 
@@ -146,7 +176,7 @@
 .td-muted { font-size: .8rem; color: var(--mc-text-2); }
 .amount   { font-size: .8375rem; font-weight: 700; color: var(--mc-green); }
 
-// â”€â”€ Type Badge â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Type Badge ───────────────────────────────
 .type-badge {
     display: inline-flex; align-items: center;
     padding: .2rem .6rem; border-radius: 20px;
@@ -159,7 +189,7 @@
     &--suivi           { background: var(--mc-green-bg);  color: var(--mc-green);  }
 }
 
-// â”€â”€ Badge â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Badge ────────────────────────────────────
 .badge {
     display: inline-flex; align-items: center;
     padding: .22rem .6rem; border-radius: 20px;
@@ -173,7 +203,7 @@
     &--inactif    { background: var(--mc-surface-2); color: var(--mc-text-3); border: 1px solid var(--mc-border); }
 }
 
-// â”€â”€ Row Actions â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Row Actions ──────────────────────────────
 .row-actions { display: flex; gap: .25rem; align-items: center; }
 
 .btn-action {
@@ -190,7 +220,7 @@
     &--disabled { color: var(--mc-border); cursor: not-allowed; &:hover { background: none; border-color: var(--mc-border); color: var(--mc-border); } }
 }
 
-// â”€â”€ Table Empty â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Table Empty ──────────────────────────────
 .table-empty {
     display: flex; flex-direction: column; align-items: center;
     padding: 3rem; color: var(--mc-text-3); font-size: .875rem;
@@ -199,7 +229,7 @@
     &__icon { font-size: 2.5rem; color: var(--mc-border); }
 }
 
-// â”€â”€ Detail Panel â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Detail Panel ─────────────────────────────
 .detail-panel {
     background: var(--mc-surface);
     border: 1px solid var(--mc-border);
@@ -240,7 +270,7 @@
     &__value { font-size: .8375rem; font-weight: 600; color: var(--mc-text-1); &--amount { color: var(--mc-green); font-size: .95rem; } }
 }
 
-// â”€â”€ Dialog Stepper â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Dialog Stepper ───────────────────────────
 .stepper {
     display: flex; align-items: center;
     gap: 0; margin: .5rem 0 1.5rem;
@@ -279,7 +309,7 @@
     &--done { background: var(--mc-green); }
 }
 
-// â”€â”€ Step Content â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Step Content ─────────────────────────────
 .step-content {
     display: flex; flex-direction: column; gap: 1rem;
     min-height: 260px;
@@ -292,7 +322,7 @@
     &--between { justify-content: space-between; }
 }
 
-// â”€â”€ Form Elements â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Form Elements ────────────────────────────
 .form-row {
     display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;
     align-items: start;
@@ -322,7 +352,7 @@
     resize: vertical; min-height: 80px; line-height: 1.5;
 }
 
-// â”€â”€ Constantes â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Constantes ───────────────────────────────
 .constantes-section {
     background: var(--mc-surface-2);
     border: 1px solid var(--mc-border);
@@ -348,7 +378,7 @@
     &__unit { font-size: .62rem; color: var(--mc-text-3); font-weight: 400; }
 }
 
-// â”€â”€ Ordonnance â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Ordonnance ───────────────────────────────
 .med-add-row {
     display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: .75rem; align-items: end;
 }

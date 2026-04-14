@@ -1,10 +1,38 @@
-﻿// ================================================
-//  patients.scss  â€”  MediCab Pro
+// ================================================
+//  patients.scss  —  MediCab Pro
 // ================================================
 
 :host {
+    --mc-primary:        #2563EB;
+    --mc-primary-dark:   #1D4ED8;
+    --mc-primary-light:  #EFF4FF;
 
+    --mc-bg:             #F1F5FA;
+    --mc-surface:        #FFFFFF;
+    --mc-surface-2:      #F8FAFD;
+
+    --mc-border:         #E5EAF4;
+    --mc-border-hover:   #C9D4E8;
+
+    --mc-text-1:         #0D1B3E;
+    --mc-text-2:         #4A5878;
+    --mc-text-3:         #8A95B0;
+
+    --mc-green:          #059669;
+    --mc-green-bg:       #ECFDF5;
+    --mc-red:            #DC2626;
     --mc-red-bg:       #FEF2F2;
+    --mc-orange:         #D97706;
+    --mc-orange-bg:      #FFFBEB;
+    --mc-blue:           #2563EB;
+    --mc-blue-bg:        #EFF6FF;
+
+    --mc-radius:         12px;
+    --mc-radius-sm:      8px;
+    --mc-radius-lg:      16px;
+
+    --mc-shadow-sm:      0 1px 4px rgba(13,27,62,.07), 0 1px 2px rgba(13,27,62,.04);
+    --mc-shadow-md:      0 4px 16px rgba(13,27,62,.08), 0 1px 4px rgba(13,27,62,.04);
 
     display: block;
     padding: 1.75rem 2rem;
@@ -12,7 +40,7 @@
     min-height: 100%;
 }
 
-// â”€â”€ Page Header â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Page Header ──────────────────────────────
 .page-header {
     display: flex;
     align-items: center;
@@ -43,7 +71,7 @@
     }
 }
 
-// â”€â”€ Buttons â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Buttons ──────────────────────────────────
 .btn-primary {
     display: inline-flex;
     align-items: center;
@@ -103,7 +131,7 @@
     i { font-size: .8rem; }
 }
 
-// â”€â”€ Search Bar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Search Bar ───────────────────────────────
 .search-bar {
     display: flex;
     gap: .75rem;
@@ -146,7 +174,7 @@
     }
 }
 
-// â”€â”€ Panel / Table wrapper â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Panel / Table wrapper ─────────────────────
 .panel {
     background: var(--mc-surface);
     border: 1px solid var(--mc-border);
@@ -155,7 +183,7 @@
     overflow: hidden;
 }
 
-// â”€â”€ Table overrides (PrimeNG mc-table) â”€â”€â”€â”€â”€â”€â”€
+// ── Table overrides (PrimeNG mc-table) ───────
 ::ng-deep .mc-table {
 
     .p-datatable-thead > tr > th {
@@ -196,7 +224,7 @@
     }
 }
 
-// â”€â”€ Table Cells â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Table Cells ──────────────────────────────
 .patient-cell {
     display: flex;
     align-items: center;
@@ -235,7 +263,7 @@
 .td-sub   { font-size: .7rem;    color: var(--mc-text-3); margin-top: 2px; }
 .td-mono  { font-size: .8rem;    color: var(--mc-text-2); font-variant-numeric: tabular-nums; }
 
-// â”€â”€ Blood Badge â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Blood Badge ──────────────────────────────
 .blood-badge {
     display: inline-flex;
     align-items: center;
@@ -257,7 +285,7 @@
     }
 }
 
-// â”€â”€ Badges â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Badges ───────────────────────────────────
 .badge {
     display: inline-flex;
     align-items: center;
@@ -275,11 +303,11 @@
     // IMC variants
     &--imc-poids-normal  { background: var(--mc-green-bg);  color: var(--mc-green);  }
     &--imc-surpoids      { background: var(--mc-orange-bg); color: var(--mc-orange); }
-    &--imc-obÃ©sitÃ©       { background: var(--mc-red-bg);    color: var(--mc-red);    }
-    &--imc-insuffisance-pondÃ©rale { background: var(--mc-blue-bg); color: var(--mc-blue); }
+    &--imc-obésité       { background: var(--mc-red-bg);    color: var(--mc-red);    }
+    &--imc-insuffisance-pondérale { background: var(--mc-blue-bg); color: var(--mc-blue); }
 }
 
-// â”€â”€ Row Actions â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Row Actions ──────────────────────────────
 .row-actions {
     display: flex;
     gap: .25rem;
@@ -311,7 +339,7 @@
     }
 }
 
-// â”€â”€ Table empty â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Table empty ──────────────────────────────
 .table-empty {
     display: flex;
     flex-direction: column;
@@ -327,7 +355,7 @@
     }
 }
 
-// â”€â”€ Dialog Form â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Dialog Form ──────────────────────────────
 .dialog-form {
     display: flex;
     flex-direction: column;
@@ -378,7 +406,7 @@
     padding-top: .25rem;
 }
 
-// â”€â”€ Detail Dialog â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Detail Dialog ────────────────────────────
 .detail-profile {
     display: flex;
     align-items: center;

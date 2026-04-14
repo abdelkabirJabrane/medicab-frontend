@@ -1,10 +1,38 @@
-﻿// ================================================
-//  dossiers.scss  â€”  MediCab Pro
+// ================================================
+//  dossiers.scss  —  MediCab Pro
 // ================================================
 
 :host {
+    --mc-primary:        #2563EB;
+    --mc-primary-dark:   #1D4ED8;
+    --mc-primary-light:  #EFF4FF;
 
+    --mc-bg:             #F1F5FA;
+    --mc-surface:        #FFFFFF;
+    --mc-surface-2:      #F8FAFD;
+
+    --mc-border:         #E5EAF4;
+    --mc-border-hover:   #C9D4E8;
+
+    --mc-text-1:         #0D1B3E;
+    --mc-text-2:         #4A5878;
+    --mc-text-3:         #8A95B0;
+
+    --mc-green:          #059669;
+    --mc-green-bg:       #ECFDF5;
+    --mc-red:            #DC2626;
     --mc-red-bg:       #FEF2F2;
+    --mc-orange:         #D97706;
+    --mc-orange-bg:      #FFFBEB;
+    --mc-blue:           #2563EB;
+    --mc-blue-bg:        #EFF6FF;
+
+    --mc-radius:         12px;
+    --mc-radius-sm:      8px;
+    --mc-radius-lg:      16px;
+
+    --mc-shadow-sm:      0 1px 4px rgba(13,27,62,.07), 0 1px 2px rgba(13,27,62,.04);
+    --mc-shadow-md:      0 4px 16px rgba(13,27,62,.08), 0 1px 4px rgba(13,27,62,.04);
 
     display: block;
     padding: 1.75rem 2rem;
@@ -12,7 +40,7 @@
     min-height: 100%;
 }
 
-// â”€â”€ Page Header â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Page Header ──────────────────────────────
 .page-header {
     display: flex;
     align-items: center;
@@ -24,7 +52,7 @@
     &__subtitle { margin-top: .3rem; font-size: .875rem; color: var(--mc-text-3); }
 }
 
-// â”€â”€ Buttons â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Buttons ──────────────────────────────────
 .btn-primary {
     display: inline-flex; align-items: center; gap: .45rem;
     padding: .6rem 1.1rem; background: var(--mc-primary); color: #fff;
@@ -71,7 +99,7 @@
     &--neutral { color: var(--mc-text-3); &:hover { background: var(--mc-primary-light); border-color: var(--mc-primary); color: var(--mc-primary); } }
 }
 
-// â”€â”€ Main Grid â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Main Grid ────────────────────────────────
 .dossiers-grid {
     display: grid;
     grid-template-columns: 1fr;
@@ -84,7 +112,7 @@
     }
 }
 
-// â”€â”€ Search Box â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Search Box ───────────────────────────────
 .search-box {
     position: relative;
     margin-bottom: .875rem;
@@ -109,7 +137,7 @@
     }
 }
 
-// â”€â”€ Dossier Cards â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Dossier Cards ────────────────────────────
 .dossier-cards {
     display: flex; flex-direction: column; gap: .5rem;
 }
@@ -170,7 +198,7 @@
     }
 }
 
-// â”€â”€ Blood Badge â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Blood Badge ──────────────────────────────
 .blood-badge {
     display: inline-flex; align-items: center; justify-content: center;
     padding: .2rem .5rem; background: var(--mc-red-bg); color: var(--mc-red);
@@ -178,7 +206,7 @@
     letter-spacing: .3px;
 }
 
-// â”€â”€ Detail Panel â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Detail Panel ─────────────────────────────
 .dossier-detail {
     background: var(--mc-surface);
     border: 1px solid var(--mc-border);
@@ -214,7 +242,7 @@
     }
 }
 
-// â”€â”€ Vitals Grid â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Vitals Grid ──────────────────────────────
 .vitals-grid {
     display: grid; grid-template-columns: repeat(4, 1fr);
     gap: 1px; background: var(--mc-border);
@@ -248,7 +276,7 @@
     }
 }
 
-// â”€â”€ IMC Badge â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── IMC Badge ────────────────────────────────
 .imc-badge {
     display: inline-flex; margin-top: .35rem;
     padding: .18rem .5rem; border-radius: 20px;
@@ -260,7 +288,7 @@
     &--insuffisance { background: var(--mc-blue-bg);   color: var(--mc-blue);   }
 }
 
-// â”€â”€ Medical Grid â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Medical Grid ─────────────────────────────
 .medical-grid {
     display: grid; grid-template-columns: 1fr 1fr;
     gap: 1px; background: var(--mc-border);
@@ -297,7 +325,7 @@
     }
 }
 
-// â”€â”€ Medical Items â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Medical Items ────────────────────────────
 .medical-item {
     display: flex; align-items: center; gap: .5rem;
     font-size: .8125rem; color: var(--mc-text-1);
@@ -312,7 +340,7 @@
     &--green .medical-item__dot { background: var(--mc-green); }
 }
 
-// â”€â”€ Allergy Tags â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Allergy Tags ─────────────────────────────
 .allergy-tags {
     display: flex; flex-wrap: wrap; gap: .375rem; margin-top: .25rem;
 }
@@ -324,7 +352,7 @@
     font-size: .72rem; font-weight: 600;
 }
 
-// â”€â”€ Consultation History â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Consultation History ──────────────────────
 .consult-history {
     display: flex; flex-direction: column; gap: .5rem;
 }
@@ -363,7 +391,7 @@
     font-size: .7rem; color: var(--mc-text-3); margin-top: 2px;
 }
 
-// â”€â”€ Medical Section Title Row â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Medical Section Title Row ────────────────
 .medical-section__title-row {
     display: flex; align-items: center; justify-content: space-between;
     margin-bottom: 1rem;
@@ -373,7 +401,7 @@
     padding: .4rem .8rem; font-size: .75rem;
 }
 
-// â”€â”€ Documents Section â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Documents Section ────────────────────────
 .docs-grid {
     display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: .75rem;

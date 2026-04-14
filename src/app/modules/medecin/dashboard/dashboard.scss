@@ -1,10 +1,40 @@
-﻿// ================================================
-//  dashboard.scss  â€”  MediCab Pro
+// ================================================
+//  dashboard.scss  —  MediCab Pro
 //  Design : clean clinical SaaS, Plus Jakarta Sans
 // ================================================
 
-// â”€â”€ Design Tokens â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Design Tokens ────────────────────────────────
 :host {
+    --mc-primary:        #2563EB;
+    --mc-primary-dark:   #1D4ED8;
+    --mc-primary-light:  #EFF4FF;
+
+    --mc-bg:             #F1F5FA;
+    --mc-surface:        #FFFFFF;
+    --mc-surface-2:      #F8FAFD;
+
+    --mc-border:         #E5EAF4;
+    --mc-border-hover:   #C9D4E8;
+
+    --mc-text-1:         #0D1B3E;
+    --mc-text-2:         #4A5878;
+    --mc-text-3:         #8A95B0;
+
+    --mc-green:          #059669;
+    --mc-green-bg:       #ECFDF5;
+    --mc-red:            #DC2626;
+    --mc-red-bg:         #FEF2F2;
+    --mc-orange:         #D97706;
+    --mc-orange-bg:      #FFFBEB;
+    --mc-blue:           #2563EB;
+    --mc-blue-bg:        #EFF6FF;
+
+    --mc-radius:         12px;
+    --mc-radius-sm:      8px;
+    --mc-radius-lg:      16px;
+
+    --mc-shadow-sm:      0 1px 4px rgba(13,27,62,.07), 0 1px 2px rgba(13,27,62,.04);
+    --mc-shadow-md:      0 4px 16px rgba(13,27,62,.08), 0 1px 4px rgba(13,27,62,.04);
 
     display: block;
     padding: 1.75rem 2rem;
@@ -12,7 +42,7 @@
     min-height: 100%;
 }
 
-// â”€â”€ Utility â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Utility ──────────────────────────────────────
 %panel-base {
     background: var(--mc-surface);
     border: 1px solid var(--mc-border);
@@ -20,7 +50,7 @@
     box-shadow: var(--mc-shadow-sm);
 }
 
-// â”€â”€ Page Header â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Page Header ──────────────────────────────────
 .dash-header {
     display: flex;
     align-items: center;
@@ -49,7 +79,7 @@
     }
 }
 
-// â”€â”€ Primary Button â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Primary Button ───────────────────────────────
 .btn-primary {
     display: inline-flex;
     align-items: center;
@@ -78,7 +108,7 @@
     i { font-size: 0.78rem; }
 }
 
-// â”€â”€ KPI Grid â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── KPI Grid ─────────────────────────────────────
 .kpi-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -89,7 +119,7 @@
     @media (max-width: 600px)  { grid-template-columns: 1fr; }
 }
 
-// â”€â”€ KPI Card â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── KPI Card ─────────────────────────────────────
 .kpi-card {
     @extend %panel-base;
     padding: 1.25rem 1.375rem;
@@ -105,7 +135,7 @@
         transform: translateY(-2px);
     }
 
-    // â”€â”€ Colour variants
+    // ── Colour variants
     &--blue   { border-top-color: var(--mc-blue);
         .kpi-card__icon { background: var(--mc-blue-bg);   i { color: var(--mc-blue);   } } }
     &--orange { border-top-color: var(--mc-orange);
@@ -163,7 +193,7 @@
     }
 }
 
-// â”€â”€ Content Grid â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Content Grid ─────────────────────────────────
 .content-grid {
     display: grid;
     grid-template-columns: 1fr 340px;
@@ -174,7 +204,7 @@
     @media (max-width: 1100px) { grid-template-columns: 1fr; }
 }
 
-// â”€â”€ Charts Grid â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Charts Grid ──────────────────────────────────
 .charts-grid {
     display: grid;
     grid-template-columns: 2fr 1fr 1fr;
@@ -197,7 +227,7 @@
     padding-top: 1rem;
 }
 
-// â”€â”€ Panel â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Panel ────────────────────────────────────────
 .panel {
     @extend %panel-base;
     overflow: hidden;
@@ -244,7 +274,7 @@
     }
 }
 
-// â”€â”€ RDV List â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── RDV List ─────────────────────────────────────
 .rdv-list {
     padding: 0.75rem;
     display: flex;
@@ -325,7 +355,7 @@
     }
 }
 
-// â”€â”€ Badge â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Badge ────────────────────────────────────────
 .badge {
     display: inline-flex;
     align-items: center;
@@ -349,7 +379,7 @@
     }
 }
 
-// â”€â”€ Icon Button â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Icon Button ──────────────────────────────────
 .btn-icon {
     width: 30px;
     height: 30px;
@@ -373,7 +403,7 @@
     i { font-size: 0.78rem; }
 }
 
-// â”€â”€ Activity List â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Activity List ────────────────────────────────
 .activity-list {
     padding: 0.25rem 1.375rem 0.75rem;
 }

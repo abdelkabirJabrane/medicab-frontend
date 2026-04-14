@@ -1,8 +1,38 @@
-﻿// ================================================
-//  factures.scss  â€”  MediCab Pro
+// ================================================
+//  factures.scss  —  MediCab Pro
 // ================================================
 
 :host {
+    --mc-primary:        #2563EB;
+    --mc-primary-dark:   #1D4ED8;
+    --mc-primary-light:  #EFF4FF;
+
+    --mc-bg:             #F1F5FA;
+    --mc-surface:        #FFFFFF;
+    --mc-surface-2:      #F8FAFD;
+
+    --mc-border:         #E5EAF4;
+    --mc-border-hover:   #C9D4E8;
+
+    --mc-text-1:         #0D1B3E;
+    --mc-text-2:         #4A5878;
+    --mc-text-3:         #8A95B0;
+
+    --mc-green:          #059669;
+    --mc-green-bg:       #ECFDF5;
+    --mc-red:            #DC2626;
+    --mc-red-bg:         #FEF2F2;
+    --mc-orange:         #D97706;
+    --mc-orange-bg:      #FFFBEB;
+    --mc-blue:           #2563EB;
+    --mc-blue-bg:        #EFF6FF;
+
+    --mc-radius:         12px;
+    --mc-radius-sm:      8px;
+    --mc-radius-lg:      16px;
+
+    --mc-shadow-sm:      0 1px 4px rgba(13,27,62,.07), 0 1px 2px rgba(13,27,62,.04);
+    --mc-shadow-md:      0 4px 16px rgba(13,27,62,.08), 0 1px 4px rgba(13,27,62,.04);
 
     display: block;
     padding: 1.75rem 2rem;
@@ -10,7 +40,7 @@
     min-height: 100%;
 }
 
-// â”€â”€ Page Header â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Page Header ──────────────────────────────
 .page-header {
     display: flex; align-items: center; justify-content: space-between;
     gap: 1rem; margin-bottom: 1.5rem;
@@ -27,7 +57,7 @@
     }
 }
 
-// â”€â”€ Stats Grid â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Stats Grid ───────────────────────────────
 .stats-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -38,7 +68,7 @@
     @media (max-width: 500px)  { grid-template-columns: 1fr; }
 }
 
-// â”€â”€ Stat Card â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Stat Card ────────────────────────────────
 .stat-card {
     background: var(--mc-surface);
     border: 1px solid var(--mc-border);
@@ -81,7 +111,7 @@
     &__unit { font-size: .8rem; font-weight: 500; color: var(--mc-text-3); margin-left: .2rem; }
 }
 
-// â”€â”€ Panel / Table â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Panel / Table ────────────────────────────
 .panel {
     background: var(--mc-surface);
     border: 1px solid var(--mc-border);
@@ -121,7 +151,7 @@
     }
 }
 
-// â”€â”€ Table Cells â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Table Cells ──────────────────────────────
 .td-mono   { font-size: .8rem; font-weight: 600; color: var(--mc-text-2); font-variant-numeric: tabular-nums; letter-spacing: .2px; }
 .td-name   { font-size: .8375rem; font-weight: 600; color: var(--mc-text-1); }
 .td-muted  { font-size: .8rem; color: var(--mc-text-3); }
@@ -130,7 +160,7 @@
 .td-due    { font-size: .8375rem; font-weight: 700; color: var(--mc-red); }
 .td-zero   { font-size: .8375rem; color: var(--mc-text-3); }
 
-// â”€â”€ Badges â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Badges ───────────────────────────────────
 .badge {
     display: inline-flex; align-items: center;
     padding: .22rem .65rem; border-radius: 20px;
@@ -144,7 +174,7 @@
     &--brouillon           { background: var(--mc-surface-2); color: var(--mc-text-3); border: 1px solid var(--mc-border); }
 }
 
-// â”€â”€ Row Actions â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Row Actions ──────────────────────────────
 .row-actions { display: flex; gap: .25rem; }
 
 .btn-action {
@@ -158,14 +188,14 @@
     &--success { color: var(--mc-green);    &:hover { background: var(--mc-green-bg); border-color: var(--mc-green); } }
 }
 
-// â”€â”€ Table Empty â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Table Empty ──────────────────────────────
 .table-empty {
     display: flex; flex-direction: column; align-items: center;
     padding: 3rem; color: var(--mc-text-3); font-size: .875rem; gap: .75rem;
     &__icon { font-size: 2.5rem; color: var(--mc-border); }
 }
 
-// â”€â”€ Payment Summary â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Payment Summary ──────────────────────────
 .payment-summary {
     background: var(--mc-surface-2);
     border: 1px solid var(--mc-border);
@@ -189,7 +219,7 @@
     &__divider { height: 1px; background: var(--mc-border); margin: .5rem 0; }
 }
 
-// â”€â”€ Dialog Form â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Dialog Form ──────────────────────────────
 .dialog-form { display: flex; flex-direction: column; gap: 1rem; }
 
 .form-field  { display: flex; flex-direction: column; gap: .35rem; }
@@ -214,7 +244,7 @@
     &--lg { font-size: 1.2rem; font-weight: 700; padding: .75rem 1rem; text-align: center; letter-spacing: -.3px; }
 }
 
-// â”€â”€ Buttons â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Buttons ──────────────────────────────────
 .btn-outline {
     display: inline-flex; align-items: center; gap: .4rem;
     padding: .55rem 1.1rem; background: transparent; color: var(--mc-text-2);

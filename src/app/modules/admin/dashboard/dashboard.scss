@@ -1,15 +1,45 @@
-﻿// ================================================
-//  dashboard.scss â€” Admin Dashboard â€” MediCab Pro
+// ================================================
+//  dashboard.scss — Admin Dashboard — MediCab Pro
 //  Redesigned to match monitoring.scss visual style
 // ================================================
 
 :host {
+    --mc-primary:        #2563EB;
+    --mc-primary-dark:   #1D4ED8;
+    --mc-primary-light:  #EFF4FF;
+
+    --mc-bg:             #F1F5FA;
+    --mc-surface:        #FFFFFF;
+    --mc-surface-2:      #F8FAFD;
+
+    --mc-border:         #E5EAF4;
+    --mc-border-hover:   #C9D4E8;
+
+    --mc-text-1:         #0D1B3E;
+    --mc-text-2:         #4A5878;
+    --mc-text-3:         #8A95B0;
+
+    --mc-green:          #059669;
+    --mc-green-bg:       #ECFDF5;
+    --mc-red:            #DC2626;
+    --mc-red-bg:         #FEF2F2;
+    --mc-orange:         #D97706;
+    --mc-orange-bg:      #FFFBEB;
+    --mc-blue:           #2563EB;
+    --mc-blue-bg:        #EFF6FF;
+
+    --mc-radius:         12px;
+    --mc-radius-sm:      8px;
+    --mc-radius-lg:      16px;
+
+    --mc-shadow-sm:      0 1px 4px rgba(13,27,62,.07), 0 1px 2px rgba(13,27,62,.04);
+    --mc-shadow-md:      0 4px 16px rgba(13,27,62,.08), 0 1px 4px rgba(13,27,62,.04);
 
     display: block; padding: 1.75rem 2rem; background: var(--mc-bg); min-height: 100%;
     --adm-accent:#EA580C; --adm-accent-dark:#C2410C; --adm-accent-light:#FFF7ED;
 }
 
-// â”€â”€ Page Header â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Page Header ────────────────────────────────
 .page-header {
     display:flex; align-items:center; justify-content:space-between; gap:1rem; margin-bottom:1.5rem;
     &__title    { font-size:1.55rem; font-weight:800; color:var(--mc-text-1); letter-spacing:-.4px; }
@@ -35,7 +65,7 @@
     i { font-size:.78rem; }
 }
 
-// â”€â”€ Charts Section â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Charts Section ─────────────────────────────
 .charts-section {
     display: grid; grid-template-columns: 2fr 1fr; gap: 1.25rem; margin-bottom: 1.25rem;
     @media(max-width: 1100px) { grid-template-columns: 1fr; }
@@ -58,7 +88,7 @@
     }
 }
 
-// â”€â”€ KPI Grid â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── KPI Grid ───────────────────────────────────
 .kpi-grid {
     display:grid; grid-template-columns:repeat(4,1fr); gap:1rem; margin-bottom:1.25rem;
     @media(max-width:1200px){ grid-template-columns:repeat(2,1fr); }
@@ -101,7 +131,7 @@
     }
 }
 
-// â”€â”€ Content Grid â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Content Grid ───────────────────────────────
 .content-grid {
     display:grid; grid-template-columns:1fr 300px; gap:1.25rem; margin-bottom:1.25rem; align-items:start;
     @media(max-width:1100px){ grid-template-columns:1fr; }
@@ -109,7 +139,7 @@
 
 .right-col { display:flex; flex-direction:column; gap:1.25rem; }
 
-// â”€â”€ Panel â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Panel ─────────────────────────────────────
 .panel {
     background:var(--mc-surface); border:1px solid var(--mc-border);
     border-radius:16px; box-shadow:var(--mc-shadow-sm); overflow:hidden;
@@ -128,7 +158,7 @@
     }
 }
 
-// â”€â”€ Cabinet List â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Cabinet List ───────────────────────────────
 .cabinet-list { padding:.5rem; }
 .cabinet-item {
     display:flex; align-items:center; gap:.75rem;
@@ -150,7 +180,7 @@
     &__plan  { font-size:.65rem; font-weight:700; color:var(--mc-text-3); }
 }
 
-// â”€â”€ Abonnements expirants â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Abonnements expirants ──────────────────────
 .abon-list { padding:.5rem; }
 .abon-item {
     display:flex; align-items:center; gap:.75rem;
@@ -168,7 +198,7 @@
     }
 }
 
-// â”€â”€ Alertes systÃ¨me â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Alertes système ────────────────────────────
 .alerts-list { padding:.5rem; }
 .alert-item {
     display:flex; align-items:center; gap:.625rem;
@@ -198,7 +228,7 @@
     &--info     { background:var(--mc-blue-bg);    color:var(--mc-blue); }
 }
 
-// â”€â”€ Status badges â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Status badges ──────────────────────────────
 .badge {
     display:inline-flex; align-items:center; padding:.22rem .6rem;
     border-radius:20px; font-size:.62rem; font-weight:800; text-transform:uppercase; letter-spacing:.45px;
@@ -207,7 +237,7 @@
     &--suspendu  { background:var(--mc-red-bg);   color:var(--mc-red); }
 }
 
-// â”€â”€ Plans Grid & Card â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Plans Grid & Card ──────────────────────────
 .plans-grid {
     display:grid; grid-template-columns:repeat(4,1fr); gap:1rem; margin-top: 1rem;
     @media(max-width:1100px){ grid-template-columns:repeat(2,1fr); }

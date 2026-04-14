@@ -1,8 +1,38 @@
-﻿// ================================================
-//  dashboard.scss  â€”  SecrÃ©taire  â€”  MediCab Pro
+// ================================================
+//  dashboard.scss  —  Secrétaire  —  MediCab Pro
 // ================================================
 
 :host {
+    --mc-primary:        #2563EB;
+    --mc-primary-dark:   #1D4ED8;
+    --mc-primary-light:  #EFF4FF;
+
+    --mc-bg:             #F1F5FA;
+    --mc-surface:        #FFFFFF;
+    --mc-surface-2:      #F8FAFD;
+
+    --mc-border:         #E5EAF4;
+    --mc-border-hover:   #C9D4E8;
+
+    --mc-text-1:         #0D1B3E;
+    --mc-text-2:         #4A5878;
+    --mc-text-3:         #8A95B0;
+
+    --mc-green:          #059669;
+    --mc-green-bg:       #ECFDF5;
+    --mc-red:            #DC2626;
+    --mc-red-bg:         #FEF2F2;
+    --mc-orange:         #D97706;
+    --mc-orange-bg:      #FFFBEB;
+    --mc-blue:           #2563EB;
+    --mc-blue-bg:        #EFF6FF;
+
+    --mc-radius:         12px;
+    --mc-radius-sm:      8px;
+    --mc-radius-lg:      16px;
+
+    --mc-shadow-sm:      0 1px 4px rgba(13,27,62,.07), 0 1px 2px rgba(13,27,62,.04);
+    --mc-shadow-md:      0 4px 16px rgba(13,27,62,.08), 0 1px 4px rgba(13,27,62,.04);
 
     display: block;
     padding: 1.75rem 2rem;
@@ -10,7 +40,7 @@
     min-height: 100%;
 }
 
-// â”€â”€ Page Header â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Page Header ──────────────────────────────
 .dash-header {
     display: flex; align-items: center; justify-content: space-between;
     gap: 1rem; margin-bottom: 1.75rem;
@@ -22,7 +52,7 @@
     &__actions { display: flex; gap: .625rem; align-items: center; }
 }
 
-// â”€â”€ Buttons â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Buttons ──────────────────────────────────
 .btn-primary {
     display: inline-flex; align-items: center; gap: .45rem;
     padding: .6rem 1.2rem; background: var(--mc-primary); color: #fff;
@@ -44,7 +74,7 @@
     i { font-size: .78rem; }
 }
 
-// â”€â”€ KPI Grid â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── KPI Grid ─────────────────────────────────
 .kpi-grid {
     display: grid; grid-template-columns: repeat(4, 1fr);
     gap: 1rem; margin-bottom: 1.25rem;
@@ -79,7 +109,7 @@
     &__icon { width: 46px; height: 46px; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; i { font-size: 1.15rem; } }
 }
 
-// â”€â”€ Content Grid â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Content Grid ─────────────────────────────
 .content-grid {
     display: grid; grid-template-columns: 1fr 320px;
     gap: 1.25rem; margin-bottom: 1.25rem; align-items: start;
@@ -88,7 +118,7 @@
 
 .right-col { display: flex; flex-direction: column; gap: 1.25rem; }
 
-// â”€â”€ Panel â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Panel ────────────────────────────────────
 .panel {
     background: var(--mc-surface); border: 1px solid var(--mc-border);
     border-radius: 16px; box-shadow: var(--mc-shadow-sm); overflow: hidden;
@@ -105,7 +135,7 @@
     }
 }
 
-// â”€â”€ RDV List â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── RDV List ─────────────────────────────────
 .rdv-list { padding: .75rem; display: flex; flex-direction: column; gap: .4rem; }
 
 .rdv-item {
@@ -130,7 +160,7 @@
     &__actions { display: flex; gap: .25rem; flex-shrink: 0; }
 }
 
-// â”€â”€ Badge â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Badge ────────────────────────────────────
 .badge {
     display: inline-flex; align-items: center; padding: .22rem .6rem; border-radius: 20px;
     font-size: .68rem; font-weight: 700; text-transform: uppercase; letter-spacing: .45px; white-space: nowrap; flex-shrink: 0;
@@ -141,7 +171,7 @@
     &--arrive     { background: var(--mc-purple-bg); color: var(--mc-purple); }
 }
 
-// â”€â”€ Action Buttons â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Action Buttons ───────────────────────────
 .btn-action {
     width: 28px; height: 28px; border-radius: 8px; border: 1px solid var(--mc-border);
     background: var(--mc-surface); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all .15s;
@@ -151,7 +181,7 @@
     &--info    { color: var(--mc-purple); &:hover { background: var(--mc-purple-bg); border-color: var(--mc-purple); } }
 }
 
-// â”€â”€ Salle d'attente â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Salle d'attente ──────────────────────────
 .attente-list { padding: .75rem; display: flex; flex-direction: column; gap: .4rem; }
 
 .attente-empty {
@@ -179,7 +209,7 @@
     border-radius: 20px; font-size: .62rem; font-weight: 800; letter-spacing: .4px; flex-shrink: 0;
 }
 
-// â”€â”€ Activity List â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Activity List ────────────────────────────
 .activity-list { padding: .25rem 1.375rem .75rem; }
 
 .activity-item {
@@ -191,7 +221,7 @@
     &__time { margin-top: 3px; font-size: .68rem; color: var(--mc-text-3); }
 }
 
-// â”€â”€ Stats Row â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Stats Row ────────────────────────────────
 .stats-row {
     display: grid; grid-template-columns: 1fr 1fr;
     gap: 1.25rem;
@@ -221,7 +251,7 @@
     &__count { font-size: .78rem; font-weight: 700; color: var(--mc-text-1); min-width: 24px; text-align: right; }
 }
 
-// â”€â”€ MÃ©decins List â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── Médecins List ────────────────────────────
 .medecins-list { padding: .5rem 1.375rem 1rem; display: flex; flex-direction: column; gap: .5rem; }
 
 .medecin-item {
