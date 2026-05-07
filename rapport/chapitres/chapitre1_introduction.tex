@@ -1,0 +1,176 @@
+%============================================================
+% CHAPITRE 1 — INTRODUCTION GÉNÉRALE
+%============================================================
+\chapter{Introduction générale}
+
+\section{Contexte et motivation}
+
+La numérisation des pratiques médicales constitue aujourd'hui un enjeu majeur
+pour les systèmes de santé à travers le monde. Au Maroc, ce mouvement de
+transformation digitale est particulièrement significatif dans le secteur privé,
+où une majorité de cabinets médicaux continuent de fonctionner selon des modes
+de gestion traditionnels. Selon les statistiques du Ministère de la Santé marocain,
+plus des deux tiers des structures médicales libérales s'appuient encore sur des
+supports papier pour la gestion de leurs activités quotidiennes, générant des
+inefficacités qui affectent directement la qualité de la prise en charge des patients.
+
+Cette situation se traduit par des problèmes tangibles au quotidien : des dossiers
+médicaux difficiles à retrouver ou susceptibles d'être altérés, des plannings mal
+maîtrisés entraînant des pertes de temps pour les professionnels et les patients,
+une traçabilité financière insuffisante et l'impossibilité de partager rapidement
+des informations cliniques entre soignants. Dans ce contexte, la mise en œuvre
+de solutions numériques adaptées aux réalités du terrain devient une nécessité
+incontournable pour les cabinets qui souhaitent optimiser leur organisation et
+élever le niveau de qualité de leur offre de soins.
+
+C'est dans cette perspective que s'inscrit MediCab Pro, une plateforme conçue
+en tenant compte des spécificités du marché marocain et construite sur les
+fondements des architectures logicielles contemporaines. Ce projet représente
+une opportunité unique d'illustrer comment les disciplines DevOps et Cloud
+Computing peuvent apporter des réponses concrètes à un domaine aussi exigeant
+et réglementé que la santé.
+
+\section{Problématique}
+
+L'analyse approfondie du secteur médical privé marocain révèle un retard numérique
+structurel qui se manifeste à travers plusieurs dysfonctionnements récurrents et
+mesurables :
+
+\begin{itemize}
+  \item \textbf{Fragilité et confidentialité des données médicales} : les documents
+    papier sont exposés au risque de détérioration physique, de disparition ou de
+    consultation non autorisée, portant atteinte au secret médical et à la protection
+    des informations sensibles des patients.
+
+  \item \textbf{Désorganisation opérationnelle} : la gestion manuelle des plannings
+    de consultation génère des chevauchements de rendez-vous, des absences non
+    signalées et une utilisation sous-optimale du temps médical disponible.
+
+  \item \textbf{Opacité de la situation financière} : sans outil dédié, le suivi
+    du chiffre d'affaires, des créances en attente et des remboursements institutionnels
+    (CNSS/CNOPS) reste approximatif et chronophage.
+
+  \item \textbf{Manque d'assistance à la décision clinique} : les praticiens ne
+    disposent d'aucun outil intelligent pour les seconder dans la formalisation
+    des comptes rendus ou l'établissement des ordonnances.
+
+  \item \textbf{Instabilité des déploiements applicatifs} : lorsqu'une solution
+    numérique existe, elle est généralement maintenue manuellement, exposée aux
+    erreurs et difficile à faire évoluer sans risque de régression.
+\end{itemize}
+
+La problématique centrale de ce travail peut donc être formulée ainsi :
+\textit{Comment concevoir et mettre en production une plateforme SaaS médicale
+sécurisée, scalable et dotée de fonctionnalités intelligentes, s'appuyant sur
+une architecture microservices et un pipeline d'intégration et de déploiement
+continu, afin de répondre aux besoins opérationnels réels des professionnels
+de santé marocains ?}
+
+\section{Objectifs du projet}
+
+MediCab Pro poursuit deux séries d'objectifs complémentaires, fonctionnels
+d'une part et techniques de l'autre.
+
+\subsection{Objectifs fonctionnels}
+
+\begin{itemize}
+  \item Automatiser et centraliser l'ensemble de la gestion administrative
+    d'un cabinet médical : agendas, dossiers patients, consultations et facturation.
+  \item Fournir une interface web ergonomique, bilingue (français/arabe) et
+    utilisable depuis tout navigateur moderne sans installation préalable.
+  \item Intégrer un assistant IA médical (MedAgent) capable d'accompagner
+    le médecin en temps réel lors des consultations.
+  \item Proposer une architecture multi-tenant permettant l'exploitation simultanée
+    par plusieurs cabinets dans un environnement isolé et sécurisé.
+  \item Automatiser la production de rapports financiers détaillés pour une
+    meilleure pilotage de l'activité du cabinet.
+\end{itemize}
+
+\subsection{Objectifs techniques}
+
+\begin{itemize}
+  \item Concevoir une architecture microservices robuste et extensible reposant
+    sur Spring Boot et Angular 21.
+  \item Mettre en place un pipeline CI/CD complet avec Jenkins, Docker et Kubernetes
+    pour assurer des livraisons fiables et répétables.
+  \item Sécuriser les données médicales sensibles par des mécanismes JWT, OAuth2
+    et une gestion des droits basée sur les rôles (RBAC).
+  \item Déployer un système d'observabilité complet (Prometheus, Grafana) et
+    un déploiement déclaratif GitOps (ArgoCD).
+  \item Garantir un taux de disponibilité de 99,9\% grâce à l'auto-scaling
+    Kubernetes et aux patterns de résilience (Circuit Breaker, Retry).
+\end{itemize}
+
+\section{Méthodologie adoptée}
+
+La conduite du projet MediCab Pro s'est appuyée sur un ensemble de pratiques
+méthodologiques reconnues dans l'ingénierie logicielle moderne.
+
+\subsection{Approche Agile}
+
+Le projet a été structuré selon les principes agiles du framework Scrum,
+avec des cycles de développement de deux semaines. Cette organisation itérative
+favorise une livraison progressive des fonctionnalités, une réactivité aux
+retours et une gestion proactive des risques. Chaque itération se conclut
+par une démonstration des fonctionnalités développées et une session de
+rétrospective visant l'amélioration continue du processus.
+
+\subsection{Domain-Driven Design}
+
+La décomposition du système en microservices s'est appuyée sur les principes
+du Domain-Driven Design (DDD), qui préconise d'identifier les contextes
+fonctionnels délimités et d'aligner la structure technique sur les domaines
+métier réels : gestion de l'identité, suivi des patients, consultations cliniques,
+facturation et assistance intelligente.
+
+\subsection{DevOps et automatisation}
+
+L'intégralité du cycle de vie applicatif est prise en charge par un pipeline
+CI/CD Jenkins entièrement automatisé. Depuis la soumission du code source jusqu'à
+son déploiement sur le cluster Kubernetes, chaque étape est orchestrée : compilation,
+exécution des tests, contrôle de la qualité du code, fabrication des images Docker
+et synchronisation GitOps via ArgoCD. Cette automatisation réduit significativement
+l'exposition aux erreurs humaines et assure la reproductibilité des déploiements.
+
+\subsection{Test-Driven Development}
+
+La maîtrise de la qualité logicielle repose sur une démarche orientée tests :
+tests unitaires avec JUnit 5 et Mockito, tests d'intégration avec Testcontainers,
+et évaluation de la couverture de code via SonarQube. L'objectif est de maintenir
+un taux de couverture supérieur à 80\% pour l'ensemble des microservices critiques.
+
+\section{Structure du rapport}
+
+Le présent document s'articule autour de huit chapitres complémentaires :
+
+\begin{itemize}
+  \item \textbf{Chapitre 1 : Introduction générale}\\
+    Présentation du cadre général, de la problématique identifiée, des objectifs
+    visés, de l'approche méthodologique retenue et de la structure du mémoire.
+
+  \item \textbf{Chapitre 2 : Contexte général du projet}\\
+    Élaboration du cahier des charges, spécification des exigences fonctionnelles
+    et non fonctionnelles, et description des acteurs du système.
+
+  \item \textbf{Chapitre 3 : Analyse et Conception}\\
+    Architecture technique détaillée, modélisation UML (cas d'utilisation,
+    séquences, classes) et conception du pipeline DevOps.
+
+  \item \textbf{Chapitre 4 : Réalisation}\\
+    Description des outils retenus, des technologies employées et des interfaces
+    principales de la solution.
+
+  \item \textbf{Chapitre 5 : Conteneurisation et Déploiement}\\
+    Dockerisation des microservices et orchestration sur cluster Kubernetes.
+
+  \item \textbf{Chapitre 6 : Tests et Validation}\\
+    Stratégie de test, résultats des tests unitaires, d'intégration et de
+    performance.
+
+  \item \textbf{Chapitre 7 : Pipeline CI/CD et Monitoring}\\
+    Automatisation du pipeline, supervision avec Prometheus/Grafana et
+    déploiement GitOps avec ArgoCD.
+
+  \item \textbf{Chapitre 8 : Conclusion et Perspectives}\\
+    Bilan du projet, difficultés rencontrées et axes d'évolution envisagés.
+\end{itemize}

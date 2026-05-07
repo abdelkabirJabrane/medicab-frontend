@@ -1,0 +1,273 @@
+<div class="min-h-screen bg-[#F8FAFC] flex flex-col text-[#1E293B]">
+  
+  <!-- Premium Header -->
+  <header class="hero-gradient px-4 pt-20 pb-32">
+    <div class="max-w-6xl mx-auto flex flex-col items-center">
+      
+      <!-- Brand & Link -->
+      <div class="absolute top-0 right-0 left-0 p-6 flex justify-between items-center">
+        <div class="text-2xl font-black text-white flex items-center gap-2 cursor-pointer transition-transform hover:scale-105" routerLink="/">
+          <div class="bg-white p-1 rounded-lg">
+             <i class="pi pi-plus text-[#6c3fc5] text-lg"></i>
+          </div>
+          MedGest
+        </div>
+        <a href="/auth/login" class="bg-white/10 backdrop-blur-md text-white border border-white/20 px-6 py-2 rounded-full text-sm font-semibold hover:bg-white/20 transition-all">
+          Accès Professionnel
+        </a>
+      </div>
+
+      <!-- Hero Text -->
+      <h1 class="text-4xl md:text-5xl font-bold text-white text-center mb-4 max-w-3xl leading-tight">
+        Votre santé mérite le meilleur accompagnement.
+      </h1>
+      <p class="text-white/80 text-lg mb-10 font-light">Trouvez et réservez votre consultation en quelques secondes.</p>
+
+      <!-- Glassmorphism Search Bar -->
+      <div class="glass-search w-full max-w-4xl rounded-2xl md:rounded-full p-2 flex flex-col md:flex-row gap-2">
+        <div class="flex-1 flex items-center px-6 py-3">
+          <i class="pi pi-search text-[#6c3fc5] mr-3 font-bold"></i>
+          <input type="text" 
+                 [(ngModel)]="searchQuery" 
+                 (keyup.enter)="searchDoctors()"
+                 placeholder="Nom, spécialité..." 
+                 class="w-full outline-none text-gray-800 bg-transparent text-lg font-normal placeholder:text-gray-400">
+        </div>
+        <div class="hidden md:block w-[1px] h-10 bg-gray-200 my-auto"></div>
+        <div class="flex-1 flex items-center px-6 py-3 relative group/loc">
+          <i class="pi pi-map-marker text-[#6c3fc5] mr-3 font-bold"></i>
+          <input type="text" 
+                 [(ngModel)]="locationQuery" 
+                 (keyup.enter)="searchDoctors()"
+                 placeholder="Ville ou quartier..." 
+                 class="w-full outline-none text-gray-800 bg-transparent text-lg font-normal placeholder:text-gray-400">
+          <button (click)="useGeolocation()" 
+                  title="Utiliser ma position actuelle"
+                  class="absolute right-4 text-gray-400 hover:text-[#6c3fc5] p-2 transition-all hover:bg-white/50 rounded-full animate-pulse-subtle">
+            <i class="pi pi-compass text-lg"></i>
+          </button>
+        </div>
+        <button (click)="searchDoctors()" class="bg-[#6c3fc5] hover:bg-[#5a33a3] text-white font-bold py-4 px-12 rounded-full transition-all shadow-lg hover:shadow-[#6c3fc544] flex items-center justify-center gap-3">
+          <i class="pi pi-search font-bold"></i> Rechercher
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Filter & Content Area -->
+  <main class="max-w-6xl mx-auto w-full px-4 -mt-16 relative z-10">
+    
+    <!-- Quick Filters -->
+    <div class="bg-white rounded-2xl shadow-xl flex flex-wrap items-center gap-4 p-4 mb-10 border border-gray-100">
+      <span class="text-gray-400 font-medium text-sm ml-2 hidden lg:inline">Filtres rapides :</span>
+      <button (click)="quickFilter('')" 
+              class="bg-[#6c3fc511] text-[#6c3fc5] border border-[#6c3fc522] rounded-xl px-5 py-2.5 hover:bg-[#6c3fc522] transition-all text-sm font-bold flex items-center gap-2">
+        <i class="pi pi-th-large"></i> Tous
+      </button>
+      <button (click)="useGeolocation()" 
+              class="bg-blue-50 text-blue-600 border border-blue-100 rounded-xl px-5 py-2.5 hover:bg-blue-100 transition-all text-sm font-bold flex items-center gap-2">
+        <i class="pi pi-compass"></i> Autour de moi
+      </button>
+      <button (click)="quickFilter('Généraliste')" 
+              class="bg-[#F8FAFC] border border-gray-100 rounded-xl px-5 py-2.5 hover:border-[#6c3fc5] hover:text-[#6c3fc5] transition-all text-sm font-medium flex items-center gap-2">
+        <i class="pi pi-user"></i> Généraliste
+      </button>
+      <button (click)="quickFilter('Dentiste')" 
+              class="bg-[#F8FAFC] border border-gray-100 rounded-xl px-5 py-2.5 hover:border-[#6c3fc5] hover:text-[#6c3fc5] transition-all text-sm font-medium flex items-center gap-2">
+        <i class="pi pi-heart"></i> Dentiste
+      </button>
+      <button (click)="quickFilter('Cardiologue')" 
+              class="bg-[#F8FAFC] border border-gray-100 rounded-xl px-5 py-2.5 hover:border-[#6c3fc5] hover:text-[#6c3fc5] transition-all text-sm font-medium flex items-center gap-2">
+        <i class="pi pi-bolt"></i> Cardiologue
+      </button>
+      <button (click)="quickFilter('Cabinet')" 
+              class="bg-[#F8FAFC] border border-gray-100 rounded-xl px-5 py-2.5 hover:border-[#6c3fc5] hover:text-[#6c3fc5] transition-all text-sm font-medium flex items-center gap-2">
+        <i class="pi pi-building"></i> Cabinet
+      </button>
+      <button (click)="quickFilter('Téléconsultation')" 
+              class="bg-[#F8FAFC] border border-gray-100 rounded-xl px-5 py-2.5 hover:border-[#6c3fc5] hover:text-[#6c3fc5] transition-all text-sm font-medium flex items-center gap-2">
+        <i class="pi pi-video"></i> Vidéo
+      </button>
+      <div class="ml-auto flex items-center gap-4 text-sm font-medium">
+         <span class="text-gray-500">{{ doctors().length }} résultats trouvés</span>
+      </div>
+    </div>
+
+    <!-- Results Section -->
+    <div class="mb-20">
+      @if (loading()) {
+        <div class="flex flex-col items-center py-24 fade-in">
+          <div class="relative w-16 h-16">
+            <div class="absolute inset-0 border-4 border-[#6c3fc522] rounded-full"></div>
+            <div class="absolute inset-0 border-4 border-[#6c3fc5] rounded-full border-t-transparent animate-spin"></div>
+          </div>
+          <p class="text-gray-400 mt-6 font-medium animate-pulse">Recherche des meilleurs praticiens...</p>
+        </div>
+      } @else {
+        <div class="grid grid-cols-1 gap-8">
+          @for (doc of doctors(); track doc.id) {
+            <div class="doctor-card bg-white rounded-2xl overflow-hidden flex flex-col lg:flex-row fade-in">
+              
+              <!-- Left Part: Doctor Profile -->
+              <div class="p-8 lg:w-[350px] bg-white border-r border-gray-50">
+                <div class="flex lg:flex-col items-center lg:items-start gap-4 mb-6">
+                  <div class="relative group">
+                    <img [src]="doc.profileImageUrl || 'assets/layout/images/placeholder.png'" 
+                         [alt]="doc.firstName" 
+                         class="w-20 h-20 lg:w-28 lg:h-28 rounded-2xl object-cover shadow-md border-2 border-slate-50">
+                    <div class="absolute -bottom-2 -right-2 bg-green-500 w-6 h-6 rounded-full border-[3px] border-white flex items-center justify-center" 
+                         title="Médecin vérifié">
+                      <i class="pi pi-check text-white text-[10px] font-bold"></i>
+                    </div>
+                  </div>
+                  <div>
+                    <h3 class="text-xl font-bold text-slate-900 group-hover:text-[#6c3fc5] transition-colors">
+                      {{ getDoctorFullName(doc) }}
+                    </h3>
+                    <div class="flex items-center gap-2 mt-2">
+                       <span class="badge-specialite">{{ doc.specialite || 'Médecin' }}</span>
+                       <span *ngIf="doc.distance != null" class="bg-blue-50 text-blue-600 text-[10px] font-bold px-2 py-0.5 rounded-full border border-blue-100 italic">
+                          à {{ doc.distance.toFixed(1) }} km
+                       </span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="space-y-4 mb-8">
+                  <p class="flex items-start gap-3 text-sm text-slate-500 leading-relaxed cursor-pointer group/loc" (click)="openGoogleMaps(doc.address, doc.ville)">
+                    <i class="pi pi-map-marker text-[#6c3fc5] group-hover/loc:scale-110 transition-transform mt-1 text-base"></i>
+                    <span class="group-hover/loc:text-[#6c3fc5] transition-colors">
+                        <strong class="text-slate-700 group-hover/loc:text-[#6c3fc5]" *ngIf="doc.ville">{{ doc.ville }}</strong>
+                        <span *ngIf="doc.ville && doc.address"> - </span>
+                        <span>{{ doc.address || 'Adresse à confirmer' }}</span>
+                    </span>
+                  </p>
+                  <p class="flex items-center gap-3 text-sm text-slate-500">
+                    <i class="pi pi-wallet text-[#6c3fc5] text-base"></i>
+                    <span>Consultation à partir de 250 DH</span>
+                  </p>
+                </div>
+
+                <div class="grid grid-cols-1 gap-3">
+                  <button (click)="takeAppointment(doc.slug, '','')" 
+                          class="bg-[#6c3fc5] hover:bg-[#5a32a3] text-white font-bold py-3 px-6 rounded-xl shadow-lg transition-all transform hover:-translate-y-1 flex items-center justify-center gap-2">
+                    <i class="pi pi-calendar-plus"></i>
+                    Prendre RDV
+                  </button>
+                  <button (click)="revealPhone(doc.id)" 
+                          class="w-full bg-white border border-slate-200 hover:border-slate-300 text-slate-600 py-3 rounded-xl font-semibold transition-all flex items-center justify-center gap-2">
+                    <i class="pi pi-phone text-[#6c3fc5]" *ngIf="revealedPhones[doc.id]"></i>
+                    <i class="pi pi-phone text-slate-400" *ngIf="!revealedPhones[doc.id]"></i> 
+                    {{ revealedPhones[doc.id] ? (doc.phoneNumber || 'Numéro non renseigné') : 'Afficher le numéro' }}
+                  </button>
+                </div>
+              </div>
+
+              <!-- Right Part: Availability Calendar -->
+              <div class="flex-1 bg-[#FDFDFF] p-6 lg:p-8 flex items-center relative">
+                
+                <button (click)="prevDays()" 
+                        class="calendar-nav-btn absolute left-2 z-10 shadow-sm"
+                        [disabled]="isStartDateToday()">
+                  <i class="pi pi-chevron-left"></i>
+                </button>
+
+                <div class="w-full grid grid-cols-5 gap-3">
+                  @for (day of weekDays(); track day.toISOString()) {
+                    <div class="min-w-0">
+                      <div class="text-center mb-6">
+                        <div class="text-slate-900 font-bold text-sm capitalize">{{ formatDayName(day) }}</div>
+                        <div class="text-slate-400 text-[11px] font-medium mt-1">{{ formatDayNumber(day) }}</div>
+                      </div>
+                      
+                        @let dateIso = formatDateIso(day);
+                        @let daySlots = doc.availabilities?.[dateIso] || [];
+                        
+                        <div class="flex flex-col gap-2">
+                          @if (daySlots.length === 0) {
+                            <div class="h-[150px] flex items-center justify-center border-t border-dashed border-slate-100 italic text-[10px] text-slate-300">
+                               {{ day.getDay() === 0 || day.getDay() === 6 ? 'Week-end' : 'Indisponible' }}
+                            </div>
+                          } @else {
+                            @for (s of daySlots.slice(0, 4); track s) {
+                              @let isBusy = s.startsWith('BUSY:');
+                              @let slotTime = isBusy ? s.split(':')[1] : s;
+                              
+                              <button (click)="!isBusy && takeAppointment(doc.slug, dateIso, slotTime)" 
+                                      [disabled]="isBusy"
+                                      class="slot-btn w-full py-2.5 rounded-lg font-bold text-xs shadow-sm transition-all flex items-center justify-center gap-2"
+                                      [ngClass]="isBusy ? 'bg-rose-50 text-rose-500 border-rose-100 cursor-not-allowed opacity-60' : 'bg-white border border-slate-100 hover:border-indigo-600 hover:text-indigo-600 text-slate-600'">
+                                <i *ngIf="isBusy" class="pi pi-lock text-[9px]"></i>
+                                <span>{{ slotTime }}</span>
+                              </button>
+                            }
+                            @if (daySlots.length > 4) {
+                              <button (click)="takeAppointment(doc.slug, dateIso, '')" 
+                                      class="w-full py-2.5 text-indigo-600 font-bold text-[10px] hover:bg-slate-50 rounded-lg transition-all uppercase tracking-wider">
+                                + Voir plus
+                              </button>
+                            }
+                          }
+                        </div>
+                    </div>
+                  }
+                </div>
+
+                <button (click)="nextDays()" 
+                        class="calendar-nav-btn absolute right-2 z-10 shadow-sm">
+                  <i class="pi pi-chevron-right"></i>
+                </button>
+
+              </div>
+            </div>
+          }
+        </div>
+
+        @if (doctors().length === 0 && !loading()) {
+            <div class="bg-white rounded-3xl p-20 text-center shadow-sm border border-gray-50 fade-in">
+              <i class="pi pi-search text-gray-200 text-7xl block mb-6"></i>
+              <h3 class="text-2xl font-bold text-gray-800 mb-2">Aucun praticien trouvé</h3>
+              <p class="text-gray-500 max-w-sm mx-auto">Essayez de modifier vos critères de recherche ou de changer de ville.</p>
+              <button (click)="searchQuery = ''; locationQuery = ''; searchDoctors()" class="mt-8 text-[#6c3fc5] font-bold hover:underline">Voir tous les médecins</button>
+            </div>
+        }
+      }
+    </div>
+  </main>
+
+  <!-- Premium Footer -->
+  <footer class="bg-slate-900 text-white pt-20 pb-10">
+     <div class="max-w-6xl mx-auto px-4 grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
+        <div class="col-span-2">
+           <div class="text-2xl font-bold mb-6 flex items-center gap-2">
+             <i class="pi pi-heart-fill text-[#6c3fc5]"></i> MedGest
+           </div>
+           <p class="text-slate-400 max-w-sm leading-relaxed mb-6">La plateforme Saas marocaine de référence pour la gestion des cabinets médicaux et la prise de rendez-vous en ligne.</p>
+           <div class="flex gap-4">
+              <i class="pi pi-facebook text-xl hover:text-[#6c3fc5] cursor-pointer transition-colors"></i>
+              <i class="pi pi-instagram text-xl hover:text-[#6c3fc5] cursor-pointer transition-colors"></i>
+              <i class="pi pi-linkedin text-xl hover:text-[#6c3fc5] cursor-pointer transition-colors"></i>
+           </div>
+        </div>
+        <div>
+           <h4 class="font-bold text-lg mb-6">Solutions</h4>
+           <ul class="space-y-3 text-slate-400">
+             <li class="hover:text-white transition-colors cursor-pointer">Pour les médecins</li>
+             <li class="hover:text-white transition-colors cursor-pointer">Pour les cliniques</li>
+             <li class="hover:text-white transition-colors cursor-pointer">Téléconsultation</li>
+           </ul>
+        </div>
+        <div>
+           <h4 class="font-bold text-lg mb-6">Support</h4>
+           <ul class="space-y-3 text-slate-400">
+             <li class="hover:text-white transition-colors cursor-pointer">Centre d'aide</li>
+             <li class="hover:text-white transition-colors cursor-pointer">Contact</li>
+             <li class="hover:text-white transition-colors cursor-pointer">Confidentialité</li>
+           </ul>
+        </div>
+     </div>
+     <div class="max-w-6xl mx-auto px-4 pt-10 border-t border-slate-800 text-center text-slate-500 text-sm">
+        &copy; 2026 MedGest. Tous droits réservés.
+     </div>
+  </footer>
+</div>

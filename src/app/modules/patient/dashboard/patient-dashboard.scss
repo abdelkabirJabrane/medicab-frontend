@@ -1,0 +1,44 @@
+.header-banner {
+    background: linear-gradient(135deg, #1e1b4b 0%, #4338ca 100%);
+    position: relative;
+    border-bottom-left-radius: 60px;
+    border-bottom-right-radius: 60px;
+    overflow: hidden;
+
+    &::after {
+        content: "";
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        opacity: 0.1;
+        background-image: radial-gradient(circle at 2px 2px, white 1px, transparent 0);
+        background-size: 40px 40px;
+    }
+}
+
+.tag-premium {
+    ::ng-deep .p-tag {
+        padding: 6px 12px;
+        border-radius: 12px;
+        font-size: 10px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+}
+
+.animate-in {
+    animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.slot-card {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    &:hover {
+        border-color: #6366f1;
+        background: #f5f3ff;
+    }
+}

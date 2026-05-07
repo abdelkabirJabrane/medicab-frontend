@@ -1,0 +1,210 @@
+%============================================================
+% CHAPITRE 3 — ANALYSE ET CONCEPTION
+%============================================================
+\chapter{Analyse et Conception}
+
+\section{Introduction}
+
+La phase d'analyse et de conception occupe une place centrale dans tout projet
+de développement logiciel. Elle permet de traduire les exigences recueillies
+au chapitre précédent en un modèle architectural cohérent, clair et techniquement
+réalisable. Pour la modélisation de MediCab Pro, nous avons fait le choix du
+langage UML (Unified Modeling Language), standard reconnu pour sa capacité à
+représenter fidèlement les architectures distribuées complexes et à faciliter
+la communication entre toutes les parties prenantes du projet.
+
+\section{Architecture technique globale}
+
+\subsection{Vue d'ensemble de l'architecture}
+
+L'architecture de MediCab Pro repose sur un découpage en couches fonctionnelles
+bien séparées. La couche de présentation, développée en Angular, ne communique
+jamais directement avec les microservices applicatifs : toutes les requêtes
+transitent par une API Gateway qui joue le rôle de point d'entrée centralisé,
+chargé du routage, de la sécurité et de l'équilibrage de charge. Chaque
+microservice Spring Boot expose ses propres fonctionnalités via une interface
+REST documentée avec Swagger. La communication inter-services s'effectue de
+manière synchrone via REST, renforcée par des mécanismes de tolérance aux
+pannes (Circuit Breaker Resilience4j).
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{Architecture globale.png}
+  \caption{Architecture microservices globale de MediCab Pro}
+  \label{fig:arch-globale}
+\end{figure}
+
+\subsection{Microservices implémentés}
+
+\begin{table}[H]
+\centering
+\caption{Inventaire des microservices de MediCab Pro}
+\label{tab:microservices}
+\renewcommand{\arraystretch}{1.4}
+\begin{tabularx}{\textwidth}{|>{\bfseries\ttfamily}p{4cm}|p{1.5cm}|X|}
+\hline
+\textbf{Service} & \textbf{Port} & \textbf{Responsabilité} \\
+\hline
+auth-service & 8081 & Authentification JWT, OAuth2 et contrôle d'accès RBAC \\
+\hline
+appointment-service & 8082 & Gestion des agendas, rendez-vous et file d'attente \\
+\hline
+patient-service & 8083 & Dossiers patients, antécédents et documents médicaux \\
+\hline
+medical-record-service & 8084 & Consultations médicales et historique clinique \\
+\hline
+ordonnance-service & 8085 & Prescriptions électroniques et gestion médicaments \\
+\hline
+billing-service & 8086 & Facturation, suivi des paiements et rapports financiers \\
+\hline
+notification-service & 8087 & Envoi de notifications, alertes et rappels \\
+\hline
+ai-service & 8088 & Module IA MedAgent (FastAPI / Python) \\
+\hline
+api-gateway & 8080 & Point d'entrée unique, routage et sécurité transverse \\
+\hline
+discovery-service & 8761 & Registre de services Eureka Server \\
+\hline
+config-service & 8888 & Configuration externalisée et centralisée \\
+\hline
+\end{tabularx}
+\end{table}
+
+\section{Diagrammes de cas d'utilisation}
+
+\subsection{Définition}
+
+Le diagramme de cas d'utilisation matérialise les interactions entre les acteurs
+externes au système et les fonctionnalités que celui-ci met à leur disposition.
+Il constitue le premier niveau de modélisation UML et permet de capturer les
+exigences fonctionnelles sous une forme visuelle, accessible à toutes les parties
+prenantes, qu'elles soient techniques ou métier.
+
+\subsection{DCU --- Espace Médecin}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{UsecaseMedcine.png}
+  \caption{Diagramme de cas d'utilisation --- Espace Médecin}
+  \label{fig:dcu-medecin}
+\end{figure}
+
+\subsection{DCU --- Espace Secrétaire Médicale}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{UsecaseSecritaire.png}
+  \caption{Diagramme de cas d'utilisation --- Espace Secrétaire Médicale}
+  \label{fig:dcu-secretaire}
+\end{figure}
+
+\subsection{DCU --- Espace Super Administrateur}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{UsecaseSuperAdmin.png}
+  \caption{Diagramme de cas d'utilisation --- Espace Super Administrateur}
+  \label{fig:dcu-admin}
+\end{figure}
+
+\subsection{DCU --- Module IA (MedAgent)}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{UsecaseAiAgent.png}
+  \caption{Diagramme de cas d'utilisation --- Module IA MedAgent}
+  \label{fig:dcu-ia}
+\end{figure}
+
+\section{Diagrammes de séquence}
+
+\subsection{Diagramme de séquence --- Authentification JWT}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{SequenceAuth.png}
+  \caption{Diagramme de séquence --- Authentification JWT}
+  \label{fig:ds-auth}
+\end{figure}
+
+\subsection{Diagramme de séquence --- Création d'un rendez-vous}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{SequanceRendezVous.png}
+  \caption{Diagramme de séquence --- Création d'un rendez-vous}
+  \label{fig:ds-rdv}
+\end{figure}
+
+\subsection{Diagramme de séquence --- Consultation avec MedAgent}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{SequanceConsultationAiAgent.png}
+  \caption{Diagramme de séquence --- Consultation assistée par MedAgent}
+  \label{fig:ds-medagent}
+\end{figure}
+
+\subsection{Diagramme de séquence --- Génération de facture}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{SequanceFacture.png}
+  \caption{Diagramme de séquence --- Génération de facture}
+  \label{fig:ds-facture}
+\end{figure}
+
+\section{Diagrammes de classes}
+
+\subsection{Module Authentification (auth-service)}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{ClasseAuth.png}
+  \caption{Diagramme de classe --- Module Authentification}
+  \label{fig:dc-auth}
+\end{figure}
+
+\subsection{Module Patient (patient-service)}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{ClassePatient.png}
+  \caption{Diagramme de classe --- Module Patient}
+  \label{fig:dc-patient}
+\end{figure}
+
+\subsection{Module Rendez-vous (appointment-service)}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{ClasseRendesVous.png}
+  \caption{Diagramme de classe --- Module Rendez-vous}
+  \label{fig:dc-rdv}
+\end{figure}
+
+\subsection{Module Consultations et Ordonnances}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{ClasseOrdonanceConsultataion.png}
+  \caption{Diagramme de classe --- Module Consultations et Ordonnances}
+  \label{fig:dc-consultation}
+\end{figure}
+
+\subsection{Module Facturation (billing-service)}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{ClasseFacturation.png}
+  \caption{Diagramme de classe --- Module Facturation}
+  \label{fig:dc-billing}
+\end{figure}
+
+\section{Conclusion}
+
+Ce chapitre a exposé l'ensemble de la conception architecturale de MediCab Pro :
+une structure distribuée composée de onze microservices indépendants, une
+modélisation UML complète des interactions entre acteurs et composants, et une
+conception guidée par le principe de séparation des responsabilités. Le chapitre
+suivant décrit la phase de réalisation concrète de l'application.

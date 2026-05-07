@@ -1,0 +1,424 @@
+<!-- Wrapper page publique -->
+<div class="min-h-screen bg-[#F8FAFC] text-slate-900 pb-20">
+
+  <!-- Header Design -->
+  <header class="hero-gradient px-4 md:px-12 pt-14 pb-20 shadow-2xl relative overflow-hidden">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6 relative z-20">
+      <!-- Logo Side -->
+      <div class="flex items-center gap-5 cursor-pointer group" routerLink="/search">
+        <div class="logo-container">
+          <i class="pi pi-plus text-indigo-600 text-2xl"></i>
+        </div>
+        <div class="flex flex-col">
+          <h1 class="logo-text">MedGest<span class="text-white/60">Pro</span></h1>
+          <span class="logo-subtitle">Réseau Médical Privé</span>
+        </div>
+      </div>
+
+      <!-- Action Side -->
+      <div class="flex items-center gap-4">
+        <a href="/auth/login" class="practitioner-btn">
+          <i class="pi pi-user mr-2"></i>
+          <span>Espace Praticien</span>
+        </a>
+      </div>
+    </div>
+    
+    <!-- Abstract Shapes for Premium Look -->
+    <div class="absolute -top-24 -right-24 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
+    <div class="absolute -bottom-24 -left-24 w-64 h-64 bg-indigo-500/20 rounded-full blur-3xl"></div>
+  </header>
+
+  <div class="max-w-7xl mx-auto px-6 -mt-6 relative z-20">
+    
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+      
+      <!-- Left Sidebar (Col 4) -->
+      <div class="lg:col-span-4 space-y-6 animate-in">
+        
+        <!-- Doctor Profile Card -->
+        <div class="premium-card p-8 flex flex-col items-center text-center relative overflow-hidden">
+          <div class="absolute top-0 right-0 p-4">
+             <div class="px-3 py-1 bg-emerald-50 text-emerald-600 text-[10px] font-black rounded-full border border-emerald-100">DISPONIBLE</div>
+          </div>
+
+          <div class="relative mb-8 mt-4">
+            <div class="absolute inset-0 bg-indigo-500 rounded-[40px] blur-3xl opacity-10"></div>
+            <img [src]="doctor?.profileImageUrl"
+                 (error)="doctor!.profileImageUrl = 'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?q=80&w=300&h=300&auto=format&fit=crop'"
+                 class="w-40 h-40 rounded-[40px] object-cover border-8 border-white shadow-2xl relative z-10">
+          </div>
+          
+          <h1 class="text-3xl font-black text-slate-900 leading-tight">
+            Dr. {{ doctor?.firstName }} {{ doctor?.lastName }}
+          </h1>
+          <p class="text-sm font-bold text-indigo-500 mt-2 uppercase tracking-widest">{{ doctor?.specialite }}</p>
+          
+          <div class="w-20 h-1.5 bg-indigo-50 rounded-full my-8"></div>
+          
+          <div class="w-full space-y-6">
+            <div class="flex items-center gap-5 text-left group cursor-pointer" (click)="openGoogleMaps(doctor?.address || '', doctor?.ville || '')">
+              <div class="w-12 h-12 rounded-2xl bg-slate-50 text-slate-400 flex items-center justify-center border border-slate-100 group-hover:bg-indigo-600 group-hover:text-white transition-all">
+                <i class="pi pi-map-marker"></i>
+              </div>
+              <div>
+                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Localisation</p>
+                <p class="text-sm font-bold text-slate-700 group-hover:text-indigo-600 transition-colors">{{ doctor?.address || 'Adresse confidentielle' }}</p>
+              </div>
+            </div>
+
+            <!-- Embedded Map Preview -->
+            <div class="w-full h-48 rounded-2xl overflow-hidden border border-slate-100 shadow-inner bg-slate-50 mt-4 relative group/map" *ngIf="doctor?.address || doctor?.ville">
+               <iframe 
+                 width="100%" 
+                 height="100%" 
+                 frameborder="0" 
+                 style="border:0; filter: grayscale(0.2) contrast(1.1);" 
+                 [src]="'https://maps.google.com/maps?q=' + (doctor?.address || '') + ' ' + (doctor?.ville || '') + '&t=&z=15&ie=UTF8&iwloc=&output=embed' | safeUrl" 
+                 allowfullscreen>
+               </iframe>
+               <div class="absolute inset-0 bg-indigo-600/0 group-hover/map:bg-indigo-600/5 transition-all pointer-events-none"></div>
+            </div>
+            
+            <div class="flex items-center gap-5 text-left group cursor-pointer" (click)="revealPhone()">
+              <div class="w-12 h-12 rounded-2xl bg-slate-50 text-slate-400 flex items-center justify-center border border-slate-100 group-hover:bg-rose-600 group-hover:text-white transition-all">
+                <i class="pi pi-phone"></i>
+              </div>
+              <div>
+                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Téléphone Secrétariat</p>
+                <p class="text-sm font-bold text-slate-700" *ngIf="phoneRevealed">{{ doctor?.phoneNumber || 'Non renseigné' }}</p>
+                <p class="text-sm font-bold text-indigo-500 hover:underline" *ngIf="!phoneRevealed">Afficher le numéro</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Dynamic Legend -->
+        <div class="premium-card p-8 group">
+          <h3 class="text-xs font-black text-slate-900 uppercase tracking-widest mb-6 border-b border-slate-50 pb-4">Disponibilités</h3>
+          <div class="space-y-4">
+            <div class="flex items-center justify-between group/item">
+              <span class="text-sm font-bold text-slate-500 group-hover/item:text-slate-900 transition-colors">Créneaux libres</span>
+              <div class="status-dot available"></div>
+            </div>
+            <div class="flex items-center justify-between group/item">
+              <span class="text-sm font-bold text-slate-500 group-hover/item:text-slate-900 transition-colors">Réservations</span>
+              <div class="status-dot reserved"></div>
+            </div>
+            <div class="flex items-center justify-between group/item">
+              <span class="text-sm font-bold text-slate-500 group-hover/item:text-slate-900 transition-colors">Jours fériés / Congés</span>
+              <div class="status-dot closed"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Calendar (Col 8) -->
+      <div class="lg:col-span-8 space-y-6">
+        
+        <!-- Header Calendar -->
+        <div class="premium-card p-6 flex items-center justify-between animate-in" style="animation-delay: 0.1s">
+          <div class="flex items-center gap-4">
+             <div class="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center font-black">
+                {{ today | date:'dd' }}
+             </div>
+             <div>
+                <h2 class="text-lg font-black text-slate-900">Agenda en direct</h2>
+                <p class="text-xs text-slate-400 font-bold uppercase tracking-widest">Semaine du {{ today | date:'dd MMMM' }}</p>
+             </div>
+          </div>
+          <div class="flex gap-2">
+             <button class="bg-slate-50 hover:bg-slate-100 p-3 rounded-xl transition text-slate-400"><i class="pi pi-print"></i></button>
+             <button class="bg-indigo-600 text-white px-6 py-3 rounded-xl text-xs font-black tracking-widest">PRENDRE RDV</button>
+          </div>
+        </div>
+
+        <!-- FullCalendar Wrapper -->
+        <div class="premium-card p-6 animate-in" style="animation-delay: 0.2s">
+          <div *ngIf="loading" class="flex flex-col items-center justify-center py-48 gap-6 text-center">
+              <div class="relative">
+                <div class="w-16 h-16 border-4 border-indigo-50 rounded-full"></div>
+                <div class="w-16 h-16 border-4 border-indigo-600 rounded-full border-t-transparent animate-spin absolute top-0"></div>
+              </div>
+              <p class="text-slate-400 font-black text-[10px] tracking-[0.3em]">SYNCHRONISATION DES DONNÉES...</p>
+          </div>
+          
+          <div *ngIf="!loading" class="calendar-container">
+            <full-calendar #calendar [options]="calendarOptions"></full-calendar>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Dialog d'Authentification / Choix mode (PREMIUM RE-DESIGN) -->
+<p-dialog [(visible)]="authDialogVisible"
+          [modal]="true"
+          [closable]="true"
+          [showHeader]="false"
+          [style]="{width: '520px', borderRadius: '32px', maxHeight: '90vh'}"
+          contentStyleClass="p-0"
+          styleClass="auth-dialog-premium">
+
+    <div class="relative pt-[6px] overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+         style="max-height: calc(90vh - 20px)">
+        <!-- Gradient Accent Bar -->
+        <div class="absolute top-0 left-0 right-0 h-[6px] bg-gradient-to-r from-indigo-500 via-purple-500 to-indigo-600"></div>
+        
+        <div class="px-8 py-8">
+            <!-- Close Button -->
+            <button (click)="authDialogVisible = false" class="absolute top-5 right-5 w-10 h-10 rounded-full flex items-center justify-center text-slate-300 hover:bg-slate-50 hover:text-slate-900 transition-all">
+                <i class="pi pi-times"></i>
+            </button>
+
+            <!-- Toggle Tabs (NEW) -->
+            <div class="flex bg-slate-50 p-1.5 rounded-2xl mb-6 border border-slate-100">
+                <button (click)="setAuthMode('login')"
+                        [class.bg-white]="authMode === 'login'"
+                        [class.shadow-md]="authMode === 'login'"
+                        [class.text-indigo-600]="authMode === 'login'"
+                        class="flex-1 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all">
+                    Déjà inscrit
+                </button>
+                <button (click)="setAuthMode('register')"
+                        [class.bg-white]="authMode === 'register'"
+                        [class.shadow-md]="authMode === 'register'"
+                        [class.text-indigo-600]="authMode === 'register'"
+                        class="flex-1 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all">
+                    Nouveau patient
+                </button>
+            </div>
+
+            <!-- Header Content Dynamique -->
+            <div class="text-center mb-8">
+                <div class="inline-flex w-12 h-12 bg-indigo-50 text-indigo-600 rounded-[18px] items-center justify-center mb-4 text-xl shadow-inner-lg rotate-3 transition-transform hover:rotate-0">
+                    <i [class]="authMode === 'login' ? 'pi pi-lock' : 'pi pi-user-plus'"></i>
+                </div>
+                <h2 class="text-xl font-black text-slate-900 tracking-tight mb-2">
+                    {{ authMode === 'login' ? 'Bon retour parmi nous' : 'Créer votre profil' }}
+                </h2>
+                <p class="text-[9px] text-slate-400 font-bold uppercase tracking-[0.15em]">
+                    {{ authMode === 'login' ? 'Identification sécurisée' : 'Rejoignez le réseau MedGest' }}
+                </p>
+            </div>
+
+            <!-- Login View -->
+            <div class="space-y-6" *ngIf="authMode === 'login'">
+                <div class="form-field-premium">
+                    <label>NOM D'UTILISATEUR</label>
+                    <div class="input-group">
+                        <i class="pi pi-user"></i>
+                        <input type="text" [(ngModel)]="loginData.username" placeholder="votre_identifiant">
+                    </div>
+                </div>
+                
+                <div class="form-field-premium">
+                    <label>MOT DE PASSE</label>
+                    <div class="input-group">
+                        <i class="pi pi-lock"></i>
+                        <input type="password" [(ngModel)]="loginData.password" placeholder="••••••••">
+                    </div>
+                </div>
+
+                <button (click)="loginFromPopup()" 
+                        [disabled]="loggingIn"
+                        class="btn-primary-glow">
+                    <i *ngIf="loggingIn" class="pi pi-spin pi-spinner"></i>
+                    <span>{{ loggingIn ? 'AUTHENTIFICATION...' : 'ACCÉDER À MON COMPTE' }}</span>
+                </button>
+
+                <!-- Continuer sans compte -->
+                <div class="text-center pt-2">
+                    <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-3">— ou —</p>
+                    <button (click)="continuerSansCompte()"
+                            class="w-full py-4 rounded-2xl border-2 border-slate-100 text-slate-500 font-black text-[10px] tracking-widest hover:bg-slate-50 hover:border-indigo-100 hover:text-indigo-600 transition-all uppercase">
+                        <i class="pi pi-arrow-right mr-2"></i>
+                        Continuer sans compte
+                    </button>
+                </div>
+            </div>
+
+
+            <!-- Register View (NEW) -->
+            <div class="space-y-5" *ngIf="authMode === 'register'">
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="form-field-premium">
+                        <label>PRÉNOM</label>
+                        <div class="input-group">
+                            <input type="text" [(ngModel)]="registerData.firstName" placeholder="Jean" style="padding-left: 20px !important;">
+                        </div>
+                    </div>
+                    <div class="form-field-premium">
+                        <label>NOM</label>
+                        <div class="input-group">
+                            <input type="text" [(ngModel)]="registerData.lastName" placeholder="Dupont" style="padding-left: 20px !important;">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-field-premium">
+                    <label>E-MAIL</label>
+                    <div class="input-group">
+                        <i class="pi pi-envelope"></i>
+                        <input type="email" [(ngModel)]="registerData.email" placeholder="jean@mail.com">
+                    </div>
+                </div>
+
+                <div class="form-field-premium">
+                    <label>TÉLÉPHONE MOBILE</label>
+                    <div class="input-group">
+                        <i class="pi pi-phone"></i>
+                        <input type="text" [(ngModel)]="registerData.phoneNumber" placeholder="06 00 00 00 00">
+                    </div>
+                </div>
+
+                <div class="form-field-premium">
+                    <label>NOM D'UTILISATEUR</label>
+                    <div class="input-group">
+                        <i class="pi pi-at"></i>
+                        <input type="text" [(ngModel)]="registerData.username" placeholder="jdupont">
+                    </div>
+                </div>
+
+                <div class="form-field-premium">
+                    <label>MOT DE PASSE</label>
+                    <div class="input-group">
+                        <i class="pi pi-eye"></i>
+                        <input type="password" [(ngModel)]="registerData.password" placeholder="••••••••">
+                    </div>
+                </div>
+
+                <button (click)="registerFromPopup()" 
+                        [disabled]="registering"
+                        class="btn-primary-glow bg-gradient-to-r from-emerald-500 to-indigo-600 shadow-emerald-100">
+                    <i *ngIf="registering" class="pi pi-spin pi-spinner"></i>
+                    <span>{{ registering ? 'CRÉATION...' : 'CRÉER MON COMPTE' }}</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</p-dialog>
+
+<!-- Modal Réservation (PREMIUM RE-DESIGN) -->
+<p-dialog [(visible)]="dialogVisible"
+          [modal]="true"
+          [closable]="true"
+          [showHeader]="false"
+          [style]="{width: '580px', borderRadius: '32px', maxHeight: '90vh'}"
+          contentStyleClass="p-0"
+          styleClass="auth-dialog-premium">
+
+  <div class="relative pt-[6px] overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+       style="max-height: calc(90vh - 20px)">
+    <!-- Gradient Accent Bar -->
+    <div class="absolute top-0 left-0 right-0 h-[6px] bg-gradient-to-r from-emerald-500 via-indigo-500 to-purple-600"></div>
+
+    <div class="px-10 py-12">
+        <!-- Close Button -->
+        <button (click)="dialogVisible = false" class="absolute top-6 right-6 w-10 h-10 rounded-full flex items-center justify-center text-slate-300 hover:bg-slate-50 hover:text-slate-900 transition-all">
+            <i class="pi pi-times"></i>
+        </button>
+
+        <!-- Header Recap -->
+        <div class="text-center mb-10">
+            <h2 class="text-3xl font-black text-slate-900 tracking-tight">Finaliser votre RDV</h2>
+            <p class="text-[10px] text-slate-400 font-black uppercase tracking-[0.2em] mt-2">Dernière étape avant confirmation</p>
+        </div>
+        
+        <!-- Recap Widget (DARK MILLER CARD) -->
+        <div class="bg-slate-900 rounded-[35px] p-8 text-white relative overflow-hidden group mb-10 shadow-2xl shadow-slate-200">
+          <div class="relative z-10 flex items-center justify-between">
+            <div>
+               <p class="text-[10px] font-black tracking-[0.3em] text-indigo-400 mb-3 uppercase">DATE RÉSERVÉE</p>
+               <p class="text-2xl font-black tracking-tight">{{ nouveauRdv.date | date:'EEEE dd MMMM' | uppercase }}</p>
+               <div class="flex items-center gap-3 mt-4">
+                  <span class="text-5xl font-black text-white tracking-tighter">{{ nouveauRdv.heure }}</span>
+                  <div class="px-3 py-1 bg-white/10 rounded-full text-[10px] font-black tracking-widest text-indigo-300 border border-white/5">GMT+1</div>
+               </div>
+            </div>
+            <div class="text-right hidden sm:block">
+               <div class="w-20 h-20 rounded-full bg-gradient-to-br from-indigo-500/20 to-purple-500/0 flex items-center justify-center border border-white/5">
+                  <i class="pi pi-calendar-plus text-4xl text-indigo-400"></i>
+               </div>
+            </div>
+          </div>
+          <!-- Abstract light shapes -->
+          <div class="absolute -right-10 -bottom-10 w-40 h-40 bg-indigo-500/10 rounded-full blur-3xl"></div>
+          <div class="absolute top-0 right-0 w-20 h-20 bg-purple-500/10 rounded-full blur-2xl"></div>
+        </div>
+
+        <div class="space-y-8">
+            <!-- Patient Identity (Connected Mode) -->
+            <div class="bg-indigo-50/40 rounded-3xl p-6 border border-indigo-100/50 flex items-center justify-between" *ngIf="authService.isLoggedIn()">
+               <div class="flex items-center gap-5">
+                  <div class="w-14 h-14 rounded-2xl bg-white shadow-sm flex items-center justify-center text-indigo-600 text-xl border border-indigo-50">
+                     <i class="pi pi-user"></i>
+                  </div>
+                  <div>
+                     <p class="text-[9px] font-black text-indigo-400 uppercase tracking-widest">PATIENT CONNECTÉ</p>
+                     <p class="text-lg font-black text-slate-900">{{ nouveauRdv.nomPatient }}</p>
+                     <p class="text-xs text-slate-500 font-bold opacity-70">{{ nouveauRdv.email }}</p>
+                  </div>
+               </div>
+               <div class="px-3 py-1 bg-emerald-50 text-emerald-600 text-[9px] font-black rounded-lg">VÉRIFIÉ</div>
+            </div>
+
+            <!-- Guest Form (If Continue without account) -->
+            <div class="space-y-6" *ngIf="!authService.isLoggedIn()">
+                <div class="form-field-premium">
+                    <label>NOM ET PRÉNOM DU PATIENT</label>
+                    <div class="input-group">
+                        <i class="pi pi-user"></i>
+                        <input type="text" [(ngModel)]="nouveauRdv.nomPatient" placeholder="Tapez ici...">
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <div class="form-field-premium">
+                        <label>MOBILE</label>
+                        <div class="input-group">
+                            <i class="pi pi-phone"></i>
+                            <input type="text" [(ngModel)]="nouveauRdv.telephone" placeholder="06 00...">
+                        </div>
+                    </div>
+                    <div class="form-field-premium">
+                        <label>E-MAIL</label>
+                        <div class="input-group">
+                            <i class="pi pi-envelope"></i>
+                            <input type="text" [(ngModel)]="nouveauRdv.email" placeholder="votre@email.com">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Motif Form -->
+            <div class="form-field-premium">
+                <label>MOTIF DE LA CONSULTATION</label>
+                <div class="input-group">
+                    <i class="pi pi-comment"></i>
+                    <input type="text" [(ngModel)]="nouveauRdv.motif" placeholder="Ex: Première visite, suivi médical...">
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex gap-4 pt-4">
+              <button (click)="dialogVisible = false"
+                      class="flex-1 py-5 rounded-2xl border-2 border-slate-100 text-slate-400 font-black text-[11px] tracking-widest hover:bg-slate-50 transition uppercase">
+                Annuler
+              </button>
+              <button (click)="sauvegarderRdv()"
+                      [disabled]="enregistrement"
+                      class="flex-[2] btn-primary-glow">
+                <i *ngIf="enregistrement" class="pi pi-spin pi-spinner"></i>
+                <span>{{ enregistrement ? 'TRAITEMENT...' : 'CONFIRMER LE RDV' }}</span>
+              </button>
+            </div>
+        </div>
+        
+        <p class="text-center text-[10px] text-slate-400 font-bold uppercase tracking-[0.2em] mt-10">Notification immédiate après confirmation</p>
+    </div>
+  </div>
+</p-dialog>
+
+<p-toast></p-toast>

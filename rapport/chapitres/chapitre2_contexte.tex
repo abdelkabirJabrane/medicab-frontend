@@ -1,0 +1,212 @@
+%============================================================
+% CHAPITRE 2 — CONTEXTE GÉNÉRAL DU PROJET
+%============================================================
+\chapter{Contexte général du projet}
+
+\section{Introduction}
+
+MediCab Pro est une solution numérique de type SaaS pensée pour répondre aux
+besoins quotidiens des professionnels de santé exerçant en libéral au Maroc.
+Sa cible principale regroupe les médecins généralistes et spécialistes, leurs
+assistants administratifs ainsi que les gestionnaires de la plateforme. Le périmètre
+fonctionnel de la solution couvre l'intégralité du parcours de soin, de la prise
+de rendez-vous initiale jusqu'à l'émission des factures, en englobant la tenue du
+dossier patient électronique et la rédaction assistée des prescriptions médicales
+par intelligence artificielle.
+
+La pertinence de ce projet tient à sa capacité à transformer structurellement
+le fonctionnement des cabinets médicaux marocains, en leur proposant une solution
+numérique complète, sécurisée et adaptée aux contraintes locales : qualité variable
+de la connexion internet, usage quotidien du français et de l'arabe, et respect
+des exigences légales de la loi 09-08 relative à la protection des données à
+caractère personnel.
+
+\section{Problématique}
+
+L'observation des pratiques actuelles dans les cabinets médicaux privés marocains
+révèle que la gestion manuelle reste la norme dans une proportion importante des
+structures. Cette réalité engendre plusieurs catégories de dysfonctionnements,
+identifiées lors de l'analyse des besoins :
+
+\begin{itemize}
+  \item Accès difficile aux archives médicales et risque non négligeable de perte
+    ou d'altération des dossiers papier.
+  \item Gestion approximative des agendas (rendez-vous qui se chevauchent,
+    absences non signalées, absence de rappels automatiques aux patients).
+  \item Suivi financier défaillant : paiements non tracés, remboursements
+    CNSS/CNOPS non consolidés, impayés mal gérés.
+  \item Absence d'intégration des technologies actuelles : Cloud, architectures
+    distribuées, intelligence artificielle.
+  \item Déploiements applicatifs artisanaux, difficiles à maintenir et exposés
+    aux incidents de production.
+  \item Manque d'outils adaptés au bilinguisme du marché marocain (français/arabe).
+\end{itemize}
+
+\section{Cahier des charges}
+
+\subsection{Introduction}
+
+L'ambition principale de ce projet est de livrer une plateforme numérique complète
+permettant aux équipes médicales de prendre en charge l'ensemble des activités
+administratives et cliniques d'un cabinet, depuis n'importe quel navigateur web,
+sans nécessiter d'installation locale ni d'infrastructure propre.
+
+\subsection{Besoins fonctionnels}
+
+Les fonctionnalités attendues de la plateforme sont organisées en six grands modules :
+
+\subsubsection*{Module 1 — Gestion des Rendez-vous}
+\begin{itemize}
+  \item Calendrier interactif actualisé en temps réel (vues par jour, semaine et mois).
+  \item Création, modification et suppression de rendez-vous avec gestion
+    des états (confirmé, urgent, en attente, annulé).
+  \item Liste d'attente dynamique et traitement des absences patients.
+  \item Système de rappels automatiques par notification.
+\end{itemize}
+
+\subsubsection*{Module 2 — Dossier Patient Électronique (DPE)}
+\begin{itemize}
+  \item Constitution et administration des dossiers patients (identité, antécédents
+    médicaux et chirurgicaux, allergies déclarées, traitements en cours).
+  \item Suivi des paramètres biologiques : groupe sanguin, poids, taille, avec
+    calcul automatique de l'indice de masse corporelle (IMC).
+  \item Historique exhaustif des consultations avec diagnostic et montant associé.
+  \item Archivage et consultation des documents médicaux avec export au format PDF.
+  \item Recherche multicritère par nom, numéro de CIN ou numéro de téléphone.
+\end{itemize}
+
+\subsubsection*{Module 3 — Consultations et Ordonnances}
+\begin{itemize}
+  \item Saisie des consultations avec motif de visite, type, diagnostic retenu et montant.
+  \item Élaboration et gestion des ordonnances électroniques avec liste de médicaments.
+  \item Impression et export au format PDF des ordonnances et comptes rendus médicaux.
+\end{itemize}
+
+\subsubsection*{Module 4 — Facturation et Gestion Financière}
+\begin{itemize}
+  \item Émission automatique des factures liées aux actes de consultation.
+  \item Suivi du statut des paiements (acquittée, en attente, non réglée).
+  \item Tableau de bord financier avec indicateurs graphiques interactifs.
+  \item Export des données en PDF et en format Excel.
+\end{itemize}
+
+\subsubsection*{Module 5 — Assistant IA Médical (MedAgent)}
+\begin{itemize}
+  \item Interface intelligente permettant la dictée ou la saisie textuelle des
+    observations cliniques.
+  \item Extraction automatique des informations médicales pertinentes (symptômes,
+    diagnostic probable).
+  \item Rédaction automatique de comptes rendus médicaux structurés.
+  \item Génération automatique d'ordonnances fondée sur le diagnostic établi.
+\end{itemize}
+
+\subsubsection*{Module 6 — Administration Multi-Tenant}
+\begin{itemize}
+  \item Tableau de bord dédié au super-administrateur avec vision globale de
+    la plateforme.
+  \item Gestion du cycle de vie des cabinets médicaux (création, activation,
+    suspension).
+  \item Supervision des abonnements et des grilles tarifaires.
+  \item Monitoring de la plateforme avec indicateurs de croissance.
+\end{itemize}
+
+\subsection{Besoins non fonctionnels}
+
+\begin{table}[H]
+\centering
+\caption{Exigences non fonctionnelles de MediCab Pro}
+\label{tab:nonfonctionnels}
+\renewcommand{\arraystretch}{1.4}
+\begin{tabularx}{\textwidth}{|>{\bfseries}p{3.5cm}|X|}
+\hline
+\textbf{Catégorie} & \textbf{Détails} \\
+\hline
+Disponibilité &
+  Taux de disponibilité de 99.9\% assuré par l'orchestration Kubernetes
+  et l'auto-scaling horizontal. \\
+\hline
+Sécurité &
+  Protocole HTTPS obligatoire, authentification par JWT, contrôle d'accès
+  basé sur les rôles (RBAC), conformité à la loi 09-08 marocaine. \\
+\hline
+Performance &
+  Temps de réponse des API REST inférieur à 300 ms pour 95\% des requêtes.
+  Latence P99 sous le seuil de 500 ms. \\
+\hline
+Scalabilité &
+  Architecture multi-tenant, montée en charge horizontale via le HPA
+  Kubernetes. Capacité à supporter plus de 100 cabinets simultanés. \\
+\hline
+Multi-langue &
+  Interface disponible en français et en arabe. \\
+\hline
+Responsivité &
+  Interface adaptative compatible avec les postes de travail, tablettes
+  et terminaux mobiles. \\
+\hline
+Maintenabilité &
+  Architecture microservices, pipeline CI/CD intégré, analyse continue
+  par SonarQube. Couverture de tests supérieure à 80\%. \\
+\hline
+Mode sombre &
+  Prise en charge native du thème sombre (Dark Mode). \\
+\hline
+\end{tabularx}
+\end{table}
+
+\section{Spécification des besoins}
+
+\subsection{Identification des acteurs}
+
+\begin{table}[H]
+\centering
+\caption{Acteurs du système MediCab Pro et leurs attributions}
+\label{tab:acteurs}
+\renewcommand{\arraystretch}{1.4}
+\begin{tabularx}{\textwidth}{|>{\bfseries}p{3cm}|X|}
+\hline
+\textbf{Acteur} & \textbf{Rôle et attributions} \\
+\hline
+Médecin &
+  \begin{itemize}[leftmargin=*,noitemsep,topsep=2pt]
+    \item Administration de son planning professionnel
+    \item Consultation des dossiers patients et de l'historique médical
+    \item Création et gestion des consultations
+    \item Établissement et impression des prescriptions médicales
+    \item Recours à l'assistant intelligent MedAgent
+    \item Analyse des indicateurs financiers du cabinet
+  \end{itemize} \\
+\hline
+Secrétaire Médicale &
+  \begin{itemize}[leftmargin=*,noitemsep,topsep=2pt]
+    \item Organisation des rendez-vous et du planning médical
+    \item Accueil et orientation des patients (file d'attente)
+    \item Enregistrement des nouveaux patients dans le système
+    \item Gestion de la facturation et des encaissements
+  \end{itemize} \\
+\hline
+Super Administrateur &
+  \begin{itemize}[leftmargin=*,noitemsep,topsep=2pt]
+    \item Supervision générale de la plateforme
+    \item Administration des cabinets médicaux (approche multi-tenant)
+    \item Gestion des utilisateurs et des abonnements
+    \item Supervision des performances et gestion des alertes système
+  \end{itemize} \\
+\hline
+Système IA (MedAgent) &
+  \begin{itemize}[leftmargin=*,noitemsep,topsep=2pt]
+    \item Traitement et analyse du discours médical
+    \item Extraction des entités cliniques pertinentes
+    \item Production automatique de comptes rendus et d'ordonnances
+  \end{itemize} \\
+\hline
+\end{tabularx}
+\end{table}
+
+\subsection{Conclusion}
+
+Ce chapitre a établi le cadre fonctionnel et technique de MediCab Pro, en
+précisant les attentes des différentes catégories d'utilisateurs ainsi que les
+contraintes du projet. Le chapitre suivant sera consacré à la phase d'analyse
+et de conception, avec la modélisation UML et la présentation détaillée de
+l'architecture technique retenue.

@@ -1,0 +1,993 @@
+%============================================================
+% Projet de Fin d'Études — Architecture Microservices & DevOps CI/CD
+% Université Abdelmalek Essaâdi — FPL — Master DevOps & Cloud Computing
+% Réalisé par : JABRANE ABDELKABIR
+% Encadré par : YASSINE AL-AMRANI
+% Année Universitaire : 2025-2026
+%============================================================
+\documentclass[final]{report}
+
+%------------------------------------------------------------
+% Packages
+%------------------------------------------------------------
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[french]{babel}
+\usepackage{lmodern}
+\usepackage{geometry}
+\usepackage{graphicx}        
+\usepackage[hidelinks]{hyperref}
+\usepackage{array}
+\usepackage{tabularx}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage{enumitem}
+\usepackage{amsmath}
+\usepackage{setspace}
+\usepackage{caption}
+\usepackage{float}
+\usepackage{parskip}
+\usepackage{acronym}
+\usepackage{emptypage}
+ 
+%------------------------------------------------------------
+% Page geometry
+%------------------------------------------------------------
+\geometry{
+  top=2.5cm, bottom=2.5cm,
+  left=3cm, right=2.5cm
+}
+ 
+%------------------------------------------------------------
+% Colors
+%------------------------------------------------------------
+\definecolor{blueUAE}{RGB}{0,70,150}
+\definecolor{codegreen}{RGB}{0,128,0}
+\definecolor{codegray}{RGB}{128,128,128}
+\definecolor{codeblue}{RGB}{0,0,180}
+\definecolor{backcolour}{RGB}{245,245,245}
+\definecolor{medgreen}{RGB}{16,120,80}
+\definecolor{deepblue}{RGB}{0,50,120}
+\definecolor{lightgray}{RGB}{240,240,240}
+ 
+%------------------------------------------------------------
+% Listings styles
+%------------------------------------------------------------
+\lstdefinestyle{javastyle}{
+  backgroundcolor=\color{backcolour},
+  commentstyle=\color{codegreen}\itshape,
+  keywordstyle=\color{codeblue}\bfseries,
+  numberstyle=\tiny\color{codegray},
+  stringstyle=\color{orange},
+  basicstyle=\ttfamily\footnotesize,
+  breakatwhitespace=false,
+  breaklines=true,
+  captionpos=b,
+  keepspaces=true,
+  numbers=left,
+  numbersep=5pt,
+  showspaces=false,
+  showstringspaces=false,
+  showtabs=false,
+  tabsize=2,
+  frame=single,
+  rulecolor=\color{gray!40},
+  language=Java
+}
+ 
+\lstdefinestyle{yamlstyle}{
+  backgroundcolor=\color{backcolour},
+  commentstyle=\color{codegreen}\itshape,
+  keywordstyle=\color{codeblue}\bfseries,
+  stringstyle=\color{orange},
+  basicstyle=\ttfamily\footnotesize,
+  breaklines=true,
+  numbers=left,
+  numberstyle=\tiny\color{codegray},
+  numbersep=5pt,
+  frame=single,
+  rulecolor=\color{gray!40},
+  tabsize=2,
+}
+ 
+\lstdefinestyle{dockerstyle}{
+  backgroundcolor=\color{backcolour},
+  commentstyle=\color{codegreen}\itshape,
+  keywordstyle=\color{codeblue}\bfseries,
+  numberstyle=\tiny\color{codegray},
+  stringstyle=\color{orange},
+  basicstyle=\ttfamily\footnotesize,
+  breaklines=true,
+  numbers=left,
+  numbersep=5pt,
+  frame=single,
+  rulecolor=\color{gray!40},
+  tabsize=2,
+}
+ 
+\lstdefinestyle{bashstyle}{
+  backgroundcolor=\color{black!90},
+  basicstyle=\ttfamily\footnotesize\color{white},
+  breaklines=true,
+  frame=single,
+  rulecolor=\color{black},
+}
+ 
+%------------------------------------------------------------
+% Headers / Footers
+%------------------------------------------------------------
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\textit{Master DevOps \& Cloud Computing \quad MediCab Pro}}
+\fancyhead[R]{\small\thepage}
+\fancyfoot[C]{}
+\renewcommand{\headrulewidth}{0.4pt}
+ 
+%------------------------------------------------------------
+% Section formatting
+%------------------------------------------------------------
+\titleformat{\chapter}[display]
+  {\normalfont\Large\bfseries\color{blueUAE}}
+  {\chaptertitlename\ \thechapter}{10pt}{\Huge}
+\titlespacing*{\chapter}{0pt}{20pt}{30pt}
+ 
+\titleformat{\section}
+  {\normalfont\large\bfseries\color{blueUAE}}
+  {\thesection}{1em}{}
+ 
+\titleformat{\subsection}
+  {\normalfont\normalsize\bfseries}
+  {\thesubsection}{1em}{}
+ 
+\titleformat{\subsubsection}
+  {\normalfont\normalsize\itshape\bfseries}
+  {\thesubsubsection}{1em}{}
+ 
+%------------------------------------------------------------
+% Hyperref config
+%------------------------------------------------------------
+\hypersetup{
+  colorlinks=true,
+  linkcolor=blueUAE,
+  urlcolor=blueUAE,
+  citecolor=blueUAE,
+  pdftitle={MediCab Pro — Plateforme SaaS de Gestion de Cabinets Médicaux},
+  pdfauthor={JABRANE ABDELKABIR},
+}
+ 
+%------------------------------------------------------------
+% Misc
+%------------------------------------------------------------
+\setlength{\parskip}{6pt}
+\onehalfspacing
+ 
+%============================================================
+\begin{document}
+%============================================================
+ 
+%------------------------------------------------------------
+% PAGE DE GARDE
+%------------------------------------------------------------
+\begin{titlepage}
+  \centering
+  \vspace*{1cm}
+ 
+  {\Large\bfseries Université Abdelmalek Essaâdi}\\[0.3cm]
+  {\large\scshape Faculté Polydisciplinaire de Larache --- FPL}\\[0.2cm]
+  {\large Département d'Informatique}\\[1cm]
+ 
+  \rule{\linewidth}{1.5pt}\\[0.4cm]
+  {\LARGE\bfseries\color{blueUAE} Master : DevOps et Cloud Computing}\\[0.4cm]
+  \rule{\linewidth}{1.5pt}\\[0.8cm]
+ 
+  {\large\bfseries Projet de fin d'études}\\[1.2cm]
+ 
+  \rule{0.85\linewidth}{2pt}\\[0.5cm]
+  {\Huge\bfseries\color{blueUAE} MediCab Pro}\\[0.4cm]
+  {\LARGE\bfseries\color{blueUAE} Plateforme SaaS de Gestion de}\\[0.3cm]
+  {\LARGE\bfseries\color{blueUAE} Cabinets Médicaux}\\[0.3cm]
+  {\large Architecture Microservices · REST API · Pipeline DevOps CI/CD}\\[0.3cm]
+  {\large Angular · Spring Boot · PostgreSQL · Docker · Kubernetes · Jenkins}\\[0.3cm]
+  \rule{0.85\linewidth}{2pt}\\[2cm]
+ 
+  \begin{minipage}[t]{0.45\textwidth}
+    \raggedright
+    {\large\bfseries\underline{Réalisé par :}}\\[0.3cm]
+    {\large\bfseries JABRANE ABDELKABIR}
+  \end{minipage}
+  \hfill
+  \begin{minipage}[t]{0.45\textwidth}
+    \raggedright
+    {\large\bfseries\underline{Encadré par :}}\\[0.3cm]
+    {\large\bfseries YASSINE AL-AMRANI}
+  \end{minipage}
+ 
+  \vfill
+  {\large\underline{\bfseries Année Universitaire : 2025-2026}}
+\end{titlepage}
+ 
+%------------------------------------------------------------
+% DÉDICACE
+%------------------------------------------------------------
+\chapter*{Dédicace}
+\addcontentsline{toc}{chapter}{Dédicace}
+\thispagestyle{fancy}
+ 
+\vspace*{3cm}
+ 
+\begin{center}
+  \textit{\large Ce travail est avant tout dédié à mes parents.}\\[0.5cm]
+  \textit{Rien de tout ceci n'aurait vu le jour sans votre présence rassurante et vos encouragements perpétuels.\\
+  Vous m'avez toujours poussé vers le haut, et les concessions que vous avez faites pour mon avenir resteront gravées dans mon esprit.}\\[1cm]
+ 
+  \textit{\large À mon équipe enseignante,}\\[0.5cm]
+  \textit{et singulièrement à Monsieur \textbf{Yassine AL-AMRANI}, qui a su guider mes pas.\\
+  Votre patience, votre sens de la pédagogie et votre encadrement ont été les piliers de cette réussite universitaire.}\\[1cm]
+ 
+  \textit{\large Aux amis et étudiants de ma promotion,}\\[0.5cm]
+  \textit{avec qui j'ai traversé tant d'épreuves et partagé d'excellents souvenirs.\\
+  L'entraide dont nous avons fait preuve a forgé des liens uniques.}\\[1.5cm]
+\end{center}
+ 
+\newpage
+ 
+%------------------------------------------------------------
+% REMERCIEMENTS
+%------------------------------------------------------------
+\chapter*{Remerciements}
+\addcontentsline{toc}{chapter}{Remerciements}
+\thispagestyle{fancy}
+ 
+La concrétisation de ce mémoire marque la fin d'un cycle universitaire enrichissant, et il m'importe de témoigner ma gratitude envers toutes les personnes ayant facilité cette entreprise.
+ 
+Je désire tout d'abord mettre en lumière l'apport inestimable de mon directeur de recherche, \textbf{Monsieur Yassine AL-AMRANI}, qui m'a encadré avec une grande bienveillance. Son expertise technique, ses remarques toujours justes et son écoute attentive ont balisé mon cheminement et évité de nombreux écueils méthodologiques.
+ 
+Mes pensées se tournent ensuite vers l'ensemble du corps professoral du cursus \textit{DevOps et Cloud Computing} enseigné à la Faculté Polydisciplinaire de Larache. Le savoir-faire que vous nous avez transmis s'est avéré crucial pour aborder sereinement les défis informatiques contemporains.
+ 
+Je salue également l'implication des membres du jury, qui me font l'honneur d'évaluer ce livrable. Leurs critiques et interrogations permettront sans doute d'élever encore le niveau de réflexion autour de ces problématiques d'ingénierie.
+ 
+Enfin, je ne saurais oublier ma sphère privée : proches, amis et famille, dont le réconfort a constitué un moteur puissant dans les moments de doute inhérents à un tel projet.
+ 
+\vspace{1cm}
+\begin{flushright}
+  \textit{JABRANE ABDELKABIR}\\
+  \textit{Larache, 2026}
+\end{flushright}
+ 
+\newpage
+ 
+%------------------------------------------------------------
+% TABLE DES MATIÈRES ET AUTRES LISTES
+%------------------------------------------------------------
+\tableofcontents
+\newpage
+\listoffigures
+\newpage
+\listoftables
+\newpage
+ 
+%------------------------------------------------------------
+% LISTE DES ABRÉVIATIONS
+%------------------------------------------------------------
+\chapter*{Liste des Sigles et Acronymes}
+\addcontentsline{toc}{chapter}{Liste des Sigles et Acronymes}
+\thispagestyle{fancy}
+ 
+\begin{acronym}[KUBERNETES]
+  \acro{API}{Application Programming Interface}
+  \acro{CI/CD}{Intégration Continue et Déploiement Continu}
+  \acro{CNSS}{Caisse Nationale de Sécurité Sociale}
+  \acro{CNOPS}{Caisse Nationale des Organismes de Prévoyance Sociale}
+  \acro{CPU}{Processeur Central}
+  \acro{CIN}{Carte d'Identité Nationale}
+  \acro{DCU}{Diagramme de Cas d'Utilisation}
+  \acro{DDD}{Domain-Driven Design (Conception dirigée par le domaine)}
+  \acro{DPE}{Dossier Patient Informatisé/Électronique}
+  \acro{HDS}{Hébergement de Données de Santé}
+  \acro{HPA}{Auto-Scaling Horizontal des Pods}
+  \acro{HTTP}{HyperText Transfer Protocol}
+  \acro{HTTPS}{HTTP Sécurisé}
+  \acro{IA}{Intelligence Artificielle}
+  \acro{IDE}{Environnement de Développement Intégré}
+  \acro{IMC}{Indice de Masse Corporelle}
+  \acro{JSON}{JavaScript Object Notation}
+  \acro{JWT}{JSON Web Token}
+  \acro{MVC}{Modèle-Vue-Contrôleur}
+  \acro{RBAC}{Contrôle d'accès basé sur les rôles}
+  \acro{REST}{Representational State Transfer}
+  \acro{SaaS}{Logiciel en tant que Service}
+  \acro{SQL}{Structured Query Language}
+  \acro{TDD}{Développement Piloté par les Tests}
+  \acro{UML}{Langage de Modélisation Unifié}
+\end{acronym}
+ 
+\newpage
+ 
+%============================================================
+% RÉSUMÉ
+%============================================================
+\chapter*{Résumé de l'étude}
+\addcontentsline{toc}{chapter}{Résumé de l'étude}
+ 
+L'initiative portée par ce travail de fin d'études consiste à créer de toutes pièces "MediCab Pro", un environnement logiciel dématérialisé (Software as a Service) pensé pour optimiser le quotidien des structures de soins au Maroc. L'objectif est d'accompagner les professionnels de la santé dans leur transition vers le "tout numérique", en remplaçant les processus chronophages par une application centralisée. De la prise de rendez-vous en ligne jusqu'à la gestion comptable, en passant par le suivi rigoureux des dossiers médicaux, l'outil se veut exhaustif.
+ 
+La véritable force de cette création réside dans son module intelligent, "MedAgent". Basé sur l'intelligence artificielle générative, ce compagnon virtuel soulage le médecin durant la consultation en automatisant la saisie des rapports cliniques et l'émission des ordonnances. L'application garantit par ailleurs une stricte séparation des informations grâce à un modèle d'hébergement multi-locataire, permettant de servir plusieurs cliniques simultanément tout en assurant une étanchéité absolue des bases de données.
+ 
+Technologiquement parlant, la plateforme s'appuie sur un découpage en microservices, combinant la robustesse de Java (Spring Boot) et la souplesse de Python (FastAPI) pour l'IA. Le côté client, fluide et bilingue, est bâti sur Angular 21 et TypeScript. Pour parfaire le tout, un pipeline de déploiement continu, orchestré par Jenkins, ArgoCD et Kubernetes, vient certifier la stabilité, la sécurité et la haute disponibilité du produit fini.
+ 
+\textbf{Mots-clés :} Informatique Cloud, Architecture modulaire, Usine logicielle, Spring Boot Java, Frontend Angular, Cluster Kubernetes, Agent IA, Multitenance, Automatisation GitOps.
+ 
+%============================================================
+% ABSTRACT
+%============================================================
+\chapter*{Abstract}
+\addcontentsline{toc}{chapter}{Abstract}
+ 
+The primary goal of this academic project is to build "MediCab Pro", a cloud-based application crafted specifically to streamline operations within Moroccan medical clinics. By migrating traditional paper-based routines to a centralized digital hub, healthcare professionals can efficiently oversee everything from patient appointments to billing and digital health records.
+ 
+A key differentiator of this system is "MedAgent", an embedded AI assistant designed to lighten the cognitive load on doctors. Operating during active consultations, it automatically generates medical summaries and writes prescriptions based on conversational input or quick notes. Security and data privacy are paramount, addressed through a strict multi-tenant architecture that isolates the data of different medical practices on the same infrastructure.
+ 
+Under the hood, the system is engineered using a robust microservices approach, leveraging Spring Boot (Java) for core logic and FastAPI (Python) for AI tasks. The user interface is driven by Angular 21 and TypeScript, offering a modern, bilingual, and highly responsive experience. The entire lifecycle is managed via rigorous DevOps practices, utilizing Docker for containerization, Kubernetes for orchestration, and a fully automated Jenkins/ArgoCD pipeline to ensure flawless continuous delivery.
+ 
+\textbf{Keywords:} Cloud computing, Microservices, CI/CD pipeline, Java Spring Boot, Angular framework, Kubernetes ecosystem, Intelligent Agent, Multi-tenant isolation, Automated deployment.
+ 
+
+%==== CHAPITRE 1 ====%
+\chapter{Introduction et Contexte Stratégique}
+ 
+\section{Origines et motivations de la démarche}
+Le tissu médical privé marocain traverse actuellement une phase de mutation profonde. Bien que les outils technologiques soient omniprésents dans notre quotidien, une forte proportion de cliniques et de cabinets libéraux reste attachée aux méthodologies traditionnelles. L'utilisation massive de documents physiques et de cahiers de rendez-vous manuscrits est toujours une norme répandue. Cette résistance au changement technologique ralentit non seulement la productivité des secrétariats, mais peut également impacter la qualité du suivi médical.
+ 
+Les répercussions de ce modèle archaïque sont bien réelles : égarements de pièces cliniques importantes, chevauchement des consultations, opacité dans le suivi des encaissements, et difficultés à compiler rapidement l'historique d'un patient. Face à ce constat, il devient impératif de doter le secteur médical d'outils informatiques capables de fiabiliser et d'accélérer ces flux de travail.
+ 
+C'est ainsi qu'est née l'idée de "MediCab Pro". Notre but est de concevoir un logiciel en tant que service (SaaS) répondant aux normes de développement les plus récentes. Ce mémoire se propose donc de démontrer comment l'application conjointe des architectures distribuées (microservices) et de la culture DevOps peut engendrer un produit logiciel médical hautement qualitatif, sécurisé et prêt à l'emploi.
+ 
+\section{Positionnement du problème}\label{problematique}
+L'absence de solutions numériques intégrées dans les cabinets médicaux libéraux suscite des inquiétudes à plusieurs niveaux :
+\begin{itemize}
+  \item \textbf{Vulnérabilité de l'information} : L'archivage papier n'offre aucune garantie de sauvegarde contre les sinistres et complique drastiquement la protection du secret médical.
+  \item \textbf{Déficit d'organisation} : La tenue d'un agenda manuel favorise les erreurs humaines (doublons, oublis) et génère des temps d'attente interminables pour la patientèle.
+  \item \textbf{Gestion de trésorerie fastidieuse} : L'évaluation de la rentabilité ou le suivi des créances auprès des organismes d'assurance (CNSS, CNOPS) deviennent des tâches ardues et sujettes aux erreurs de calcul.
+  \item \textbf{Carences algorithmiques} : Contrairement à d'autres secteurs, le corps médical sous-exploite l'intelligence artificielle, alors qu'elle pourrait l'aider à formuler plus rapidement ses diagnostics ou ses comptes rendus.
+\end{itemize}
+ 
+Dès lors, la question qui oriente l'intégralité de cette étude se formule ainsi : \textit{Par quels moyens techniques pouvons-nous structurer, développer et déployer de façon automatisée une plateforme SaaS médicale multi-cliniques, intégrant de l'intelligence artificielle et capable d'assurer une très haute disponibilité ?}
+ 
+\section{Finalités escomptées}
+L'ambition de ce projet dépasse la simple réalisation académique et vise des objectifs concrets, tant sur le plan de l'usage que sur celui de la technique.
+ 
+\subsection{Livrables fonctionnels}
+\begin{itemize}
+  \item Fournir un outil centralisant la totalité des tâches courantes d'une clinique (agenda, dossiers numérisés, comptabilité).
+  \item Livrer une interface web fluide, s'adaptant à tout type d'écran, et nativement traduite en arabe et en français.
+  \item Déployer un robot conversationnel médical (MedAgent) pour réduire le temps de rédaction des professionnels de santé.
+  \item Assurer un cloisonnement des espaces de travail, afin qu'une instance de l'application puisse servir plusieurs cabinets distincts (multi-tenant).
+\end{itemize}
+ 
+\subsection{Cibles d'ingénierie}
+\begin{itemize}
+  \item Modéliser un backend éclaté en microservices pour garantir une tolérance aux pannes maximale.
+  \item Concevoir une chaîne logistique logicielle (CI/CD) irréprochable avec Jenkins, SonarQube et ArgoCD.
+  \item Sécuriser les flux réseau au travers de tokens cryptographiques (JWT) et d'un contrôle d'accès strict.
+  \item Rendre le système observable en temps réel via l'implémentation de tableaux de bord Prometheus et Grafana.
+\end{itemize}
+ 
+\section{Approche de développement}
+La réussite d'un tel projet repose sur l'adoption de méthodes de travail modernes et éprouvées.
+ 
+\subsection{Itérations et Agilité}
+L'avancement s'est fait sous le signe de l'agilité, avec un découpage du travail en cycles courts de deux semaines. Ce fonctionnement a permis de présenter régulièrement de nouvelles fonctionnalités, de valider rapidement les hypothèses et de pivoter sans douleur en cas de blocage technique.
+ 
+\subsection{Design orienté métier}
+Pour éviter de créer un monolithe difficile à maintenir, l'architecture a été pensée selon les préceptes du Domain-Driven Design (DDD). Chaque aspect de l'application (l'authentification, le planning, les finances) a été isolé dans son propre périmètre d'exécution, ce qui a naturellement guidé la création de nos différents microservices.
+ 
+\subsection{Assurance qualité et usine logicielle}
+Afin d'éviter le stress des déploiements manuels, chaque ligne de code poussée sur notre dépôt distant déclenche une batterie de contrôles. L'usine logicielle compile, teste, audite et package le programme sous forme de conteneurs Docker, avant de confier la mise à jour aux orchestrateurs de production (Kubernetes via une approche GitOps).
+ 
+\section{Structuration du mémoire}
+Le présent document est organisé en huit parties distinctes :
+\begin{itemize}
+  \item \textbf{Chapitre 1 : Introduction et Contexte Stratégique} --- Présente les fondations, la problématique et la méthodologie employée.
+  \item \textbf{Chapitre 2 : Définition des Besoins} --- Cartographie les attentes des utilisateurs et les contraintes de fonctionnement.
+  \item \textbf{Chapitre 3 : Modélisation et Architecture} --- Illustre la conception du système à grand renfort de diagrammes UML et de schémas réseau.
+  \item \textbf{Chapitre 4 : Choix Technologiques et Réalisation} --- Expose les langages retenus et dévoile l'aspect final de l'application.
+  \item \textbf{Chapitre 5 : Packagings et Conteneurs} --- Explique la transformation du code en images Docker et la gestion par Kubernetes.
+  \item \textbf{Chapitre 6 : Stratégie de Validation} --- Démontre la fiabilité du produit à travers des campagnes de tests automatisés.
+  \item \textbf{Chapitre 7 : Ingénierie DevOps} --- Décortique le fonctionnement interne de la chaîne CI/CD et du système d'alerting.
+  \item \textbf{Chapitre 8 : Conclusion générale} --- Tire les enseignements du projet et trace des perspectives pour son évolution.
+\end{itemize}
+ 
+
+%==== CHAPITRE 2 ====%
+\chapter{Définition des Besoins}
+ 
+\section{Panorama général}
+L'outil que nous avons nommé "MediCab Pro" est un service applicatif hébergé dans le Cloud. Il s'adresse principalement aux acteurs de la santé libérale au Maroc, englobant les médecins spécialistes ou généralistes, leurs secrétaires, et les techniciens en charge de la plateforme. La vocation de cette application est d'informatiser de bout en bout l'accueil et le suivi d'un patient : depuis le moment où il demande une consultation jusqu'au paiement final de ses honoraires.
+ 
+L'enjeu d'une telle digitalisation est immense. Il s'agit de fournir aux cabinets un environnement de travail fiable, ergonomique, multilingue et totalement conforme à la réglementation en vigueur sur le traitement des données sensibles, tout en palliant les éventuels problèmes de connexion internet qui peuvent survenir.
+ 
+\section{L'origine du besoin}
+L'observation du terrain montre que l'informatisation des cabinets médicaux locaux accuse un retard certain. Cette situation engendre des dysfonctionnements qui pénalisent la croissance de ces structures :
+\begin{itemize}
+  \item Pertes récurrentes d'historiques médicaux à cause d'un stockage purement physique.
+  \item Chaos dans la gestion des agendas, caractérisé par des salles d'attente surpeuplées et des patients mécontents.
+  \item Inefficacité du processus de facturation, rendant la comptabilité laborieuse à clôturer en fin de mois.
+  \item Ignorance totale des atouts de l'IA pour aider à la décision médicale ou à la rédaction documentaire.
+  \item Absence de solutions logicielles véritablement adaptées aux spécificités linguistiques et culturelles locales.
+\end{itemize}
+ 
+\section{Cahier des charges détaillé}
+\subsection{Objectif global}
+La directive principale est de créer un portail accessible en tout lieu, permettant d'abandonner définitivement le format papier, et ce, de manière intuitive et hautement sécurisée.
+ 
+\subsection{Attentes métier}
+Le système s'articule autour de six piliers majeurs :
+ 
+\subsubsection*{Axe 1 — Gestionnaire de Plannings}
+\begin{itemize}
+  \item Calendrier interactif avec vue personnalisable (quotidienne, hebdomadaire, etc.).
+  \item Manipulation intuitive des événements (glisser-déposer, validation) avec gestion des degrés d'urgence.
+  \item Algorithme de liste d'attente pour optimiser le temps du praticien en cas de désistement.
+  \item Envoi de notifications par mail ou SMS pour rappeler les visites imminentes.
+\end{itemize}
+ 
+\subsubsection*{Axe 2 — Le Dossier Patient}
+\begin{itemize}
+  \item Fiches complètes centralisant les informations civiles, les maladies chroniques et les antécédents familiaux.
+  \item Suivi des variables physiologiques (courbes de poids, tension, calcul automatique de l'IMC).
+  \item Historisation intégrale de tous les passages du patient dans le cabinet.
+  \item Espace d'importation pour les résultats de laboratoires ou les imageries médicales.
+\end{itemize}
+ 
+\subsubsection*{Axe 3 — Espace Clinique et Prescriptions}
+\begin{itemize}
+  \item Interface dédiée à l'enregistrement des notes d'examen et des diagnostics finaux.
+  \item Création d'ordonnances sécurisées avec suggestion de posologies.
+  \item Export et impression des prescriptions sur des formats de papier standardisés.
+\end{itemize}
+ 
+\subsubsection*{Axe 4 — Volet Comptable}
+\begin{itemize}
+  \item Automatisation de la création de la facture suite à une consultation.
+  \item Classification visuelle des impayés et des règlements effectués.
+  \item Tableaux récapitulatifs pour analyser la rentabilité du cabinet.
+\end{itemize}
+ 
+\subsubsection*{Axe 5 — Assistance Cognitive (MedAgent)}
+\begin{itemize}
+  \item Module de saisie intelligent capable d'analyser du texte brut.
+  \item Extraction autonome des informations médicales clés depuis les notes du docteur.
+  \item Rédaction magique d'un rapport de consultation structuré par l'IA.
+\end{itemize}
+ 
+\subsubsection*{Axe 6 — Cloisonnement et Administration}
+\begin{itemize}
+  \item Console maîtresse pour le propriétaire de la solution SaaS.
+  \item Paramétrage des abonnements et onboarding de nouvelles cliniques clientes.
+  \item Ségrégation totale des bases de données pour que la clinique A n'ait aucune visibilité sur les données de la clinique B.
+\end{itemize}
+ 
+\subsection{Contraintes de réalisation}
+\begin{table}[H]
+\centering
+\caption{Exigences techniques du système}
+\renewcommand{\arraystretch}{1.4}
+\begin{tabularx}{\textwidth}{|>{\bfseries}p{3.5cm}|X|}
+\hline
+\textbf{Spécification} & \textbf{Détails} \\
+\hline
+Résilience & Objectif de 99.9\% de fonctionnement ininterrompu, soutenu par l'orchestrateur Kubernetes. \\
+\hline
+Protection & Trafic crypté, authentification par token, et habilitations restrictives pour protéger le secret professionnel. \\
+\hline
+Vélocité & Latence maximale acceptée de 300 millisecondes pour un confort d'utilisation optimal. \\
+\hline
+Élasticité & Capacité du système à multiplier ses ressources (auto-scaling) en fonction du nombre de requêtes. \\
+\hline
+Accessibilité & Design fluide s'affichant aussi bien sur un écran géant que sur un smartphone. \\
+\hline
+\end{tabularx}
+\end{table}
+ 
+\section{Typologie des profils utilisateurs}
+\begin{table}[H]
+\centering
+\caption{Rôles et permissions au sein de l'application}
+\renewcommand{\arraystretch}{1.4}
+\begin{tabularx}{\textwidth}{|>{\bfseries}p{3cm}|X|}
+\hline
+\textbf{Profil} & \textbf{Responsabilités} \\
+\hline
+Le Médecin &
+  Consulte son agenda, étudie le passif des patients, rédige les prescriptions, utilise l'IA pour générer ses comptes rendus, et possède un regard sur les rentrées d'argent. \\
+\hline
+L'Assistance administrative &
+  Filtre les appels, gère les flux en salle d'attente, enregistre les nouveaux patients et s'occupe de la caisse. Ce rôle limite fortement l'accès aux données médicales sensibles. \\
+\hline
+L'Administrateur SaaS &
+  S'assure du bon fonctionnement des serveurs, active ou désactive les comptes des différentes cliniques et surveille l'état de santé de l'infrastructure. \\
+\hline
+\end{tabularx}
+\end{table}
+ 
+\section{Bilan de l'expression des besoins}
+Les attentes de notre public cible ayant été minutieusement inventoriées, le défi consiste désormais à forger une base logicielle capable d'absorber l'ensemble de ces prérequis. Le chapitre qui suit détaillera la démarche de modélisation retenue.
+ 
+
+%==== CHAPITRE 3 ====%
+\chapter{Modélisation et Architecture}
+ 
+\section{Introduction au design logiciel}
+Avant d'écrire la moindre ligne de code, la phase de modélisation agit comme le véritable plan de construction de notre application. Le but est de traduire les exigences fonctionnelles étudiées précédemment en schémas techniques rigoureux. Pour ce faire, nous nous sommes appuyés sur les normes du langage UML, qui offre une grammaire visuelle parfaite pour cartographier les méandres d'une architecture orientée services.
+ 
+\section{Fondations techniques}
+\subsection{Réseau et Topologie}
+La structure de MediCab Pro s'articule autour d'un principe fondamental : le découplage. Le portail utilisateur (Angular) interroge le backend au travers d'une porte d'entrée unique, baptisée "API Gateway". Cette dernière filtre le trafic, authentifie les utilisateurs et redirige chaque requête vers la brique logicielle concernée. Les services de traitement (codés en Spring Boot) opèrent en coulisse et communiquent entre eux via des interfaces HTTP REST standardisées. Pour éviter l'effondrement du système en cas de lenteur d'un module, des barrières de sécurité logicielles (le pattern Circuit Breaker) ont été mises en place.
+ 
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{Architecture globale.png}
+  \caption{Schéma général des interactions réseau}
+\end{figure}
+ 
+\subsection{Inventaire des briques applicatives}
+\begin{table}[H]
+\centering
+\caption{Répartition des domaines métiers par microservice}
+\renewcommand{\arraystretch}{1.4}
+\begin{tabularx}{\textwidth}{|>{\bfseries\ttfamily}p{4cm}|p{1.5cm}|X|}
+\hline
+\textbf{Dénomination} & \textbf{Port} & \textbf{Fonction première} \\
+\hline
+auth-service & 8081 & Émission de laissez-passer numériques (JWT) et validation des droits. \\
+\hline
+appointment-service & 8082 & Orchestration des agendas et gestion de la file d'attente. \\
+\hline
+patient-service & 8083 & Mémorisation de l'état civil et archivage des documents cliniques. \\
+\hline
+medical-record-service & 8084 & Historisation chronologique des actes médicaux. \\
+\hline
+ordonnance-service & 8085 & Génération dynamique des listes de médicaments. \\
+\hline
+billing-service & 8086 & Enregistrement des règlements et calcul de la facturation. \\
+\hline
+notification-service & 8087 & Messagerie interne et envoi d'alertes par courriel. \\
+\hline
+ai-service & 8088 & Cerceau cognitif (FastAPI) pour l'analyse de texte médical. \\
+\hline
+api-gateway & 8080 & Tour de contrôle centralisant le trafic entrant. \\
+\hline
+discovery-service & 8761 & Registre recensant dynamiquement l'adresse de chaque service. \\
+\hline
+config-service & 8888 & Coffre-fort des paramètres d'environnement. \\
+\hline
+\end{tabularx}
+\end{table}
+ 
+\section{Exploration via les Cas d'Utilisation}
+\subsection{Objectif de la démarche}
+Ces diagrammes agissent comme des synopsis. Ils mettent en scène les utilisateurs (les acteurs) et listent de manière exhaustive les actions qu'ils sont en droit d'exécuter sur le système.
+ 
+\subsection{Actions du corps médical}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{UsecaseMedcine.png}
+  \caption{Eventail des opérations autorisées pour un médecin}
+\end{figure}
+ 
+\subsection{Actions du pôle administratif}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{UsecaseSecritaire.png}
+  \caption{Tâches courantes réalisables par le secrétariat}
+\end{figure}
+ 
+\subsection{Supervision globale}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{UsecaseSuperAdmin.png}
+  \caption{Pouvoirs de l'administrateur de l'infrastructure SaaS}
+\end{figure}
+ 
+\subsection{Intervention de l'Intelligence Artificielle}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{UsecaseAiAgent.png}
+  \caption{Périmètre d'intervention du module MedAgent}
+\end{figure}
+ 
+\section{Chorégraphie des échanges (Diagrammes de séquence)}
+\subsection{Processus d'identification}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{SequenceAuth.png}
+  \caption{Cinématique de la validation des identifiants et création du token}
+\end{figure}
+ 
+\subsection{Programmation d'une visite}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{SequanceRendezVous.png}
+  \caption{Chronologie des appels pour insérer un rendez-vous}
+\end{figure}
+ 
+\subsection{Assistance par le robot médical}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{SequanceConsultationAiAgent.png}
+  \caption{Étapes de communication avec le moteur d'inférence Python}
+\end{figure}
+ 
+\subsection{Processus d'encaissement}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{SequanceFacture.png}
+  \caption{Génération et sauvegarde d'une pièce comptable}
+\end{figure}
+ 
+\section{Cartographie des données (Diagrammes de classes)}
+\subsection{Périmètre : Gestion des Accès}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{ClasseAuth.png}
+  \caption{Entités régissant les utilisateurs et leurs permissions}
+\end{figure}
+ 
+\subsection{Périmètre : Dossier Individuel}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{ClassePatient.png}
+  \caption{Organisation des données de la fiche signalétique médicale}
+\end{figure}
+ 
+\subsection{Périmètre : Gestion du Temps}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{ClasseRendesVous.png}
+  \caption{Structure temporelle de l'agenda et des salles d'attente}
+\end{figure}
+ 
+\subsection{Périmètre : Suivi Clinique}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{ClasseOrdonanceConsultataion.png}
+  \caption{Représentation informatique des consultations et prescriptions}
+\end{figure}
+ 
+\subsection{Périmètre : Transactions}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{ClasseFacturation.png}
+  \caption{Modèle économique et de facturation}
+\end{figure}
+ 
+\section{Conclusion de la phase de design}
+L'architecture logicielle est dorénavant figée. L'éclatement du système en composants indépendants et l'utilisation de schémas UML clairs garantissent une feuille de route sans ambiguïté pour les développeurs. La section qui suit présentera les langages et outils choisis pour donner vie à ces diagrammes.
+ 
+
+%==== CHAPITRE 4 ====%
+\chapter{Choix Technologiques et Réalisation}
+ 
+\section{Enjeux du développement}
+Ce chapitre marque la transition de la théorie vers la pratique. Après avoir validé les schémas d'architecture, la construction proprement dite a pu démarrer. Nous détaillons ici le triptyque de technologies retenues pour bâtir l'application et nous proposons une visite visuelle des interfaces finalisées.
+ 
+\section{Arsenal Technologique}
+\subsection{Vue globale de la pile}
+La création d'une plateforme SaaS exigeante requiert l'assemblage de composants logiciels de pointe, couvrant aussi bien l'écriture du code que l'hébergement et le contrôle continu.
+ 
+\subsection{Les ateliers de codage}
+\textbf{IntelliJ IDEA :} Considéré comme la référence incontestée pour l'écosystème Java, cet éditeur a été la plaque tournante du développement backend. Ses algorithmes d'autocomplétion avancés et son débogueur puissant ont favorisé la production d'un code fiable et robuste.\\
+\textbf{WebStorm :} Dans l'univers de la programmation web, ce logiciel excelle. Il a été choisi pour concevoir le client Angular, offrant une lisibilité exceptionnelle du TypeScript et un rendu immédiat des feuilles de style complexes.
+ 
+\subsection{Moteurs du serveur}
+\textbf{Spring Boot \& Java 21 :} L'intelligence métier de la plateforme est motorisée par ce duo redoutable. La version 21 de Java offre des performances accrues grâce aux threads virtuels, tandis que Spring Boot supprime toute la lourdeur de configuration inhérente à la création d'API professionnelles.\\
+\textbf{Python \& FastAPI :} Pour insuffler de l'intelligence artificielle au système, Python s'est imposé comme une évidence. Couplé au cadriciel FastAPI, il permet d'exécuter des modèles de traitement du langage naturel à très haute vitesse et d'exposer les résultats en une fraction de seconde.
+ 
+\subsection{Technologie visuelle}
+\textbf{Angular 21 \& TypeScript :} Le pilotage de l'interface est confié à Angular, soutenu par la rigueur de typage de TypeScript. Ce tandem permet de générer des "Single Page Applications" (SPA) rapides et dépourvues de rechargements de pages intempestifs.\\
+\textbf{Composants additionnels :} Afin de rendre l'expérience agréable, nous nous sommes appuyés sur PrimeNG pour les widgets sophistiqués, TailwindCSS pour l'agencement millimétré des pixels, Chart.js pour dessiner les courbes financières, et FullCalendar pour matérialiser l'agenda du médecin.
+ 
+\subsection{Ingénierie des opérations (DevOps)}
+\textbf{Docker \& Kubernetes :} L'époque des installations hasardeuses est révolue. Docker encapsule chaque fragment logiciel dans une boîte hermétique. Ensuite, Kubernetes se charge de déployer ces boîtes sur les serveurs, de les surveiller et de les dupliquer automatiquement si trop d'utilisateurs se connectent en même temps.\\
+\textbf{La chaîne Jenkins, SonarQube, ArgoCD :} Ce trio forme l'épine dorsale de nos mises à jour automatiques. Jenkins coordonne les tâches, SonarQube vérifie qu'aucun bug critique n'a été inséré dans le code, et ArgoCD assure la livraison finale en production via le paradigme GitOps.\\
+\textbf{Vigie système (Prometheus \& Grafana) :} Ces deux outils collaborent pour mesurer la tension du serveur. Ils enregistrent la consommation de RAM, la vitesse des requêtes et avertissent l'équipe de maintenance au moindre signe de faiblesse de l'infrastructure.
+ 
+\subsection{Systèmes de persistance}
+\textbf{PostgreSQL 16 \& MySQL :} Fidèle au principe de séparation des microservices, le stockage est compartimenté. L'immense majorité des transactions critiques (médicales et financières) est confiée à PostgreSQL, reconnu mondialement pour son intégrité sans faille. Des modules secondaires exploitent MySQL pour des besoins de compatibilité spécifiques.
+ 
+\section{Démonstration des Interfaces}
+ 
+\subsection{Espace de travail du Médecin}
+\subsubsection*{La page d'accueil personnalisée}
+Dès sa connexion, le praticien dispose d'une vue synthétique affichant le nombre de consultations prévues, le montant facturé sur la journée, et un coup d'œil rapide sur les patients impatients dans la salle d'attente.
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{Realisation/Tableau de bord Medcin.png}
+  \caption{Centre de commande du professionnel de santé}
+\end{figure}
+ 
+\subsubsection*{Le Gestionnaire de Temps}
+Cet outil interactif remplace l'agenda papier. Il permet de jongler entre les créneaux disponibles et d'identifier visuellement les urgences.
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{Realisation/Agenda.png}
+  \caption{Aperçu de l'organisation hebdomadaire}
+\end{figure}
+ 
+\subsubsection*{File d'attente digitalisée}
+Ce tableau de bord dynamique permet au médecin de suivre l'évolution de la salle d'attente sans sortir de son bureau, réduisant ainsi les frictions et le stress.
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{Realisation/Salle d'attente.png}
+  \caption{Suivi du flux des patients sur site}
+\end{figure}
+ 
+\subsubsection*{Archives et Profils Patients}
+C'est ici que repose le secret médical. Ce module agglomère les informations personnelles, le résumé des consultations passées et l'ensemble des documents d'imagerie ou d'analyse.
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{Realisation/ListPATIENTS.png}
+  \caption{Consultation d'un dossier médical numérisé}
+\end{figure}
+ 
+\subsubsection*{Éditeur de Thérapies}
+Cette vue est dédiée à la création rapide et sécurisée d'ordonnances, garantissant une clarté absolue pour le patient et le pharmacien.
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{Realisation/ListOrdonance.png}
+  \caption{Module d'émission des prescriptions}
+\end{figure}
+ 
+\subsubsection*{Module IA conversationnel}
+La fenêtre "MedAgent" permet au docteur d'interagir avec l'intelligence artificielle pour dicter ses remarques et obtenir un compte rendu parfaitement mis en forme.
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth]{Realisation/AI Assistant.png}
+  \caption{Interaction directe avec le robot médical}
+\end{figure}
+ 
+\subsection{Console de l'Accueil (Secrétariat)}
+Destiné aux collaborateurs administratifs, cet environnement est épuré des informations médicales. Il focalise l'attention sur la prise de rendez-vous, l'enregistrement des nouveaux arrivants et l'impression des tickets de caisse.
+\begin{figure}[H]
+  \centering
+  \fbox{\textit{[Capture : Outil d'accueil et de paiement]}}
+  \caption{Écran optimisé pour les tâches de secrétariat}
+\end{figure}
+ 
+\section{Bilan de l'étape de construction}
+Ce volet prouve que l'alliance entre une modélisation sérieuse et des frameworks modernes aboutit à un produit logiciel réactif et séduisant visuellement. La phase consécutive s'attachera à expliquer l'empaquetage de cette solution pour son déploiement sur les serveurs distants.
+ 
+
+%==== CHAPITRE 5 ====%
+\chapter{Packagings et Conteneurs}
+ 
+\section{Enjeux de l'industrialisation}
+L'un des préceptes fondateurs de la mouvance DevOps est de faire disparaître le fameux syndrome du "Ça marche sur ma machine, mais pas en production". Pour y parvenir, MediCab Pro a recours à la conteneurisation. Ce chapitre vulgarise la manière dont nous créons ces paquets universels avec Docker, avant de les confier à Kubernetes pour leur diffusion.
+ 
+\section{La fabrique à conteneurs (Docker)}
+\subsection{La technique de compilation par étapes}
+Il est inutile d'intégrer les outils de développement dans l'application finale, car cela l'alourdit et augmente les failles de sécurité potentielles. C'est la raison pour laquelle nos \textit{Dockerfiles} sont divisés en phases. La première phase agit comme un atelier : elle télécharge le code et le compile. La seconde phase, très épurée, ne conserve que l'exécutable généré pour le faire tourner sur un système d'exploitation minimaliste.
+ 
+\begin{lstlisting}[style=dockerstyle, caption={Gabarit de création d'une image}, label={lst:dockerfile-auth}]
+# Atelier de fabrication
+FROM bellsoft/liberica-openjdk-alpine:21 as usine_assemblage
+RUN apk update && apk add maven
+WORKDIR /projet
+COPY pom.xml .
+COPY src ./src
+RUN mvn clean package -DskipTests
+ 
+# Produit fini, allégé
+FROM bellsoft/liberica-openjdk-alpine:21
+WORKDIR /lancement
+COPY --from=usine_assemblage /projet/target/auth-service.jar /lancement/
+EXPOSE 8081
+ENTRYPOINT ["java", "-jar", "auth-service.jar"]
+\end{lstlisting}
+ 
+\subsection{Registre des composants}
+Au final, l'intégralité du code a été transformée en images Docker. Ces dernières sont stockées en ligne, dans un coffre-fort virtuel (Docker Hub), prêtes à être récupérées par nos serveurs pour démarrer le système (ex: \texttt{medicab/patient-service:latest}).
+ 
+\section{Pilotage de la flotte (Kubernetes)}
+\subsection{Principes de fonctionnement}
+Une fois les conteneurs créés, il faut un chef d'orchestre pour s'assurer qu'ils fonctionnent H24. Kubernetes remplit ce rôle. Il place nos applications dans une zone sécurisée (\texttt{medicab-prod}) et vérifie constamment si elles sont "vivantes". Si l'une d'entre elles plante, il en redémarre une copie dans la seconde.
+ 
+\begin{lstlisting}[style=yamlstyle, caption={Fichier de configuration d'un module}, label={lst:deploy-yaml}]
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: module-patients
+  namespace: medicab-prod
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: module-patients
+  template:
+    metadata:
+      labels:
+        app: module-patients
+    spec:
+      containers:
+      - name: process-patients
+        image: medicab/patient-service:latest
+        ports:
+        - containerPort: 8083
+        livenessProbe:
+          httpGet:
+            path: /actuator/health
+            port: 8083
+          initialDelaySeconds: 60
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+\end{lstlisting}
+ 
+\subsection{Mécanismes de déploiement}
+Le cluster s'anime grâce à diverses instructions que nous lui fournissons :
+\begin{itemize}
+  \item \textbf{Déploiements (Deployments)} : Obligent le serveur à maintenir systématiquement au moins deux copies d'un même programme pour éviter toute coupure.
+  \item \textbf{Aiguilleurs (Ingress)} : Jouent le rôle de pare-feu et de routeur web, s'occupant de sécuriser la ligne en HTTPS avant de faire entrer le visiteur.
+  \item \textbf{Variateur de puissance (HPA)} : Demande au serveur d'allumer de nouvelles copies du programme si le processeur commence à surchauffer sous l'afflux de visiteurs.
+  \item \textbf{Dossiers confidentiels (Secrets)} : Sont utilisés pour dissimuler les mots de passe de bases de données afin qu'ils ne traînent jamais en clair dans le code.
+\end{itemize}
+ 
+\subsection{Remplacement sans interruption}
+Pour injecter une nouvelle version du logiciel, nous optons pour la stratégie du remplacement continu (\textbf{Rolling Update}). Kubernetes éteint un ancien conteneur, en allume un nouveau, vérifie qu'il marche, puis passe au suivant. Ainsi, la clinique ne subit aucune seconde de coupure pendant la mise à jour.
+ 
+\section{Bilan de l'architecture serveur}
+L'utilisation de la combinaison Docker + Kubernetes propulse MediCab Pro au rang d'application d'entreprise ultra-résistante. Avant d'accorder à ces programmes le droit d'aller sur les serveurs, ils doivent toutefois prouver leur fiabilité. C'est le rôle des bancs d'essai que nous allons voir ensuite.
+ 
+
+%==== CHAPITRE 6 ====%
+\chapter{Stratégie de Validation}
+ 
+\section{L'importance de la fiabilité}
+S'agissant d'un logiciel touchant à la santé et aux finances d'un cabinet médical, l'intolérance aux bugs est de rigueur. Toute défaillance pourrait entraîner un diagnostic erroné ou une perte d'argent. Pour contrer ce risque, une vaste campagne de vérifications informatiques a été intégrée au cœur de notre développement.
+ 
+\section{Méthodologie d'inspection}
+Le protocole de vérification s'inspire du concept de la "pyramide de test", allant des contrôles microscopiques aux évaluations globales :
+\begin{enumerate}
+  \item \textbf{Micro-contrôles (unitaires)} : S'assurent que chaque rouage mathématique ou logique du code donne le bon résultat dans un environnement isolé.
+  \item \textbf{Assemblage des rouages (intégration)} : Valident la bonne entente entre nos programmes et les bases de données réelles.
+  \item \textbf{Simulation d'affluence (tests de charge)} : Poussent le serveur dans ses retranchements pour mesurer à partir de quel moment il commence à ralentir.
+\end{enumerate}
+ 
+\section{Examens unitaires}
+Grâce à l'outil de simulation \textbf{Mockito} et au framework \textbf{JUnit 5}, nous avons pu créer des scénarios pièges pour notre code sans avoir besoin d'installer de véritables bases de données de test.
+ 
+\begin{table}[H]
+\centering
+\caption{Tableau de bord de la couverture des tests}
+\renewcommand{\arraystretch}{1.4}
+\begin{tabularx}{\textwidth}{|X|p{2.5cm}|p{2.5cm}|p{2cm}|}
+\hline
+\textbf{Sous-système} & \textbf{Volume de tests} & \textbf{Lignes couvertes} & \textbf{Décision} \\
+\hline
+Authentification & 42 & 87\% & \textcolor{codegreen}{\textbf{Admis}} \\
+\hline
+Dossiers patients & 38 & 83\% & \textcolor{codegreen}{\textbf{Admis}} \\
+\hline
+Plannings et RDV & 35 & 81\% & \textcolor{codegreen}{\textbf{Admis}} \\
+\hline
+Historique clinique & 29 & 80\% & \textcolor{codegreen}{\textbf{Admis}} \\
+\hline
+Gestion financière & 31 & 85\% & \textcolor{codegreen}{\textbf{Admis}} \\
+\hline
+Générateur d'ordonnances & 24 & 78\% & \textcolor{orange}{\textbf{À renforcer}} \\
+\hline
+\textbf{Moyenne globale} & \textbf{199} & \textbf{82.3\%} & \textcolor{codegreen}{\textbf{Objectif atteint}} \\
+\hline
+\end{tabularx}
+\end{table}
+ 
+\section{Mise en condition réelle (Intégration)}
+Afin de certifier la fiabilité de nos sauvegardes, nous avons mobilisé la technologie \textbf{Testcontainers}. Elle permet de lancer automatiquement un serveur PostgreSQL temporaire, d'y injecter des données, de vérifier si notre programme sait les lire, puis d'effacer les traces instantanément à la fin du test.
+ 
+\section{L'épreuve de l'endurance (Performance)}
+Pour garantir que la plateforme ne s'effondrera pas le lundi matin à 9h (pic de connexion), \textbf{Apache JMeter} a été utilisé pour simuler l'activité frénétique de dizaines de secrétaires médicales en simultané.
+ 
+\begin{table}[H]
+\centering
+\caption{Comportement sous forte affluence}
+\renewcommand{\arraystretch}{1.4}
+\begin{tabularx}{\textwidth}{|X|p{2.2cm}|p{2cm}|p{2cm}|}
+\hline
+\textbf{Mécanisme sollicité} & \textbf{Intensité} & \textbf{Délai moyen} & \textbf{Taux d'échec} \\
+\hline
+Connexion utilisateur & 100 req/s & 45 ms & 0\% \\
+\hline
+Requête de profil patient & 200 req/s & 62 ms & 0\% \\
+\hline
+Ajout d'un événement au calendrier& 150 req/s & 78 ms & 0.1\% \\
+\hline
+Analyse par l'agent IA & 50 req/s & 320 ms & 0.5\% \\
+\hline
+\end{tabularx}
+\end{table}
+Le constat est extrêmement positif : le système réagit au quart de tour. Le seul module nécessitant un tiers de seconde pour répondre est le robot d'intelligence artificielle, un score tout à fait honorable étant donné le travail d'analyse linguistique qu'il doit accomplir en arrière-plan.
+ 
+\section{L'inspecteur intraitable (SonarQube)}
+Le verdict de la plateforme d'audit automatique SonarQube est sans appel : le code est propre. Le fameux "Quality Gate" est validé, certifiant l'absence de failles béantes de sécurité, et soulignant un effort notable de factorisation puisque le taux de lignes répétées plafonne à 3.2\%.
+ 
+\section{Bilan des examens}
+Le produit logiciel a passé avec succès tous les examens de passage. Nous avons l'assurance technique de livrer un outil pérenne. La section qui clôture cet aspect technique révélera comment ces batteries de tests ont été orchestrées pour se lancer toutes seules.
+ 
+
+%==== CHAPITRE 7 ====%
+\chapter{Ingénierie DevOps (CI/CD et Monitoring)}
+ 
+\section{Introduction à la robotisation des processus}
+Dans un projet informatique moderne, il est impensable de copier manuellement des fichiers vers un serveur de production. C'est une source d'erreurs inépuisable. Ce chapitre met en lumière l'artillerie lourde déployée pour robotiser la mise en ligne du code et la construction de notre tour de contrôle de surveillance (Monitoring).
+ 
+\section{L'automate de livraison (Pipeline CI/CD)}
+\subsection{La mécanique générale}
+Nous avons érigé un pipeline de livraison grâce à \textbf{Jenkins}. Son rôle est simple : scruter en permanence notre espace de stockage de code (GitHub). Dès qu'une modification y est apportée par un développeur, la grande machinerie se met en branle sans intervention humaine.
+ 
+\subsection{Le parcours d'une mise à jour}
+\begin{enumerate}
+  \item \textbf{Extraction} : L'automate télécharge la dernière version du code source.
+  \item \textbf{Construction} : Les fichiers de texte brut sont traduits en langage machine (compilation). Si le développeur a oublié une virgule, l'alerte est donnée et le processus stoppe.
+  \item \textbf{Audition} : La totalité des examens unitaires et d'intégration détaillés au Chapitre 6 s'exécute silencieusement.
+  \item \textbf{Scan de sécurité} : Des outils dédiés, comme Trivy, parcourent le projet pour s'assurer qu'aucun virus ou bibliothèque obsolète n'a été inséré par mégarde.
+  \item \textbf{Fabrication du conteneur} : Le code validé est transformé en image Docker flambant neuve, estampillée d'un numéro de version.
+  \item \textbf{La magie GitOps} : Jenkins passe le relais à \textbf{ArgoCD}. Ce dernier vérifie si l'état des serveurs Kubernetes correspond à ce qu'il a en mémoire, et si besoin, met à jour le parc serveur de manière totalement transparente.
+\end{enumerate}
+ 
+\section{La tour de contrôle (Prometheus \& Grafana)}
+\subsection{Aspiration des diagnostics vitaux}
+Une fois le logiciel sur les serveurs, le travail n'est pas terminé ; il faut le surveiller. Nos microservices ont été instrumentés avec la technologie \textbf{Micrometer}. Celle-ci prépare de petits rapports sur la santé du programme. Ensuite, la base de données temporelle \textbf{Prometheus} passe toutes les 15 secondes pour aspirer ces métriques : mémoire saturée, pics de trafic, latence inhabituelle, etc.
+ 
+\subsection{Affichage et déclenchement des sirènes}
+Les données accumulées par Prometheus sont transformées en graphiques stylisés par l'outil \textbf{Grafana}. En salle des serveurs, l'équipe possède ainsi des jauges en temps réel de l'état de "MediCab Pro".
+Pour éviter de rester fixé sur les écrans, un système d'alerting veille au grain. Si un service commence à répondre avec un délai supérieur à la normale de façon prolongée, ou si un serveur menace de manquer d'espace disque, des emails et des notifications d'urgence sont envoyés directement aux techniciens astreints.
+ 
+\section{Conclusion de l'ingénierie système}
+Le duo automatisation de livraison (CI/CD) et surveillance permanente (Monitoring) parachève la maturité technique de notre solution. Il garantit qu'aucune erreur ne viendra perturber l'expérience des médecins sur le long terme.
+ 
+
+%==== CHAPITRE 8 ====%
+\chapter*{Conclusion générale}
+\addcontentsline{toc}{chapter}{Conclusion générale}
+ 
+\section*{Aperçu rétrospectif}
+L'aboutissement du projet MediCab Pro marque une étape cruciale et la clôture de mon cycle universitaire. En concevant cette plateforme logicielle, nous avons prouvé qu'il était parfaitement faisable d'endiguer la désorganisation administrative des cliniques privées marocaines en déployant des solutions d'informatique en nuage de dernière génération.
+ 
+\subsection*{Bilan sur l'architecture et les opérations}
+Sur l'aspect purement ingénierie, la mise sur pied d'un écosystème éclaté en plus d'une dizaine de microservices témoigne d'une réelle capacité à dompter les architectures complexes de niveau "Enterprise". La séparation rigoureuse des bases de données couplée aux dispositifs de sécurisation du réseau prouve que la flexibilité peut aller de pair avec la sécurité.
+Par ailleurs, la réussite du montage de l'usine logicielle (Jenkins) et l'application stricte du modèle GitOps (ArgoCD) valident notre aptitude à opérer des chaînes DevOps de qualité professionnelle. Le couplage avec les outils d'observabilité de la fondation Cloud Native (Prometheus/Grafana) vient couronner le tout.
+ 
+\subsection*{Impact et valeur métier}
+Au-delà du défi technique, MediCab Pro offre de véritables bénéfices pratiques. L'outil restitue un atout inestimable aux praticiens : du temps. La numérisation complète des historiques, l'éradication des doubles réservations et surtout l'assistance à la rédaction offerte par le module MedAgent, changent radicalement le rapport au travail administratif dans un cabinet.
+ 
+\subsection*{Obstacles rencontrés}
+Ce long périple ne fut pas exempt de difficultés :
+\begin{itemize}
+  \item Assurer l'intégrité globale d'une transaction lorsque celle-ci implique l'écriture simultanée dans trois microservices différents (problématique des commits distribués).
+  \item Domestiquer l'environnement Kubernetes sur une machine de développement locale, avec la gestion des réseaux virtuels sous WSL 2.
+  \item Bâtir un dialogue rapide et fiable entre le monde Java (le backend principal) et l'univers Python (FastAPI gérant les calculs de l'IA).
+  \item Réfléchir à une architecture de base de données capable de garantir l'anonymat absolu entre différentes cliniques concurrentes partageant le même serveur.
+\end{itemize}
+ 
+\section*{Le futur du projet}
+Loin d'être un point final, cette soutenance ouvre la voie à de nombreuses améliorations pour MediCab Pro :
+\begin{enumerate}
+  \item \textbf{L'application Smartphone} : Offrir un portail mobile pour que les malades puissent gérer leurs créneaux de visite en toute autonomie.
+  \item \textbf{La visio-médecine} : Intégrer des flux vidéo cryptés pour permettre aux médecins de pratiquer des téléconsultations facturables.
+  \item \textbf{Un cerveau artificiel spécialisé} : Fournir des corpus de textes médicaux locaux au modèle de langage pour qu'il comprenne les nuances dialectales lors de ses synthèses cliniques.
+  \item \textbf{Liaison institutionnelle} : Développer des API pour se connecter aux serveurs des mutuelles étatiques (CNSS), accélérant ainsi le remboursement des assurés.
+  \item \textbf{Statistiques et prévisions} : Utiliser la science des données pour prévenir le corps médical des vagues de maladies saisonnières en fonction des rendez-vous pris.
+  \item \textbf{Déploiement à grande échelle} : Migrer la solution depuis notre cluster d'expérimentation vers des hébergeurs souverains hautement certifiés.
+  \item \textbf{Homologation Santé} : Lancer les audits juridiques pour obtenir le précieux sésame de l'Hébergement de Données de Santé (HDS).
+\end{enumerate}
+ 
+MediCab Pro a été pensé dès le premier jour non pas comme une simple maquette étudiante, mais comme un produit technologique mature, prêt à bouleverser la digitalisation de la santé au Maroc.
+ 
+%============================================================
+\end{document}
+%============================================================

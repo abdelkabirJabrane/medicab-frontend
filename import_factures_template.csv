@@ -1,0 +1,6 @@
+Patient,Date,Montant,Versé,Statut
+Omar Benali,28/04/2026,300,0,EMISE
+Salma Alami,27/04/2026,250,100,PARTIELLEMENT_PAYEE
+Youssef Hamdaoui,26/04/2026,150,150,PAYEE
+Simo Hamouda,25/04/2026,450,0,EMISE
+Karimi Driss,24/04/2026,200,50,PARTIELLEMENT_PAYEE
