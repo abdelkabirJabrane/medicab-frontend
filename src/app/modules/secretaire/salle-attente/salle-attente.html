@@ -11,6 +11,9 @@
             <span class="live-indicator__dot"></span>
             Temps réel
         </div>
+        <button class="btn-primary" (click)="loadPatients()" title="Actualiser la liste">
+            <i class="pi pi-refresh"></i> Actualiser
+        </button>
         <button class="btn-primary" (click)="ouvrirAjout()">
             <i class="pi pi-user-plus"></i> Enregistrer Arrivée
         </button>
@@ -248,14 +251,16 @@
                 <p-select [(ngModel)]="formArrivee.medecin"
                           [options]="medecinOptions"
                           optionLabel="label" optionValue="value"
-                          placeholder="Choisir" styleClass="w-full"></p-select>
+                          placeholder="Choisir" styleClass="w-full"
+                          appendTo="body"></p-select>
             </div>
             <div class="form-field">
                 <label class="form-label">Type</label>
                 <p-select [(ngModel)]="formArrivee.type"
                           [options]="typeOptions"
                           optionLabel="label" optionValue="value"
-                          placeholder="Choisir" styleClass="w-full"></p-select>
+                          placeholder="Choisir" styleClass="w-full"
+                          appendTo="body"></p-select>
             </div>
         </div>
 

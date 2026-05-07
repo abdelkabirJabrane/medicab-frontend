@@ -161,21 +161,28 @@ export class SalleAttenteComponent implements OnInit, OnDestroy {
 
                 this.patients = rdvsToday.map((r: any) => {
                     const p = patientsMap.get(r.patientId) || {};
-                    const nom = p.nomComplet || `${p.prenom || ''} ${p.nom || ''}`.trim() || `Patient ${r.patientId}`;
+                    let nom = p.nomComplet || `${p.prenom || ''} ${p.nom || ''}`.trim() || `Patient ${r.patientId}`;
+
+                    // ── Extraction pour Patient Public / Invité / Dossier Absent ────────
+                    if (r.notesInternes && (r.notesInternes.includes('PATIENT PUBLIC:') || r.notesInternes.includes('RDV INVITE:') || r.notesInternes.includes('Nom:'))) {
+                        const match = r.notesInternes.match(/Nom:\s*([^\n\r]*)/i);
+                        if (match && match[1] && match[1].trim()) {
+                            nom = match[1].trim();
+                        }
+                    }
                     const initiales = nom.split(' ').map((n: string) => n[0] || '').join('').toUpperCase().substring(0, 2) || 'P?';
                     const heure = new Date(r.dateHeureDebut).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
 
                     const existing = existingMap.get(r.id);
 
-                    // Mapper le statut backend → statut local
+                    // ✅ Mapper le statut backend → statut local (Source de vérité = Backend)
                     let statut: PatientAttente['statut'];
-                    if (existing) {
-                        statut = existing.statut; // Conserver le statut local
-                    } else {
-                        statut = r.statut === 'TERMINE' ? 'TERMINE'
-                               : r.statut === 'EN_COURS' ? 'EN_CONSULTATION'
-                               : r.statut === 'CONFIRME' ? 'EN_ATTENTE'
-                               : 'EN_ATTENTE';
+                    switch(r.statut) {
+                        case 'TERMINE': statut = 'TERMINE'; break;
+                        case 'EN_COURS': statut = 'EN_CONSULTATION'; break;
+                        case 'CONFIRME': statut = 'ARRIVE'; break;
+                        case 'ANNULE': statut = 'ANNULE'; break;
+                        default: statut = 'EN_ATTENTE';
                     }
 
                     return {
@@ -185,14 +192,14 @@ export class SalleAttenteComponent implements OnInit, OnDestroy {
                         patient: nom,
                         initiales,
                         heure,
-                        heureArrivee: existing?.heureArrivee || null,
+                        heureArrivee: existing?.heureArrivee || (r.statut === 'CONFIRME' ? r.dateModification : null),
                         type: r.typeConsultation || 'PRESENTIELLE',
                         typeLabel: this.typeOptions[r.typeConsultation] || 'Consultation',
                         motif: r.motif || '',
                         statut,
                         couleur: this.getCouleurType(r.typeConsultation),
-                        priorite: r.typeConsultation === 'URGENCE' ? 'URGENT' : 'NORMAL',
-                        numeroAttente: existing?.numeroAttente || 0,
+                        priorite: r.typeConsultation === 'URGENT' ? 'URGENT' : 'NORMAL',
+                        numeroAttente: existing?.numeroAttente || (r.statut === 'CONFIRME' ? 1 : 0),
                         attenteMins: existing?.attenteMins || 0
                     } as PatientAttente;
                 }).sort((a: PatientAttente, b: PatientAttente) => a.heure.localeCompare(b.heure));
@@ -216,10 +223,18 @@ export class SalleAttenteComponent implements OnInit, OnDestroy {
         patient.attenteMins = 0;
         patient.numeroAttente = this.arriveeCounter++;
 
-        this.messageService.add({
-            severity: 'success',
-            summary: 'Patient arrivé',
-            detail: `${patient.patient} est en salle d'attente (N°${patient.numeroAttente})`
+        // ✅ Persister l'arrivée en backend via "confirmer"
+        this.appointmentService.confirmer(patient.rdvId).subscribe({
+            next: () => {
+                this.messageService.add({
+                    severity: 'success',
+                    summary: 'Patient arrivé',
+                    detail: `${patient.patient} est en salle d'attente (N°${patient.numeroAttente})`
+                });
+            },
+            error: () => {
+                this.messageService.add({ severity: 'error', summary: 'Erreur', detail: 'Impossible de notifier le serveur' });
+            }
         });
         this.cdr.markForCheck();
     }
@@ -228,17 +243,8 @@ export class SalleAttenteComponent implements OnInit, OnDestroy {
         // Mettre EN_CONSULTATION localement
         patient.statut = 'EN_CONSULTATION';
 
-        // Appel API pour passer en EN_COURS
-        this.appointmentService.update(patient.rdvId, {
-            tenantId: 1,
-            patientId: patient.patientId,
-            medecinId: this.authService.getCurrentUser()?.id || 1,
-            dateHeureDebut: new Date().toISOString().slice(0, 19),
-            motif: patient.motif,
-            typeConsultation: patient.type,
-            notesInternes: '',
-            statut: 'EN_COURS'
-        }).subscribe({
+        // ✅ Appel API dédié pour passer en EN_COURS (Persistance réelle)
+        this.appointmentService.enCours(patient.rdvId).subscribe({
             next: () => {
                 this.messageService.add({
                     severity: 'info',
@@ -247,7 +253,7 @@ export class SalleAttenteComponent implements OnInit, OnDestroy {
                 });
             },
             error: () => {
-                // On laisse le statut local même si l'API échoue
+                this.messageService.add({ severity: 'error', summary: 'Erreur', detail: 'Impossible de démarrer la consultation sur le serveur' });
             }
         });
         this.cdr.markForCheck();

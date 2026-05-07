@@ -33,7 +33,7 @@ export interface LigneOrdonnanceResponse {
 
 export interface OrdonnanceRequest {
     tenantId: number;
-    consultationId: number;
+    consultationId?: number | null;
     patientId: number;
     medecinId: number;
     dateEmission?: string;        // yyyy-MM-dd
@@ -47,7 +47,7 @@ export interface OrdonnanceRequest {
 export interface OrdonnanceResponse {
     id: number;
     tenantId: number;
-    consultationId: number;
+    consultationId?: number | null;
     patientId: number;
     medecinId: number;
     dateEmission?: string;

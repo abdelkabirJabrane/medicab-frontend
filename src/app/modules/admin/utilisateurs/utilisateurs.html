@@ -1,4 +1,4 @@
-<p-toast></p-toast>
+﻿<p-toast></p-toast>
 <p-confirmDialog></p-confirmDialog>
 
 <div class="page-header">
@@ -91,7 +91,25 @@
             </div>
             <div class="form-field">
                 <label class="form-label">Email <span class="form-required">*</span></label>
-                <input class="form-input" pInputText type="email" [(ngModel)]="form.email" placeholder="email@medicab.ma"/>
+                <input class="form-input" pInputText type="email" [(ngModel)]="form.email" placeholder="email@MedGest.ma"/>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-field">
+                <label class="form-label">Téléphone</label>
+                <input class="form-input" pInputText [(ngModel)]="form.phoneNumber" placeholder="06XXXXXXXX"/>
+            </div>
+            <div class="form-field">
+                <label class="form-label">Ville</label>
+                <input class="form-input" pInputText [(ngModel)]="form.ville" placeholder="Casablanca, Rabat..."/>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-field w-full">
+                <label class="form-label">Adresse Cabinet</label>
+                <input class="form-input" pInputText [(ngModel)]="form.address" placeholder="Adresse complète"/>
             </div>
         </div>
         <div class="form-row">
@@ -103,6 +121,15 @@
                           [fluid]="true"></p-select>
             </div>
             <div class="form-field">
+                <label class="form-label">Sexe <span class="form-required">*</span></label>
+                <p-select [options]="genderOptions" [(ngModel)]="form.gender" 
+                          optionLabel="label" optionValue="value" 
+                          placeholder="Choisir le sexe" [appendTo]="'body'"
+                          [fluid]="true"></p-select>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-field w-full">
                 <label class="form-label">Cabinet</label>
                 <p-select [options]="cabinetOptions" [(ngModel)]="form.cabinet" 
                           optionLabel="label" optionValue="value" 
@@ -115,6 +142,24 @@
                 <label class="form-label">Mot de passe <span class="form-required">*</span></label>
                 <input class="form-input" pInputText type="password" [(ngModel)]="form.password" placeholder="Le mot de passe de connexion"/>
             </div>
+        </div>
+
+        <!-- Professional Fields for Doctors -->
+        <hr *ngIf="form.role === 'ROLE_MEDECIN'" class="my-4 border-gray-100">
+
+        <div class="form-row" *ngIf="form.role === 'ROLE_MEDECIN'">
+            <div class="form-field">
+                <label class="form-label text-primary-600 font-bold">Spécialité</label>
+                <input class="form-input border-primary-100" pInputText [(ngModel)]="form.specialite" placeholder="ex: Cardiologue"/>
+            </div>
+            <div class="form-field">
+                <label class="form-label text-primary-600 font-bold">URL Slug (unique)</label>
+                <input class="form-input border-primary-100" pInputText [(ngModel)]="form.slug" placeholder="ex: dr-benali-rabat"/>
+            </div>
+        </div>
+        <div class="form-field w-full" *ngIf="form.role === 'ROLE_MEDECIN'">
+            <label class="form-label text-primary-600 font-bold">Mini-biographie</label>
+            <textarea class="form-input border-primary-100 min-h-[80px]" pInputTextarea [(ngModel)]="form.biographie" placeholder="Décrivez le parcours du médecin..."></textarea>
         </div>
     </div>
     <ng-template pTemplate="footer">

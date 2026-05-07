@@ -4,7 +4,6 @@ import { Router, RouterModule } from '@angular/router';
 import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
 import { ThemeService } from '../../core/services/theme.service';
-import { NotificationService } from '../../core/services/notification';
 import { AuthService } from '../../core/services/auth';
 import { DialogModule } from 'primeng/dialog';
 import { FormsModule } from '@angular/forms';
@@ -26,7 +25,6 @@ import { FloatingAiWidgetComponent } from '../../shared/components/floating-ai-w
 export class SecretaireLayoutComponent implements OnInit {
     sidebarOpen = true;
     nbEnAttente = 0;
-    nbNotifs = 0;
 
     // Quick Action States
     showQuickAction = false;
@@ -39,7 +37,6 @@ export class SecretaireLayoutComponent implements OnInit {
     constructor(
         public router: Router,
         public themeService: ThemeService,
-        private notificationService: NotificationService,
         private authService: AuthService,
         private patientService: PatientService,
         private appointmentService: AppointmentService,
@@ -163,9 +160,7 @@ export class SecretaireLayoutComponent implements OnInit {
                 { label: 'Rendez-vous', icon: 'pi pi-calendar', route: '/secretaire/rendez-vous', badge: null },
                 { label: 'Patients', icon: 'pi pi-users', route: '/secretaire/patients', badge: null },
                 { label: "Salle d'attente", icon: 'pi pi-clock', route: '/secretaire/salle-attente', badge: 4 },
-                { label: 'Facturation', icon: 'pi pi-wallet', route: '/secretaire/facturation', badge: null },
-                { label: 'Numérisation', icon: 'pi pi-print', route: '/secretaire/scanner', badge: 4 },
-                { label: 'Communications', icon: 'pi pi-bell', route: '/secretaire/notifications', badge: null }
+                { label: 'Facturation', icon: 'pi pi-wallet', route: '/secretaire/facturation', badge: null }
             ]
         },
         {
@@ -181,10 +176,7 @@ export class SecretaireLayoutComponent implements OnInit {
     }
 
     loadCounters() {
-        this.notificationService.count().subscribe({
-            next: (res) => this.nbNotifs = res,
-            error: (err) => console.warn('Erreur counters:', err)
-        });
+        // Notification service removed
     }
 
     toggleSidebar() {

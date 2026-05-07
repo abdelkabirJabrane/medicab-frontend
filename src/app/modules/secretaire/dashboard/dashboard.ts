@@ -4,6 +4,7 @@ import { RouterModule } from '@angular/router';
 import { PatientService } from '../../../core/services/patient';
 import { AppointmentService } from '../../../core/services/appointment';
 import { BillingService } from '../../../core/services/billing';
+import { AuthService } from '../../../core/services/auth';
 import { forkJoin, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 
@@ -19,7 +20,8 @@ export class SecretaireDashboardComponent implements OnInit {
     constructor(
         private patientService: PatientService,
         private appointmentService: AppointmentService,
-        private billingService: BillingService
+        private billingService: BillingService,
+        private authService: AuthService
     ) {}
 
     kpis = [
@@ -72,12 +74,21 @@ export class SecretaireDashboardComponent implements OnInit {
     }
 
     loadDashboardData() {
+        const currentUser = this.authService.getCurrentUser();
+        const mId = currentUser?.medecinId;
+
+        const appointments$ = mId 
+            ? this.appointmentService.getByMedecin(mId)
+            : this.appointmentService.getAll();
+
         forkJoin({
             patients: this.patientService.getAll().pipe(catchError(() => of([]))),
-            rdvs: this.appointmentService.getAll().pipe(catchError(() => of([]))),
+            rdvs: appointments$.pipe(catchError(() => of([]))),
             factures: this.billingService.getAll().pipe(catchError(() => of([])))
         }).subscribe(res => {
-            const todayStr = new Date().toISOString().split('T')[0];
+            const today = new Date();
+            const pad = (n: number) => String(n).padStart(2, '0');
+            const todayStr = `${today.getFullYear()}-${pad(today.getMonth() + 1)}-${pad(today.getDate())}`;
             const rdvsToday = res.rdvs.filter(r => r.dateHeureDebut && r.dateHeureDebut.startsWith(todayStr));
             
             const patientsMap = new Map<number, string>();
@@ -85,7 +96,7 @@ export class SecretaireDashboardComponent implements OnInit {
 
             // RDV Aujourd'hui
             let confirmes = rdvsToday.filter(r => r.statut === 'CONFIRME').length;
-            let arrives = rdvsToday.filter(r => r.statut === 'ARRIVE').length;
+            let arrives = rdvsToday.filter(r => r.statut === 'ARRIVE' || r.statut === 'EN_ATTENTE').length;
             let annules = rdvsToday.filter(r => r.statut === 'ANNULE').length;
 
             // Nouveaux patients aujourd'hui
@@ -93,7 +104,7 @@ export class SecretaireDashboardComponent implements OnInit {
 
             this.kpis = [
                 { titre: "RDV Aujourd'hui", valeur: rdvsToday.length.toString(), icon: 'pi pi-calendar', colorKey: 'blue', tendance: `${confirmes} confirmés`, positif: true },
-                { titre: 'En Salle Attente', valeur: arrives.toString(), icon: 'pi pi-users', colorKey: 'orange', tendance: "arrivés aujourd'hui", positif: arrives > 0 },
+                { titre: 'En Salle Attente', valeur: arrives.toString(), icon: 'pi pi-users', colorKey: 'orange', tendance: "en attente / arrivés", positif: arrives > 0 },
                 { titre: 'Nouveaux Patients', valeur: nxPatients.toString(), icon: 'pi pi-user-plus', colorKey: 'green', tendance: "enregistrés aujourd'hui", positif: true },
                 { titre: 'RDV Annulés', valeur: annules.toString(), icon: 'pi pi-times-circle', colorKey: 'purple', tendance: 'à reprogrammer', positif: false }
             ];

@@ -247,7 +247,16 @@ export class DashboardComponent implements OnInit, OnDestroy {
             const rdvsToday = res.rdvs.filter(r => r.dateHeureDebut && r.dateHeureDebut.startsWith(todayStr));
             
             this.rdvDuJour = rdvsToday.map(r => {
-                const nom = patientsMap.get(r.patientId) || `Patient ${r.patientId}`;
+                let nom = patientsMap.get(r.patientId) || `Patient ${r.patientId}`;
+
+                // ── Extraction pour Patient Public / Invité / Dossier Absent ────────
+                if (r.notesInternes && (r.notesInternes.includes('PATIENT PUBLIC:') || r.notesInternes.includes('RDV INVITE:') || r.notesInternes.includes('Nom:'))) {
+                    const match = r.notesInternes.match(/Nom:\s*([^\n\r]*)/i);
+                    if (match && match[1] && match[1].trim()) {
+                        nom = match[1].trim();
+                    }
+                }
+
                 let initials = nom.split(' ').map((n: string) => n[0]).join('').toUpperCase().substring(0, 2);
                 if (!initials) initials = 'PI';
                 return {

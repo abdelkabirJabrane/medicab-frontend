@@ -43,9 +43,16 @@
                      [class.cal-day--selected]="jour.estSelectionne"
                      [class.cal-day--today]="jour.estAujourdhui && !jour.estSelectionne"
                      [class.cal-day--empty]="!jour.numero"
+                     [class.cal-day--weekend]="jour.estWeekend"
+                     [class.cal-day--ferme]="jour.estFerme && !jour.estWeekend"
                      (click)="selectionnerJour(jour)">
                     <span class="cal-day__num">{{ jour.numero }}</span>
-                    @if (jour.rdvCount > 0) {
+                    @if (jour.estFerme && !jour.estWeekend) {
+                        <div class="cal-day__dots">
+                            <span class="cal-day__dot cal-day__dot--ferme"></span>
+                        </div>
+                    }
+                    @if (!jour.estWeekend && !jour.estFerme && jour.rdvCount > 0) {
                         <div class="cal-day__dots">
                             @for (i of [].constructor(Math.min(jour.rdvCount, 3)); track $index) {
                                 <span class="cal-day__dot"></span>
@@ -67,6 +74,9 @@
             <div class="cal-legend__item">
                 <span class="cal-legend__dot cal-legend__dot--rdv"></span> RDV programmés
             </div>
+            <div class="cal-legend__item">
+                <span class="cal-legend__dot cal-legend__dot--ferme"></span> Cabinet fermé
+            </div>
         </div>
 
         <!-- Médecin associé -->
@@ -80,133 +90,57 @@
                         <div class="medecin-filter__count">{{ medecinAssocie.rdvCount }} RDV aujourd'hui</div>
                     </div>
                 </button>
+
+                <!-- Gestion Congés -->
+                <div class="conge-box">
+                    @if (dateSelectionnee.getDay() === 0 || dateSelectionnee.getDay() === 6) {
+                        <div class="conge-box__status conge-box__status--weekend">
+                            <i class="pi pi-moon"></i> Week-end (Fermé)
+                        </div>
+                    } @else if (joursFermes.has(toDateKey(dateSelectionnee))) {
+                        <div class="conge-box__status conge-box__status--ferme">
+                            <i class="pi pi-lock"></i> Cabinet fermé / Congé
+                        </div>
+                        <button class="btn-conge btn-conge--ouvrir" (click)="toggleJourFerme({date: dateSelectionnee, estWeekend: false})">
+                            <i class="pi pi-lock-open"></i> Ouvrir le cabinet
+                        </button>
+                    } @else {
+                        <div class="conge-box__status conge-box__status--ouvert">
+                            <i class="pi pi-check-circle"></i> Cabinet ouvert
+                        </div>
+                        <button class="btn-conge btn-conge--fermer" (click)="toggleJourFerme({date: dateSelectionnee, estWeekend: false})">
+                            <i class="pi pi-lock"></i> Marquer comme fermé
+                        </button>
+                    }
+                </div>
             </div>
-        }<
+        }
 
     </div>
 
-    <!-- ── RDV du jour ──────────────────────── -->
+    <!-- ── Agenda Principal (FullCalendar) ──────── -->
     <div class="panel panel--rdvlist">
 
         <div class="panel__header">
             <div>
                 <h3 class="panel__title">
-                    RDV — {{ getDateLabel() }}
+                    Planning Médical — {{ getDateLabel() }}
                 </h3>
-                <p class="panel__subtitle">{{ rdvFiltres.length }} rendez-vous</p>
+                <p class="panel__subtitle">Consultez et gérez les rendez-vous du docteur</p>
             </div>
             <div class="panel__header-actions">
-                <!-- Vue toggle -->
-                <div class="view-toggle">
-                    <button class="view-toggle__btn"
-                            [class.view-toggle__btn--active]="vue === 'liste'"
-                            (click)="vue = 'liste'" title="Vue liste">
-                        <i class="pi pi-list"></i>
-                    </button>
-                    <button class="view-toggle__btn"
-                            [class.view-toggle__btn--active]="vue === 'timeline'"
-                            (click)="vue = 'timeline'" title="Vue timeline">
-                        <i class="pi pi-clock"></i>
-                    </button>
+                <div class="legend-chips">
+                    <span class="legend-chip legend-chip--weekend"><i class="pi pi-moon"></i> Week-end</span>
+                    <span class="legend-chip legend-chip--ferme"><i class="pi pi-lock"></i> Cabinet fermé</span>
                 </div>
             </div>
         </div>
 
-        <!-- Vide -->
-        @if (rdvFiltres.length === 0) {
-            <div class="rdv-empty">
-                <i class="pi pi-calendar-times rdv-empty__icon"></i>
-                <p>Aucun RDV pour cette journée</p>
-                <button class="btn-primary" (click)="ouvrirNouveauRdv()">
-                    <i class="pi pi-plus"></i> Créer un RDV
-                </button>
-            </div>
-        }
-
-        <!-- Vue liste -->
-        @if (vue === 'liste' && rdvFiltres.length > 0) {
-            <div class="rdv-list">
-                @for (rdv of rdvFiltres; track rdv.id) {
-                    <div class="rdv-item rdv-item--{{ rdv.statut | lowercase }}">
-
-                        <div class="rdv-item__accent rdv-item__accent--{{ rdv.statut | lowercase }}"></div>
-
-                        <div class="rdv-item__time">
-                            <div class="rdv-item__heure">{{ rdv.heure }}</div>
-                            <div class="rdv-item__duree">{{ rdv.duree }}min</div>
-                        </div>
-
-                        <div class="rdv-item__avatar">{{ rdv.initiales }}</div>
-
-                        <div class="rdv-item__info">
-                            <div class="rdv-item__name">{{ rdv.patient }}</div>
-                            <div class="rdv-item__meta">
-                                {{ rdv.type }} — Dr. {{ rdv.medecin }}
-                            </div>
-                            <div class="rdv-item__motif">{{ rdv.motif }}</div>
-                        </div>
-
-                        <span class="badge badge--{{ rdv.statut | lowercase }}">
-              {{ getStatutLabel(rdv.statut) }}
-            </span>
-
-                        <div class="rdv-item__actions">
-                            @if (rdv.statut === 'EN_ATTENTE') {
-                                <button class="btn-action btn-action--success"
-                                        title="Confirmer" (click)="confirmerRdv(rdv)">
-                                    <i class="pi pi-check"></i>
-                                </button>
-                            }
-                            @if (rdv.statut === 'CONFIRME') {
-                                <button class="btn-action btn-action--info"
-                                        title="Patient arrivé" (click)="marquerArrivee(rdv)">
-                                    <i class="pi pi-sign-in"></i>
-                                </button>
-                            }
-                            <button class="btn-action btn-action--edit"
-                                    title="Modifier" (click)="ouvrirModification(rdv)">
-                                <i class="pi pi-pencil"></i>
-                            </button>
-                            @if (rdv.statut !== 'ANNULE') {
-                                <button class="btn-action btn-action--danger"
-                                        title="Annuler" (click)="annulerRdv(rdv)">
-                                    <i class="pi pi-times"></i>
-                                </button>
-                            }
-                        </div>
-
-                    </div>
-                }
-            </div>
-        }
-
-        <!-- Vue timeline -->
-        @if (vue === 'timeline' && rdvFiltres.length > 0) {
-            <div class="timeline">
-                @for (slot of timelineSlots; track slot.heure) {
-                    <div class="timeline-slot" [class.timeline-slot--has-rdv]="slot.rdv">
-                        <div class="timeline-slot__time">{{ slot.heure }}</div>
-                        <div class="timeline-slot__content">
-                            @if (slot.rdv) {
-                                <div class="timeline-card timeline-card--{{ slot.rdv.statut | lowercase }}"
-                                     (click)="ouvrirModification(slot.rdv)">
-                                    <div class="timeline-card__name">{{ slot.rdv.patient }}</div>
-                                    <div class="timeline-card__meta">{{ slot.rdv.type }} — Dr. {{ slot.rdv.medecin }}</div>
-                                    <span class="badge badge--{{ slot.rdv.statut | lowercase }}">
-                    {{ getStatutLabel(slot.rdv.statut) }}
-                  </span>
-                                </div>
-                            } @else {
-                                <div class="timeline-slot__empty">Libre</div>
-                            }
-                        </div>
-                    </div>
-                }
-            </div>
-        }
+        <div class="calendar-main-wrapper">
+            <full-calendar [options]="calendarOptions"></full-calendar>
+        </div>
 
     </div>
-
 </div>
 
 <!-- ── Dialog Nouveau / Modifier RDV ──── -->
@@ -220,13 +154,20 @@
 
     <div class="dialog-form">
 
+        @if (!estJourAutorise(formRdv.date || dateSelectionnee)) {
+            <div class="alert-ferme">
+                <i class="pi pi-exclamation-triangle"></i>
+                {{ getJourBloqueRaison(formRdv.date || dateSelectionnee) }}
+            </div>
+        }
+
         <div class="form-field">
             <label class="form-label">Patient <span class="form-required">*</span></label>
             <p-select [(ngModel)]="formRdv.patientId"
                       [options]="patientsOptions"
                       optionLabel="label" optionValue="value"
                       [filter]="true" filterPlaceholder="Rechercher patient..."
-                      placeholder="Sélectionner un patient" styleClass="w-full">
+                      placeholder="Sélectionner un patient" styleClass="w-full" appendTo="body">
             </p-select>
         </div>
 
@@ -236,14 +177,14 @@
                 <p-select [(ngModel)]="formRdv.medecinId"
                           [options]="medecinsOptions"
                           optionLabel="label" optionValue="value"
-                          placeholder="Choisir" styleClass="w-full"></p-select>
+                          placeholder="Choisir" styleClass="w-full" appendTo="body"></p-select>
             </div>
             <div class="form-field">
                 <label class="form-label">Type</label>
                 <p-select [(ngModel)]="formRdv.type"
                           [options]="typeOptions"
                           optionLabel="label" optionValue="value"
-                          placeholder="Choisir" styleClass="w-full"></p-select>
+                          placeholder="Choisir" styleClass="w-full" appendTo="body"></p-select>
             </div>
         </div>
 
@@ -257,7 +198,7 @@
                 <p-select [(ngModel)]="formRdv.heure"
                           [options]="heureOptions"
                           optionLabel="label" optionValue="value"
-                          placeholder="Choisir" styleClass="w-full"></p-select>
+                          placeholder="Choisir" styleClass="w-full" appendTo="body"></p-select>
             </div>
         </div>
 
@@ -267,7 +208,7 @@
                 <p-select [(ngModel)]="formRdv.duree"
                           [options]="dureeOptions"
                           optionLabel="label" optionValue="value"
-                          placeholder="30 min" styleClass="w-full"></p-select>
+                          placeholder="30 min" styleClass="w-full" appendTo="body"></p-select>
             </div>
             <div class="form-field">
                 <label class="form-label">Motif</label>
@@ -292,4 +233,93 @@
         </div>
     </ng-template>
 
+</p-dialog>
+
+<!-- ── Dialog Détails RDV ──── -->
+<p-dialog 
+    header="Détails du Rendez-vous" 
+    [(visible)]="detailVisible" 
+    [modal]="true" 
+    [style]="{width: '480px'}"
+    [draggable]="false"
+    styleClass="mc-dialog">
+
+    @if (rdvSelectionne) {
+        <div class="rdv-detail">
+            <div class="rdv-detail__header">
+                <div class="rdv-detail__avatar">{{ rdvSelectionne.initiales }}</div>
+                <div class="rdv-detail__info">
+                    <h3 class="rdv-detail__name">{{ rdvSelectionne.patient }}</h3>
+                    <div class="rdv-detail__contacts">
+                        @if (rdvSelectionne.telephone) {
+                            <span class="rdv-contact-chip"><i class="pi pi-phone"></i> {{ rdvSelectionne.telephone }}</span>
+                        }
+                        @if (rdvSelectionne.email) {
+                            <span class="rdv-contact-chip"><i class="pi pi-envelope"></i> {{ rdvSelectionne.email }}</span>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <div class="rdv-detail__body">
+                <div class="detail-item">
+                    <div class="detail-item__icon"><i class="pi pi-calendar"></i></div>
+                    <div class="detail-item__content">
+                        <label>Date & Heure</label>
+                        <span>{{ getDateLabel() }} à {{ rdvSelectionne.heure }}</span>
+                    </div>
+                </div>
+
+                <div class="detail-item">
+                    <div class="detail-item__icon"><i class="pi pi-tag"></i></div>
+                    <div class="detail-item__content">
+                        <label>Type de consultation</label>
+                        <span class="badge badge--en_cours">{{ rdvSelectionne.type }}</span>
+                    </div>
+                </div>
+
+                <div class="detail-item">
+                    <div class="detail-item__icon"><i class="pi pi-comments"></i></div>
+                    <div class="detail-item__content">
+                        <label>Motif</label>
+                        <span>{{ rdvSelectionne.motif || 'Non spécifié' }}</span>
+                    </div>
+                </div>
+
+                <div class="detail-item">
+                    <div class="detail-item__icon"><i class="pi pi-info-circle"></i></div>
+                    <div class="detail-item__content">
+                        <label>Statut</label>
+                        <span class="badge" [ngClass]="'badge--' + rdvSelectionne.statut?.toLowerCase()">
+                            {{ getStatutLabel(rdvSelectionne.statut) }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="rdv-detail__actions">
+                <div class="flex-row-gap">
+                    @if (rdvSelectionne.statut === 'EN_ATTENTE') {
+                        <button class="btn-primary flex-1" (click)="confirmerRdv(rdvSelectionne); detailVisible = false">
+                            <i class="pi pi-check"></i> Confirmer le RDV
+                        </button>
+                    }
+                    @if (rdvSelectionne.statut === 'CONFIRME') {
+                        <button class="btn-primary flex-1" style="background: var(--mc-purple)" (click)="marquerArrivee(rdvSelectionne); detailVisible = false">
+                            <i class="pi pi-user-plus"></i> Marquer Arrivée
+                        </button>
+                    }
+                </div>
+                
+                <div class="flex-row-gap">
+                    <button class="btn-outline flex-1" (click)="ouvrirModification(rdvSelectionne)">
+                        <i class="pi pi-pencil"></i> Modifier
+                    </button>
+                    <button class="btn-outline btn-outline--danger flex-1" (click)="annulerRdv(rdvSelectionne); detailVisible = false">
+                        <i class="pi pi-times"></i> Annuler
+                    </button>
+                </div>
+            </div>
+        </div>
+    }
 </p-dialog>

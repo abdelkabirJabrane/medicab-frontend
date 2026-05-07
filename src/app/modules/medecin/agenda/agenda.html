@@ -1,10 +1,16 @@
 <!-- ── Header ─────────────────────────── -->
+<p-toast></p-toast>
 <div class="agenda-header">
     <div>
         <h2 class="agenda-header__title">Mon Agenda Professionnel</h2>
         <p class="agenda-header__subtitle">{{ getDateLabel() }} — Planifiez et gérez vos consultations</p>
     </div>
     <div class="header-actions">
+        <!-- Légende -->
+        <div class="legend-chips">
+            <span class="legend-chip legend-chip--weekend"><i class="pi pi-moon"></i> Week-end</span>
+            <span class="legend-chip legend-chip--ferme"><i class="pi pi-lock"></i> Cabinet fermé</span>
+        </div>
         <button class="btn-primary" (click)="ouvrirDialogNouveauRdv()">
             <i class="pi pi-plus"></i> Nouveau RDV
         </button>
@@ -12,8 +18,119 @@
 </div>
 
 <!-- ── Main Calendar Content ────────────────── -->
-<div class="calendar-wrapper panel">
-    <full-calendar [options]="calendarOptions"></full-calendar>
+<div class="agenda-layout">
+
+    <!-- Mini-calendrier latéral avec gestion congés -->
+    <div class="side-panel panel">
+
+        <div class="side-cal">
+            <!-- Navigation mois -->
+            <div class="side-cal__nav">
+                <button class="side-cal__nav-btn" (click)="moisPrecedent()">
+                    <i class="pi pi-chevron-left"></i>
+                </button>
+                <span class="side-cal__month">{{ getNomMois() }}</span>
+                <button class="side-cal__nav-btn" (click)="moisSuivant()">
+                    <i class="pi pi-chevron-right"></i>
+                </button>
+            </div>
+
+            <!-- En-têtes jours -->
+            <div class="side-cal__week-header">
+                <span *ngFor="let j of joursNoms" class="side-cal__wday">{{ j }}</span>
+            </div>
+
+            <!-- Grille jours -->
+            <div class="side-cal__grid">
+                @for (jour of joursMois; track $index) {
+                    <div class="side-cal__cell"
+                         [class.side-cal__cell--empty]="!jour.numero"
+                         [class.side-cal__cell--weekend]="jour.estWeekend"
+                         [class.side-cal__cell--ferme]="jour.estFerme && !jour.estWeekend"
+                         [class.side-cal__cell--today]="jour.estAujourdhui && !jour.estSelectionne"
+                         [class.side-cal__cell--selected]="jour.estSelectionne"
+                         (click)="selectionnerJour(jour)">
+                        @if (jour.numero) {
+                            <span class="side-cal__num">{{ jour.numero }}</span>
+                            <!-- Icône congé -->
+                            @if (jour.estFerme && !jour.estWeekend) {
+                                <i class="pi pi-lock side-cal__lock" title="Cabinet fermé"></i>
+                            }
+                            <!-- Points RDV -->
+                            @if (!jour.estWeekend && !jour.estFerme && jour.rdvCount > 0) {
+                                <div class="side-cal__dots">
+                                    @for (i of [].constructor(Math.min(jour.rdvCount, 3)); track $index) {
+                                        <span class="side-cal__dot"></span>
+                                    }
+                                </div>
+                            }
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- Bouton toggle congé sur le jour sélectionné -->
+        <div class="conge-section">
+            <div class="conge-section__title">
+                <i class="pi pi-calendar-times"></i>
+                Jour sélectionné
+            </div>
+            <p class="conge-section__date">{{ getDateLabel() }}</p>
+
+            @if (dateSelectionnee.getDay() === 0 || dateSelectionnee.getDay() === 6) {
+                <div class="conge-badge conge-badge--weekend">
+                    <i class="pi pi-moon"></i> Week-end — Non disponible
+                </div>
+            } @else if (joursFermes.has(toDateKey(dateSelectionnee))) {
+                <div class="conge-badge conge-badge--ferme">
+                    <i class="pi pi-lock"></i> Cabinet fermé / Congé
+                </div>
+                <button class="btn-conge btn-conge--ouvrir"
+                        (click)="toggleJourFerme({date: dateSelectionnee, estWeekend: false})">
+                    <i class="pi pi-lock-open"></i> Marquer comme ouvert
+                </button>
+            } @else {
+                <div class="conge-badge conge-badge--ouvert">
+                    <i class="pi pi-check-circle"></i> Cabinet ouvert
+                </div>
+                <button class="btn-conge btn-conge--fermer"
+                        (click)="toggleJourFerme({date: dateSelectionnee, estWeekend: false})">
+                    <i class="pi pi-lock"></i> Marquer comme fermé / Congé
+                </button>
+            }
+        </div>
+
+        <!-- RDV du jour -->
+        <div class="side-rdvlist">
+            <div class="side-rdvlist__header">
+                RDV du jour
+                <span class="side-rdvlist__count">{{ rdvDuJour.length }}</span>
+            </div>
+            @if (rdvDuJour.length === 0) {
+                <div class="side-rdvlist__empty">
+                    <i class="pi pi-calendar-times"></i>
+                    <p>Aucun RDV</p>
+                </div>
+            }
+            @for (rdv of rdvDuJour; track rdv.id) {
+                <div class="side-rdv-item side-rdv-item--{{ rdv.statut | lowercase }}">
+                    <div class="side-rdv-item__time">{{ rdv.heure }}</div>
+                    <div class="side-rdv-item__av">{{ rdv.initiales }}</div>
+                    <div class="side-rdv-item__info">
+                        <div class="side-rdv-item__name">{{ rdv.patient }}</div>
+                        <div class="side-rdv-item__motif">{{ rdv.motif }}</div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- Calendrier FullCalendar principal -->
+    <div class="calendar-wrapper panel">
+        <full-calendar [options]="calendarOptions"></full-calendar>
+    </div>
+
 </div>
 
 <!-- ── Dialog Detail RDV ──────────────── -->
@@ -31,7 +148,14 @@
                 <div class="rdv-detail__avatar">{{ rdvSelectionne.initiales }}</div>
                 <div class="rdv-detail__info">
                     <h3 class="rdv-detail__name">{{ rdvSelectionne.patient }}</h3>
-                    <p class="rdv-detail__meta">Patient ID: #{{ rdvSelectionne.patientId }}</p>
+                    <div class="rdv-detail__contacts">
+                        @if (rdvSelectionne.telephone) {
+                            <span class="rdv-contact-chip"><i class="pi pi-phone"></i> {{ rdvSelectionne.telephone }}</span>
+                        }
+                        @if (rdvSelectionne.email) {
+                            <span class="rdv-contact-chip"><i class="pi pi-envelope"></i> {{ rdvSelectionne.email }}</span>
+                        }
+                    </div>
                 </div>
             </div>
 
@@ -105,6 +229,14 @@
 
     <div class="dialog-form">
 
+        <!-- Avertissement si jour fermé -->
+        @if (!estJourAutorise(nouveauRdv.date || dateSelectionnee)) {
+            <div class="alert-ferme">
+                <i class="pi pi-exclamation-triangle"></i>
+                {{ getJourBloqueRaison(nouveauRdv.date || dateSelectionnee) }}
+            </div>
+        }
+
         <div class="form-field">
             <label class="form-label">Patient <span class="form-required">*</span></label>
             <p-select [(ngModel)]="nouveauRdv.patientId"
@@ -114,7 +246,8 @@
                       placeholder="Sélectionner un patient"
                       [filter]="true"
                       filterBy="nomComplet"
-                      styleClass="w-full">
+                      styleClass="w-full"
+                      appendTo="body">
             </p-select>
         </div>
 
@@ -126,7 +259,8 @@
                           optionLabel="label"
                           optionValue="value"
                           placeholder="Choisir"
-                          styleClass="w-full">
+                          styleClass="w-full"
+                          appendTo="body">
                 </p-select>
             </div>
             <div class="form-field">
@@ -136,7 +270,8 @@
                           optionLabel="label"
                           optionValue="value"
                           placeholder="Choisir"
-                          styleClass="w-full">
+                          styleClass="w-full"
+                          appendTo="body">
                 </p-select>
             </div>
         </div>

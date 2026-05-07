@@ -2,6 +2,8 @@ export interface PatientContext {
   nom_medecin: string;
   specialite: string;
   nom_patient: string;
+  patient_id?: number;
+  session_id?: string;
   age: string;
   sexe: string;
   antecedents: string;

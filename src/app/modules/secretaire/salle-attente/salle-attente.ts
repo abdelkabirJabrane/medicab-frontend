@@ -110,7 +110,7 @@ export class SalleAttenteComponent implements OnInit, OnDestroy {
                 const todayStr = new Date().toISOString().split('T')[0];
                 const rdvsToday = res.rdvs.filter(r => r.dateHeureDebut && r.dateHeureDebut.startsWith(todayStr));
 
-                this.patients = rdvsToday.filter(r => r.statut === 'EN_ATTENTE' || r.statut === 'ARRIVE').map(r => {
+                this.patients = rdvsToday.filter(r => r.statut === 'EN_ATTENTE' || r.statut === 'ARRIVE' || r.statut === 'CONFIRME').map(r => {
                     const pInfo = patientsMap.get(r.patientId) || {};
                     const np = pInfo.nomComplet || `${pInfo.prenom || ''} ${pInfo.nom || ''}`.trim() || `Patient ${r.patientId}`;
                     let initials = np.split(' ').map((n: string) => n[0]).join('').toUpperCase().substring(0, 2);
@@ -139,7 +139,25 @@ export class SalleAttenteComponent implements OnInit, OnDestroy {
 
                 this.trierFile();
 
-                this.consultes = rdvsToday.filter(r => r.statut === 'TERMINE' || r.statut === 'EN_COURS').map(r => {
+                // Trouver les patients actuellement en consultation
+                const enCoursDeConsultation = rdvsToday.filter(r => r.statut === 'EN_COURS');
+                if (this.medecinAssocie) {
+                    const rdvEnCours = enCoursDeConsultation.find(r => r.medecinId === this.medecinAssocie.id);
+                    if (rdvEnCours) {
+                        const pInfo = patientsMap.get(rdvEnCours.patientId) || {};
+                        const n = pInfo.nomComplet || `${pInfo.prenom || ''} ${pInfo.nom || ''}`.trim() || `Patient ${rdvEnCours.patientId}`;
+                        this.medecinAssocie.statut = 'occupe';
+                        this.medecinAssocie.statutLabel = 'En consultation';
+                        this.medecinAssocie.patientEnCours = n;
+                    } else {
+                        this.medecinAssocie.statut = 'disponible';
+                        this.medecinAssocie.statutLabel = 'Disponible';
+                        this.medecinAssocie.patientEnCours = null;
+                    }
+                    this.medecins = [this.medecinAssocie];
+                }
+
+                this.consultes = rdvsToday.filter(r => r.statut === 'TERMINE').map(r => {
                     const pInfo = patientsMap.get(r.patientId) || {};
                     const np = pInfo.nomComplet || `${pInfo.prenom || ''} ${pInfo.nom || ''}`.trim() || `Patient ${r.patientId}`;
                     let initials = np.split(' ').map((n: string) => n[0]).join('').toUpperCase().substring(0, 2);

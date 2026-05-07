@@ -13,11 +13,12 @@ import { CabinetService, Cabinet } from '../../../core/services/cabinet';
 import { PlanService } from '../../../core/services/plan';
 import { forkJoin } from 'rxjs';
 import { finalize } from 'rxjs/operators';
+import { SafeUrlPipe } from '../../../core/pipes/safe-url.pipe';
 
 @Component({
     selector: 'app-admin-cabinets',
     standalone: true,
-    imports: [CommonModule, RouterModule, FormsModule, TableModule, DialogModule, InputTextModule, ToastModule, ConfirmDialogModule, SelectModule],
+    imports: [CommonModule, RouterModule, FormsModule, TableModule, DialogModule, InputTextModule, ToastModule, ConfirmDialogModule, SelectModule, SafeUrlPipe],
     providers: [MessageService, ConfirmationService],
     templateUrl: './cabinets.html',
     styleUrls: ['./cabinets.scss']
@@ -208,5 +209,11 @@ export class AdminCabinetsComponent implements OnInit {
             },
             error: () => this.messageService.add({ severity: 'error', summary: 'Erreur', detail: 'Impossible d\'activer' })
         });
+    }
+
+    openGoogleMaps(address: string, city: string = ''): void {
+        const fullAddress = `${address || ''}${address && city ? ', ' : ''}${city || ''}`;
+        const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(fullAddress)}`;
+        window.open(url, '_blank');
     }
 }

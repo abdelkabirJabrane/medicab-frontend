@@ -11,15 +11,15 @@
         <!-- Input caché pour l'import Excel -->
         <input type="file" #fileInput style="display: none" (change)="importExcel($event)" accept=".xlsx, .xls">
         
-        <button class="btn-outline" (click)="triggerImport(fileInput)" pTooltip="Importer" tooltipPosition="bottom">
+        <button class="btn-import" (click)="triggerImport(fileInput)" pTooltip="Importer" tooltipPosition="bottom">
             <i class="pi pi-upload"></i> Importer
         </button>
         
-        <button class="btn-outline" (click)="exportExcel()" pTooltip="Excel" tooltipPosition="bottom">
+        <button class="btn-excel" (click)="exportExcel()" pTooltip="Excel" tooltipPosition="bottom">
             <i class="pi pi-file-excel"></i> Excel
         </button>
         
-        <button class="btn-outline" (click)="exportPDF()" pTooltip="PDF" tooltipPosition="bottom">
+        <button class="btn-pdf" (click)="exportPDF()" pTooltip="PDF" tooltipPosition="bottom">
             <i class="pi pi-file-pdf"></i> PDF
         </button>
     </div>
@@ -62,7 +62,21 @@
 
 </div>
 
-<!-- ── Tableau ─────────────────────────── -->
+<!-- ── Recherche ───────────────────────── -->
+<div class="search-bar">
+    <div class="search-bar__input-wrap">
+        <i class="pi pi-search search-bar__icon"></i>
+        <input class="search-bar__input"
+               [(ngModel)]="searchQuery"
+               (ngModelChange)="rechercher()"
+               placeholder="Rechercher par patient, N° facture, statut..."/>
+    </div>
+    <button class="btn-icon" (click)="loadFactures()" title="Rafraîchir">
+        <i class="pi pi-refresh"></i>
+    </button>
+</div>
+
+<!-- ── Tableau ───────────────────────── -->
 <div class="panel">
     <p-table
         [value]="facturesFiltres"
@@ -70,18 +84,19 @@
         [rows]="10"
         [showCurrentPageReport]="true"
         currentPageReportTemplate="{first}-{last} sur {totalRecords}"
+        [sortMode]="'single'"
         responsiveLayout="scroll"
         styleClass="mc-table">
 
         <ng-template pTemplate="header">
             <tr>
-                <th>N° Facture</th>
-                <th>Patient</th>
-                <th>Date</th>
-                <th>Montant TTC</th>
-                <th>Payé</th>
-                <th>Restant</th>
-                <th>Statut</th>
+                <th pSortableColumn="numeroFacture">N° Facture <p-sortIcon field="numeroFacture"></p-sortIcon></th>
+                <th pSortableColumn="patient">Patient <p-sortIcon field="patient"></p-sortIcon></th>
+                <th pSortableColumn="date">Date <p-sortIcon field="date"></p-sortIcon></th>
+                <th pSortableColumn="montantTTC">Montant TTC <p-sortIcon field="montantTTC"></p-sortIcon></th>
+                <th pSortableColumn="montantPaye">Payé <p-sortIcon field="montantPaye"></p-sortIcon></th>
+                <th pSortableColumn="montantRestant">Restant <p-sortIcon field="montantRestant"></p-sortIcon></th>
+                <th pSortableColumn="statut">Statut <p-sortIcon field="statut"></p-sortIcon></th>
                 <th>Actions</th>
             </tr>
         </ng-template>

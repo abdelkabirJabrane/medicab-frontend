@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+﻿import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, BehaviorSubject, tap, catchError, throwError } from 'rxjs';
 import { Router } from '@angular/router';
@@ -31,8 +31,8 @@ export interface AuthResponse {
 export class AuthService {
     private apiUrl = environment.services.auth;
     private currentUserSubject = new BehaviorSubject<AuthUser | null>(null);
-    private tokenKey = 'medicab-token';
-    private userKey = 'medicab-user';
+    private tokenKey = 'MedGest-token';
+    private userKey = 'MedGest-user';
 
     currentUser$ = this.currentUserSubject.asObservable();
 
@@ -105,6 +105,11 @@ export class AuthService {
                 let message = 'Erreur lors de l\'inscription';
                 if (error.error?.error) {
                     message = error.error.error;
+                } else if (error.error?.errors) {
+                    // Handle Spring validation errors
+                    message = Object.values(error.error.errors).join(', ');
+                } else if (error.error?.message) {
+                    message = error.error.message;
                 }
                 return throwError(() => new Error(message));
             })
@@ -138,6 +143,16 @@ export class AuthService {
      */
     getCurrentUser(): AuthUser | null {
         return this.currentUserSubject.value;
+    }
+
+    /**
+     * Mettre à jour l'utilisateur dans le stockage local et le sujet
+     */
+    updateCurrentUserInStorage(user: AuthUser): void {
+        const currentUser = this.getCurrentUser();
+        const newUser = { ...currentUser, ...user };
+        localStorage.setItem(this.userKey, JSON.stringify(newUser));
+        this.currentUserSubject.next(newUser);
     }
 
     /**

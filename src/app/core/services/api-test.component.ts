@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+﻿import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 
@@ -16,7 +16,7 @@ import { HttpClient } from '@angular/common/http';
             <h1 style="color:#60a5fa;
                     font-size:1.5rem;
                     margin-bottom:2rem">
-                🧪 MediCab Pro — API Test
+                🧪 MedGest — API Test
             </h1>
 
             <!-- Statuts services -->

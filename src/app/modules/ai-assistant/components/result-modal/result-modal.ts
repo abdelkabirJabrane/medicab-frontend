@@ -14,6 +14,7 @@ export class ResultModalComponent {
   @Input() content = '';
   @Input() title = 'Document Généré';
   @Output() visibleChange = new EventEmitter<boolean>();
+  @Output() onPrint = new EventEmitter<void>();
 
   closeModal() {
     this.visible = false;
@@ -21,6 +22,6 @@ export class ResultModalComponent {
   }
 
   printDocument() {
-    window.print();
+    this.onPrint.emit();
   }
 }

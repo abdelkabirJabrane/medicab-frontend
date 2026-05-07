@@ -1,7 +1,7 @@
 @import "primeicons/primeicons.css";
 @import "primeflex/primeflex.css";
 
-/* ── Variables MediCab Pro ───────────── */
+/* ── Variables MedGest ───────────── */
 :root {
     --mc-primary:       #2563eb;
     --mc-primary-dark:  #1d4ed8;
@@ -28,7 +28,18 @@
     --mc-radius-sm:     8px;
 }
 
-
+[data-theme="dark"] {
+    --mc-bg:            #0f172a;
+    --mc-surface:       #1e293b;
+    --mc-surface-2:     #1a2744;
+    --mc-border:        #334155;
+    --mc-text-primary:  #f1f5f9;
+    --mc-text-secondary:#94a3b8;
+    --mc-text-muted:    #64748b;
+    --mc-sidebar-bg:    #0f172a;
+    --mc-topbar-bg:     #1e293b;
+    color-scheme: dark;
+}
 
 /* ── Global ──────────────────────────── */
 * { box-sizing: border-box; }
@@ -315,4 +326,30 @@ body {
 ::-webkit-scrollbar-thumb {
     background: var(--mc-border);
     border-radius: 9999px;
+}
+
+/* ── MC PREMIUM DIALOG FIX ── */
+.auth-dialog-premium {
+    overflow: hidden !important;
+
+    .p-dialog-content {
+        overflow-y: auto !important;
+        scrollbar-width: none !important;
+        -ms-overflow-style: none !important;
+
+        &::-webkit-scrollbar {
+            display: none !important;
+        }
+    }
+}
+
+.auth-dialog-premium {
+    border: none !important;
+    box-shadow: 0 40px 100px -20px rgba(0,0,0,0.15) !important;
+    border-radius: 32px !important;
+    
+    .p-dialog-content {
+        padding: 0 !important;
+        border-radius: 32px !important;
+    }
 }

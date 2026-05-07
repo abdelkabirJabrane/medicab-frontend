@@ -74,9 +74,9 @@ export class Login {
      */
     loginAs(role: string) {
         const credentials: Record<string, { username: string; password: string }> = {
-            medecin: { username: 'medecin', password: 'medecin123' },
-            secretaire: { username: 'secretaire', password: 'secretaire123' },
-            admin: { username: 'admin', password: 'admin123' },
+            medecin: { username: 't.maghroub', password: 'Abdo2002@' },
+            secretaire: { username: 'Said.ej', password: 'Abdo2002@' },
+            admin: { username: 'admin', password: 'Admin2025@' },
             patient: { username: 'patient', password: 'patient123' }
         };
 

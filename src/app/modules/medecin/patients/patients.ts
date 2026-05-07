@@ -18,11 +18,12 @@ import * as XLSX from 'xlsx';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { saveAs } from 'file-saver';
+import { SafeUrlPipe } from '@/app/core/pipes/safe-url.pipe';
 
 @Component({
     selector: 'app-patients',
     standalone: true,
-    imports: [CommonModule, RouterModule, FormsModule, ButtonModule, TableModule, InputTextModule, DialogModule, ToastModule, ConfirmDialogModule, TooltipModule, SelectModule],
+    imports: [CommonModule, RouterModule, FormsModule, ButtonModule, TableModule, InputTextModule, DialogModule, ToastModule, ConfirmDialogModule, TooltipModule, SelectModule, SafeUrlPipe],
     providers: [MessageService, ConfirmationService],
     templateUrl: './patients.html',
     styleUrls: ['./patients.scss']
@@ -402,5 +403,11 @@ export class PatientsComponent implements OnInit, OnDestroy {
             });
         };
         reader.readAsBinaryString(file);
+    }
+
+    openGoogleMaps(address: string, city: string = ''): void {
+        const fullAddress = `${address}${city ? ', ' + city : ''}`;
+        const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(fullAddress)}`;
+        window.open(url, '_blank');
     }
 }

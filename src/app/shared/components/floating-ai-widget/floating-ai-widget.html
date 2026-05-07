@@ -5,7 +5,9 @@
                 <div class="avatar"><i class="pi pi-sparkles"></i></div>
                 <div>
                     <h4>MedAgent Support</h4>
-                    <span class="status">En ligne</span>
+                    <span class="status" [class.error]="connectionError">
+                        {{ connectionError ? 'Déconnecté' : 'En ligne' }}
+                    </span>
                 </div>
             </div>
             <button class="close-btn" (click)="close()"><i class="pi pi-times"></i></button>

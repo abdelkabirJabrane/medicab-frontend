@@ -12,6 +12,8 @@ export const environment = {
         notifications: 'http://localhost:8086/api/notifications',
         ordonnances: 'http://localhost:8087/api/ordonnances',
         cabinets: 'http://localhost:8088/api/cabinets',
-        plans: 'http://localhost:8088/api/plans'
+        plans: 'http://localhost:8088/api/plans',
+        ai: 'http://localhost:8000/api/ai',
+        aiWs: 'ws://localhost:8000/ws/chat'
     }
 };

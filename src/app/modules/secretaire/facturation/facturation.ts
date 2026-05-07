@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+﻿import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -16,11 +16,17 @@ import { forkJoin, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { AuthService } from '../../../core/services/auth';
 import { UserAdminService } from '../../../core/services/user-admin';
+import * as XLSX from 'xlsx';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
+import { saveAs } from 'file-saver';
+
+import { TooltipModule } from 'primeng/tooltip';
 
 @Component({
     selector: 'app-facturation',
     standalone: true,
-    imports: [CommonModule, RouterModule, FormsModule, ButtonModule, TableModule, DialogModule, InputTextModule, ToastModule, ConfirmDialogModule, SelectModule],
+    imports: [CommonModule, RouterModule, FormsModule, ButtonModule, TableModule, DialogModule, InputTextModule, ToastModule, ConfirmDialogModule, SelectModule, TooltipModule],
     providers: [MessageService, ConfirmationService],
     templateUrl: './facturation.html',
     styleUrls: ['./facturation.scss']
@@ -447,7 +453,7 @@ export class FacturationComponent implements OnInit {
                     </div>
                     
                     <div class="footer">
-                        Cette facture est générée par MediCab Pro - Solution de gestion de cabinet médical.
+                        Cette facture est générée par MedGest - Solution de gestion de cabinet médical.
                         <br>Merci de votre confiance.
                     </div>
                 </body>
@@ -518,7 +524,7 @@ export class FacturationComponent implements OnInit {
                     
                     <div class="divider" style="margin-top: 30px;"></div>
                     <div class="footer">
-                        Fin de ticket de clôture.<br>Généré par MediCab Pro.
+                        Fin de ticket de clôture.<br>Généré par MedGest.
                     </div>
                 </body>
             </html>
@@ -546,6 +552,64 @@ export class FacturationComponent implements OnInit {
             ANNULEE: 'Annulée'
         };
         return map[statut] ?? statut;
+    }
+
+    // ──────────────── IMPORT / EXPORT ────────────────
+
+    triggerImport(fileInput: HTMLInputElement): void {
+        fileInput.click();
+    }
+
+    importExcel(event: any): void {
+        const file = event.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (e: any) => {
+            const bstr = e.target.result;
+            const wb = XLSX.read(bstr, { type: 'binary' });
+            const ws = wb.Sheets[wb.SheetNames[0]];
+            const data: any[] = XLSX.utils.sheet_to_json(ws);
+            if (data.length === 0) return;
+            this.messageService.add({ severity: 'info', summary: 'Importation', detail: `${data.length} entrées importées (simulation)` });
+        };
+        reader.readAsBinaryString(file);
+    }
+
+    exportExcel(): void {
+        const data = this.factures.map(f => ({
+            'N° Facture': f.numero,
+            'Patient': f.patient,
+            'Date': f.date,
+            'Type': f.typeConsultation,
+            'Total TTC': f.montantTTC + ' MAD',
+            'Payé': f.montantPaye + ' MAD',
+            'Restant': f.montantRestant + ' MAD',
+            'Statut': this.getStatutLabel(f.statut)
+        }));
+        const worksheet = XLSX.utils.json_to_sheet(data);
+        const workbook = { Sheets: { data: worksheet }, SheetNames: ['factures'] };
+        const buffer: any = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+        const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+        saveAs(blob, `factures_secretaire_${new Date().getTime()}.xlsx`);
+    }
+
+    exportPDF(): void {
+        const doc = new jsPDF('l', 'mm', 'a4');
+        doc.setFontSize(14);
+        doc.text('Liste des Factures — Secrétariat', 14, 15);
+        autoTable(doc, {
+            head: [['N° Facture', 'Patient', 'Date', 'Type', 'Total TTC', 'Payé', 'Restant', 'Statut']],
+            body: this.factures.map(f => [
+                f.numero, f.patient, f.date, f.typeConsultation,
+                f.montantTTC + ' MAD', f.montantPaye + ' MAD',
+                f.montantRestant + ' MAD', this.getStatutLabel(f.statut)
+            ]),
+            startY: 22,
+            theme: 'striped',
+            headStyles: { fillColor: [37, 99, 235] },
+            styles: { fontSize: 8 }
+        });
+        doc.save(`factures_secretaire_${new Date().getTime()}.pdf`);
     }
 
     getModeLabel(mode: string): string {

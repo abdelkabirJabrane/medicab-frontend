@@ -1,5 +1,5 @@
-// ================================================
-//  utilisateurs.scss — Admin Utilisateurs — MediCab Pro
+﻿// ================================================
+//  utilisateurs.scss — Admin Utilisateurs — MedGest
 //  Redesigned to match monitoring.scss visual style
 // ================================================
 
@@ -36,7 +36,14 @@
     --mc-shadow-md:      0 4px 16px rgba(13,27,62,.08), 0 1px 4px rgba(13,27,62,.04);
 
     display: block; padding: 1.75rem 2rem; background: var(--mc-bg); min-height: 100%;
-    --adm-accent:#EA580C; --adm-accent-dark:#C2410C; --adm-accent-light:#FFF7ED; --mc-surface:#fff; --mc-surface-2:#F8FAFD; --mc-border-hover:#C9D4E8; --mc-text-2:#4A5878; --mc-text-3:#8A95B0; --mc-green-bg:#ECFDF5; --mc-red:#DC2626; --mc-red-bg:#FEF2F2; --mc-orange-bg:#FFFBEB; --mc-blue:#2563EB; --mc-blue-bg:#EFF6FF; --mc-purple-bg:#F5F3FF; --mc-shadow-md:0 4px 16px rgba(13,27,62,.08);
+    --adm-accent:#EA580C; --adm-accent-dark:#C2410C; --adm-accent-light:#FFF7ED;
+ --mc-surface:#fff; --mc-surface-2:#F8FAFD;
+ --mc-border-hover:#C9D4E8;
+ --mc-text-2:#4A5878; --mc-text-3:#8A95B0;
+ --mc-green-bg:#ECFDF5; --mc-red:#DC2626; --mc-red-bg:#FEF2F2;
+ --mc-orange-bg:#FFFBEB; --mc-blue:#2563EB; --mc-blue-bg:#EFF6FF;
+ --mc-purple-bg:#F5F3FF;
+ --mc-shadow-md:0 4px 16px rgba(13,27,62,.08);
 }
 
 // ── Page Header ────────────────────────────────
@@ -230,4 +237,25 @@
 
 .dialog-footer {
     display:flex; align-items:center; justify-content:flex-end; gap:.625rem;
+}
+
+
+:host-context([data-theme="dark"]) {
+    --mc-primary-light:  #1e293b;
+    --mc-bg:             #0f172a;
+    --mc-surface:         #1e293b;
+    --mc-surface-2:      #1a2744;
+    --mc-border:         #334155;
+    --mc-border-hover:   #475569;
+    --mc-text-1:         #f1f5f9;
+    --mc-text-2:         #94a3b8;
+    --mc-text-3:         #64748b;
+    
+    --mc-green-bg:       #022c22;
+    --mc-red-bg:         #450a0a;
+    --mc-orange-bg:      #451a03;
+    --mc-blue-bg:        #172554;
+
+    --sec-accent-light:  #042f2e;
+    --admin-accent-light: #431407;
 }

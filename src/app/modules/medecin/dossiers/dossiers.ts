@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+﻿import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -62,7 +62,7 @@ export class DossiersComponent implements OnInit {
         this.loadDossiers();
     }
 
-    loadDossiers() {
+    loadDossiers(reopenPatientId?: number) {
         forkJoin({
             patients: this.patientService.getAll().pipe(catchError(() => of([]))),
             dossiers: this.medicalRecordService.getAllDossiers().pipe(catchError(() => of([]))),
@@ -144,9 +144,15 @@ export class DossiersComponent implements OnInit {
                 this.dossiersFiltres = [...this.dossiers];
                 
                 // Si un dossier était ouvert, on le met à jour
-                if (this.dossierActif) {
-                    const updated = this.dossiers.find(x => x.patientId === this.dossierActif.patientId);
-                    if (updated) this.dossierActif = updated;
+                const targetPatientId = reopenPatientId || this.dossierActif?.patientId;
+                if (targetPatientId) {
+                    const updated = this.dossiers.find(x => x.patientId === targetPatientId);
+                    if (updated) {
+                        this.dossierActif = updated;
+                        if (updated.id) {
+                            this.loadDocuments(updated.id);
+                        }
+                    }
                 }
             },
             error: (err) => {
@@ -166,6 +172,26 @@ export class DossiersComponent implements OnInit {
     }
 
     ouvrirDossier(dossier: any) {
+        if (!dossier.hasDossier) {
+            // Ne pas encore afficher le dossier — créer d'abord silencieusement
+            const payload: any = {
+                patientId: dossier.patientId,
+                groupeSanguin: dossier.groupeSanguin !== 'N/A' ? dossier.groupeSanguin : '',
+                antecedentsPersonnels: '',
+                antecedentsFamiliaux: '',
+                allergies: '',
+                medicamentsEnCours: ''
+            };
+            if (dossier.poids) payload.poids = dossier.poids;
+            if (dossier.taille) payload.taille = dossier.taille;
+
+            this.medicalRecordService.createDossier(payload).subscribe({
+                next: () => this.loadDossiers(dossier.patientId),
+                error: () => this.loadDossiers(dossier.patientId)
+            });
+            return; // Panel reste vide jusqu'à ce que loadDossiers mette à jour dossierActif
+        }
+
         this.dossierActif = dossier;
         this.loadDocuments(dossier.id);
     }
@@ -305,7 +331,9 @@ export class DossiersComponent implements OnInit {
             next: (res) => {
                 this.messageService.add({ severity: 'success', summary: 'Succès', detail: 'Dossier mis à jour avec succès' });
                 this.editDialogVisible = false;
-                this.loadDossiers(); // Recharger pour voir les modifs
+                // Garder le patientId en mémoire pour rouvrir après rechargement
+                const patientIdActif = this.dossierActif?.patientId;
+                this.loadDossiers(patientIdActif);
             },
             error: (err) => {
                 this.messageService.add({ severity: 'error', summary: 'Erreur', detail: 'Échec de la sauvegarde.' });
@@ -454,7 +482,7 @@ export class DossiersComponent implements OnInit {
 
                     <div class="footer">
                         Document confidentiel - Soumis au secret médical.<br>
-                        Généré par MediCab Pro SaaS - 100% sécurisé (Certifié RGPD)
+                        Généré par MedGest SaaS - 100% sécurisé (Certifié RGPD)
                     </div>
                 </body>
             </html>
@@ -479,3 +507,4 @@ export class DossiersComponent implements OnInit {
         };
     }
 }
+

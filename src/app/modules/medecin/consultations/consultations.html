@@ -9,15 +9,15 @@
     <div class="header-actions">
         <input type="file" #fileInput style="display: none" (change)="importExcel($event)" accept=".xlsx, .xls">
         
-        <button class="btn-outline" (click)="triggerImport(fileInput)" pTooltip="Importer" tooltipPosition="bottom">
+        <button class="btn-import" (click)="triggerImport(fileInput)" pTooltip="Importer" tooltipPosition="bottom">
             <i class="pi pi-upload"></i> Importer
         </button>
         
-        <button class="btn-outline" (click)="exportExcel()" pTooltip="Excel" tooltipPosition="bottom">
+        <button class="btn-excel" (click)="exportExcel()" pTooltip="Excel" tooltipPosition="bottom">
             <i class="pi pi-file-excel"></i> Excel
         </button>
         
-        <button class="btn-outline" (click)="exportPDF()" pTooltip="PDF" tooltipPosition="bottom">
+        <button class="btn-pdf" (click)="exportPDF()" pTooltip="PDF" tooltipPosition="bottom">
             <i class="pi pi-file-pdf"></i> PDF
         </button>
 
@@ -27,27 +27,42 @@
     </div>
 </div>
 
+<!-- ── Recherche ───────────────────────── -->
+<div class="search-bar">
+    <div class="search-bar__input-wrap">
+        <i class="pi pi-search search-bar__icon"></i>
+        <input class="search-bar__input"
+               [(ngModel)]="searchQuery"
+               (ngModelChange)="rechercher()"
+               placeholder="Rechercher par patient, motif, diagnostic, type..."/>
+    </div>
+    <button class="btn-icon" (click)="loadData()" title="Rafraîchir">
+        <i class="pi pi-refresh"></i>
+    </button>
+</div>
+
 <!-- ── Grille principale ────────────────── -->
 <div class="consult-grid" [class.consult-grid--with-detail]="consultationActive">
 
     <!-- ── Liste ───────────────────────────── -->
     <div class="panel">
         <p-table
-            [value]="consultations"
+            [value]="consultationsFiltres"
             [paginator]="true"
             [rows]="8"
+            [sortMode]="'single'"
             responsiveLayout="scroll"
             styleClass="mc-table">
 
             <ng-template pTemplate="header">
                 <tr>
-                    <th>Patient</th>
-                    <th>Date</th>
-                    <th>Type</th>
-                    <th>Motif</th>
-                    <th>Diagnostic</th>
-                    <th>Montant</th>
-                    <th>Statut</th>
+                    <th pSortableColumn="patient">Patient <p-sortIcon field="patient"></p-sortIcon></th>
+                    <th pSortableColumn="date">Date <p-sortIcon field="date"></p-sortIcon></th>
+                    <th pSortableColumn="typeLabel">Type <p-sortIcon field="typeLabel"></p-sortIcon></th>
+                    <th pSortableColumn="motif">Motif <p-sortIcon field="motif"></p-sortIcon></th>
+                    <th pSortableColumn="diagnostic">Diagnostic <p-sortIcon field="diagnostic"></p-sortIcon></th>
+                    <th pSortableColumn="montant">Montant <p-sortIcon field="montant"></p-sortIcon></th>
+                    <th pSortableColumn="statut">Statut <p-sortIcon field="statut"></p-sortIcon></th>
                     <th>Actions</th>
                 </tr>
             </ng-template>

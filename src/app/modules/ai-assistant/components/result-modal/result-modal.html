@@ -1,7 +1,17 @@
 <p-dialog [header]="title" [(visible)]="visible" [modal]="true" [style]="{width: '60vw', minHeight: '500px'}" 
           (onHide)="closeModal()" [draggable]="false" [resizable]="false" styleClass="dark-modal">
     <div class="result-content print-area">
-        <pre>{{ content }}</pre>
+        <div class="preview-card" *ngIf="title.includes('Ordonnance')">
+            <div class="preview-header">📋 Aperçu de l'Ordonnance</div>
+            <div class="preview-body" [innerHTML]="content | json"></div>
+            <p class="preview-hint">Le document a été enregistré dans le dossier du patient. Cliquez sur Imprimer pour voir le PDF officiel.</p>
+        </div>
+        <div class="preview-card" *ngIf="title.includes('Compte-Rendu')">
+            <div class="preview-header">📄 Aperçu du Compte-Rendu</div>
+            <div class="preview-body" [innerHTML]="content | json"></div>
+            <p class="preview-hint">Le compte-rendu a été sauvegardé dans l'historique des consultations.</p>
+        </div>
+        <pre *ngIf="!title.includes('Ordonnance') && !title.includes('Compte-Rendu')">{{ content }}</pre>
     </div>
     
     <ng-template pTemplate="footer">

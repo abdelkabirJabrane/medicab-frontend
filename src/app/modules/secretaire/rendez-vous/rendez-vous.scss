@@ -1,5 +1,5 @@
-// ================================================
-//  rendez-vous.scss  —  Secrétaire  —  MediCab Pro
+﻿// ================================================
+//  rendez-vous.scss  —  Secrétaire  —  MedGest
 // ================================================
 
 :host {
@@ -10,6 +10,11 @@
     --mc-bg:             #F1F5FA;
     --mc-surface:        #FFFFFF;
     --mc-surface-2:      #F8FAFD;
+    --mc-radius-lg:      16px;
+    --mc-radius-sm:      8px;
+
+    --mc-purple:         #7c3aed;
+    --mc-purple-bg:      #f5f3ff;
 
     --mc-border:         #E5EAF4;
     --mc-border-hover:   #C9D4E8;
@@ -126,8 +131,28 @@
     }
     &--empty { cursor: default; pointer-events: none; }
     &__num { font-size: .78rem; font-weight: 500; color: var(--mc-text-1); line-height: 1; }
-    &__dots { display: flex; gap: 2px; margin-top: 3px; }
-    &__dot  { width: 4px; height: 4px; border-radius: 50%; background: var(--mc-primary); }
+    &__lock { position: absolute; top: 2px; right: 2px; font-size: .45rem; color: var(--mc-red); }
+
+    &--weekend {
+        background: repeating-linear-gradient(
+            45deg, transparent, transparent 3px,
+            rgba(148,163,184,.12) 3px, rgba(148,163,184,.12) 6px
+        );
+        cursor: not-allowed;
+        .cal-day__num { color: var(--mc-text-3); font-style: italic; }
+    }
+
+    &--ferme {
+        background: rgba(220, 38, 38, 0.12) !important;
+        border: 1px solid rgba(220, 38, 38, 0.2) !important;
+        .cal-day__num { color: var(--mc-red) !important; font-weight: 700 !important; }
+    }
+
+    &__dots { display: flex; gap: 2px; margin-top: 3px; justify-content: center; }
+    &__dot  { 
+        width: 4px; height: 4px; border-radius: 50%; background: var(--mc-primary); 
+        &--ferme { background: var(--mc-red); width: 6px; height: 6px; }
+    }
 }
 
 .cal-legend {
@@ -138,6 +163,7 @@
         &--selected { background: var(--mc-primary); }
         &--today    { background: var(--mc-blue-bg); border: 1.5px solid var(--mc-primary); }
         &--rdv      { width: 6px; height: 6px; background: var(--mc-primary); }
+        &--ferme    { width: 10px; height: 10px; background: rgba(220, 38, 38, 0.1); border: 1px solid var(--mc-red); }
     }
 }
 
@@ -158,6 +184,47 @@
     &__av   { width: 28px; height: 28px; border-radius: 7px; background: linear-gradient(135deg, #0EA5A0, #2563EB); color: #fff; font-size: .62rem; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
     &__nom  { font-size: .78rem; font-weight: 600; color: var(--mc-text-1); }
     &__count { font-size: .65rem; color: var(--mc-text-3); margin-top: 1px; }
+}
+
+// ── Congé Box ────────────────────────────────
+.conge-box {
+    margin-top: 1.25rem;
+    padding: .875rem;
+    background: var(--mc-surface-2);
+    border: 1px solid var(--mc-border);
+    border-radius: 12px;
+
+    &__status {
+        display: flex; align-items: center; gap: .5rem;
+        font-size: .75rem; font-weight: 700; margin-bottom: .7rem;
+        &--ouvert  { color: var(--mc-green); }
+        &--ferme   { color: var(--mc-red); }
+        &--weekend { color: var(--mc-text-3); }
+        i { font-size: .8rem; }
+    }
+}
+
+.btn-conge {
+    width: 100%; display: flex; align-items: center; justify-content: center;
+    gap: .4rem; padding: .45rem .875rem; border-radius: 8px;
+    font-size: .72rem; font-weight: 700; cursor: pointer; border: 1.5px solid;
+    transition: all .15s; font-family: inherit;
+
+    &--fermer {
+        background: rgba(220,38,38,.08); color: var(--mc-red); border-color: rgba(220,38,38,.2);
+        &:hover { background: var(--mc-red); color: #fff; }
+    }
+    &--ouvrir {
+        background: rgba(5,150,105,.08); color: var(--mc-green); border-color: rgba(5,150,105,.2);
+        &:hover { background: var(--mc-green); color: #fff; }
+    }
+}
+
+.alert-ferme {
+    background: var(--mc-red-bg); border: 1px solid rgba(220, 38, 38, 0.2);
+    border-radius: 8px; padding: .75rem; display: flex; align-items: flex-start; gap: .625rem;
+    font-size: .75rem; font-weight: 700; color: var(--mc-red); margin-bottom: 1rem;
+    i { margin-top: 1px; flex-shrink: 0; }
 }
 
 // ── View Toggle ──────────────────────────────
@@ -296,3 +363,161 @@
 }
 
 .dialog-footer { display: flex; justify-content: flex-end; gap: .625rem; padding-top: .25rem; }
+
+
+
+// ── Colored export/import buttons ────────────
+%btn-colored-base {
+    display: inline-flex;
+    align-items: center;
+    gap: .4rem;
+    padding: .55rem 1.1rem;
+    border-radius: var(--mc-radius-sm);
+    font-size: .875rem;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all .15s;
+    border: 1.5px solid transparent;
+    i { font-size: .82rem; }
+}
+
+.btn-import {
+    @extend %btn-colored-base;
+    background: rgba(124, 58, 237, 0.10);
+    color: #7c3aed;
+    border-color: rgba(124, 58, 237, 0.25);
+    &:hover { background: #7c3aed; color: #fff; box-shadow: 0 3px 10px rgba(124,58,237,.35); transform: translateY(-1px); }
+}
+
+.btn-excel {
+    @extend %btn-colored-base;
+    background: rgba(5, 150, 105, 0.10);
+    color: #059669;
+    border-color: rgba(5, 150, 105, 0.25);
+    &:hover { background: #059669; color: #fff; box-shadow: 0 3px 10px rgba(5,150,105,.35); transform: translateY(-1px); }
+}
+
+.btn-pdf {
+    @extend %btn-colored-base;
+    background: rgba(220, 38, 38, 0.10);
+    color: #dc2626;
+    border-color: rgba(220, 38, 38, 0.25);
+    &:hover { background: #dc2626; color: #fff; box-shadow: 0 3px 10px rgba(220,38,38,.35); transform: translateY(-1px); }
+}
+
+// ── Sortable column header styles ────────────
+::ng-deep .mc-table {
+    .p-datatable-thead > tr > th[pSortableColumn] {
+        cursor: pointer;
+        user-select: none;
+        transition: background .15s, color .15s;
+
+        &:hover {
+            background: var(--mc-primary-light);
+            color: var(--mc-primary) !important;
+        }
+
+        &.p-highlight {
+            background: var(--mc-primary-light);
+            color: var(--mc-primary) !important;
+            .p-sortable-column-icon { color: var(--mc-primary); }
+        }
+
+        .p-sortable-column-icon {
+            font-size: .65rem;
+            margin-left: .3rem;
+            color: var(--mc-text-3);
+            vertical-align: middle;
+            transition: color .15s;
+        }
+    }
+}
+
+// ── Calendar Central (FullCalendar) ──────────
+.calendar-main-wrapper {
+    padding: 1.5rem;
+    
+    ::ng-deep {
+        .fc {
+            --fc-border-color: var(--mc-border);
+            --fc-button-bg-color: var(--mc-surface);
+            --fc-button-border-color: var(--mc-border);
+            --fc-button-text-color: var(--mc-text-2);
+            --fc-button-hover-bg-color: var(--mc-surface-2);
+            --fc-button-hover-border-color: var(--mc-border-hover);
+            --fc-button-active-bg-color: var(--mc-primary-light);
+            --fc-button-active-border-color: var(--mc-primary);
+            --fc-button-active-text-color: var(--mc-primary);
+            --fc-today-bg-color: rgba(37, 99, 235, 0.04);
+            font-family: inherit;
+        }
+
+        .fc-toolbar-title { font-size: 1.15rem !important; font-weight: 800 !important; color: var(--mc-text-1); text-transform: capitalize; }
+        .fc-button { font-weight: 600 !important; font-size: 0.8rem !important; border-radius: 6px !important; padding: 0.4rem 0.75rem !important; text-transform: capitalize !important; }
+        
+        .fc-col-header-cell { padding: 0.6rem 0 !important; background: var(--mc-surface-2); border-bottom: 1px solid var(--mc-border) !important; }
+        .fc-col-header-cell-cushion { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; color: var(--mc-text-3); text-decoration: none !important; }
+
+        .fc-timegrid-slot { height: 3.5rem !important; }
+        .fc-timegrid-slot-label-cushion { font-size: 0.7rem; font-weight: 600; color: var(--mc-text-3) !important; }
+
+        .fc-event {
+            border-radius: 6px !important; padding: 2px 5px !important; font-size: 0.72rem !important;
+            font-weight: 700 !important; box-shadow: 0 2px 6px rgba(0,0,0,0.06); cursor: pointer;
+            transition: transform 0.1s;
+            &:hover { transform: scale(1.01); }
+        }
+        .fc-v-event .fc-event-main { color: #fff; }
+
+        // Blocked visuals
+        .fc-day-weekend-blocked {
+            background: repeating-linear-gradient(45deg, transparent, transparent 4px, rgba(148, 163, 184, 0.08) 4px, rgba(148, 163, 184, 0.08) 8px) !important;
+            cursor: not-allowed !important;
+        }
+        .fc-day-ferme { background: rgba(220, 38, 38, 0.12) !important; cursor: not-allowed !important; }
+        .fc-non-business { background: rgba(148, 163, 184, 0.06) !important; }
+    }
+}
+
+:host-context([data-theme="dark"]) {
+    --mc-primary-light:  #1e293b;
+    --mc-bg:             #0f172a;
+    --mc-surface:         #1e293b;
+    --mc-surface-2:      #1a2744;
+    --mc-border:         #334155;
+    --mc-border-hover:   #475569;
+    --mc-text-1:         #f1f5f9;
+    --mc-text-2:         #94a3b8;
+    --mc-text-3:         #64748b;
+    
+    --mc-green-bg:       #022c22;
+    --mc-red-bg:         #450a0a;
+    --mc-orange-bg:      #451a03;
+    --mc-blue-bg:        #172554;
+
+    --sec-accent-light:  #042f2e;
+    --admin-accent-light: #431407;
+}
+
+/* -- RDV Detail Styling -- */
+.rdv-detail {
+    &__header { display: flex; align-items: center; gap: 1.25rem; margin-bottom: 2rem; padding-bottom: 1.25rem; border-bottom: 1px solid var(--mc-border); }
+    &__avatar { width: 56px; height: 56px; border-radius: 12px; background: linear-gradient(135deg, #667eea, #764ba2); color: #fff; font-size: 1.25rem; font-weight: 800; display: flex; align-items: center; justify-content: center; }
+    &__name { font-size: 1.25rem; font-weight: 800; color: var(--mc-text-1); }
+    &__contacts { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.5rem; }
+    &__body { display: flex; flex-direction: column; gap: 1.5rem; margin-bottom: 2rem; }
+    &__actions { display: flex; flex-direction: column; gap: 0.75rem; }
+}
+.rdv-contact-chip { display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.25rem 0.625rem; background: var(--mc-surface-2); border: 1px solid var(--mc-border); border-radius: 6px; font-size: 0.75rem; font-weight: 600; color: var(--mc-text-2); i { font-size: 0.7rem; color: var(--mc-primary); } }
+.detail-item { display: flex; gap: 1rem;
+    &__icon { width: 36px; height: 36px; border-radius: 50%; background: var(--mc-surface-2); color: var(--mc-primary); display: flex; align-items: center; justify-content: center; font-size: 0.875rem; flex-shrink: 0; }
+    &__content { display: flex; flex-direction: column; gap: 0.25rem;
+        label { font-size: 0.6875rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--mc-text-3); }
+        span { font-size: 0.9375rem; font-weight: 600; color: var(--mc-text-1); }
+    }
+}
+.flex-row-gap { display: flex; gap: 0.75rem; }
+.flex-1 { flex: 1; }
+.btn-outline--danger { color: var(--mc-red); &:hover { background: var(--mc-red-bg); border-color: var(--mc-red); } }
+

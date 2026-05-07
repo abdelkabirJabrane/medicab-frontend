@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
-import { NotificationService } from '../../../core/services/notification';
 
 @Component({
     selector: 'app-admin-monitoring',
@@ -61,8 +60,7 @@ export class AdminMonitoringComponent implements OnInit, OnDestroy {
     ];
 
     constructor(
-        private messageService: MessageService,
-        private notificationService: NotificationService
+        private messageService: MessageService
     ) {}
 
     ngOnInit() {
@@ -75,25 +73,7 @@ export class AdminMonitoringComponent implements OnInit, OnDestroy {
     }
 
     loadLogs() {
-        this.notificationService.getAll().subscribe({
-            next: (data) => {
-                const apiLogs = data.map(n => {
-                    const niveau = n.statut === 'ERROR' || n.type === 'ALERT' ? 'error' : 'info';
-                    return {
-                        id: n.id,
-                        time: n.dateCreation ? new Date(n.dateCreation).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit', second: '2-digit' }) : this.getHeure(),
-                        niveau: niveau,
-                        message: `[${n.type}] ${n.sujet || n.contenu}`
-                    };
-                });
-                
-                // On garde quelques logs de test si l'API est vide ou pour enrichir
-                if (apiLogs.length > 0) {
-                    this.logs = apiLogs.concat(this.logs.slice(0, 5));
-                }
-            },
-            error: () => console.error('Erreur chargement logs')
-        });
+        // Notification service removed
     }
 
     ngOnDestroy() {

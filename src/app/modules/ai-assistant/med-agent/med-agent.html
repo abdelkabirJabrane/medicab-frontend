@@ -1,3 +1,4 @@
+<p-toast></p-toast>
 <div class="ai-layout">
     <div class="ai-layout__left">
         <!-- Formulaire de contexte si pas de session -->
@@ -52,5 +53,6 @@
     *ngIf="modalVisible"
     [(visible)]="modalVisible"
     [title]="modalTitle"
-    [content]="modalContent">
+    [content]="modalContent"
+    (onPrint)="onPrintDocument()">
 </app-result-modal>

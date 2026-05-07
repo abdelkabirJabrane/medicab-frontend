@@ -31,28 +31,54 @@
 
                     <!-- Informations Personnelles -->
                     <div class="col-span-12 lg:col-span-8">
-                        <h5 class="font-bold text-lg mb-6 text-slate-800 border-b border-slate-100 pb-2">Informations Personnelles</h5>
+                        <h5 class="font-bold text-lg mb-6 text-[var(--mc-text-1)] border-b border-[var(--mc-border)] pb-2">Informations Personnelles</h5>
                         <div class="p-fluid grid formgrid">
                             <div class="col-12 md:col-6 field">
-                                <label for="nom" class="font-semibold text-sm mb-2 block text-slate-600">Nom</label>
+                                <label for="nom" class="font-semibold text-sm mb-2 block text-[var(--mc-text-2)]">Nom</label>
                                 <input id="nom" type="text" pInputText [(ngModel)]="medecin.nom" class="w-full" />
                             </div>
                             <div class="col-12 md:col-6 field">
-                                <label for="prenom" class="font-semibold text-sm mb-2 block text-slate-600">Prénom</label>
+                                <label for="prenom" class="font-semibold text-sm mb-2 block text-[var(--mc-text-2)]">Prénom</label>
                                 <input id="prenom" type="text" pInputText [(ngModel)]="medecin.prenom" class="w-full" />
                             </div>
                             <div class="col-12 md:col-6 field">
-                                <label for="email" class="font-semibold text-sm mb-2 block text-slate-600">Email professionnel</label>
+                                <label for="email" class="font-semibold text-sm mb-2 block text-[var(--mc-text-2)]">Email professionnel</label>
                                 <input id="email" type="email" pInputText [(ngModel)]="medecin.email" class="w-full" />
                             </div>
                             <div class="col-12 md:col-6 field">
-                                <label for="telephone" class="font-semibold text-sm mb-2 block text-slate-600">Téléphone</label>
+                                <label for="telephone" class="font-semibold text-sm mb-2 block text-[var(--mc-text-2)]">Téléphone</label>
                                 <input id="telephone" type="text" pInputText [(ngModel)]="medecin.telephone" class="w-full" />
                             </div>
+                            <div class="col-12 md:col-6 field">
+                                <label for="ville" class="font-semibold text-sm mb-2 block text-[var(--mc-text-2)]">Ville</label>
+                                <input id="ville" type="text" pInputText [(ngModel)]="medecin.ville" class="w-full" placeholder="ex: Casablanca"/>
+                            </div>
+                            <div class="col-12 md:col-6 field">
+                                <div class="flex justify-between items-center mb-2">
+                                    <label for="address" class="font-semibold text-sm block text-[var(--mc-text-2)]">Adresse exacte</label>
+                                    <button (click)="openGoogleMaps(medecin.address, medecin.ville)" 
+                                            class="text-blue-600 hover:underline text-xs font-bold flex items-center gap-1 bg-transparent border-none cursor-pointer">
+                                        <i class="pi pi-map-marker"></i> Voir sur Maps
+                                    </button>
+                                </div>
+                                <input id="address" type="text" pInputText [(ngModel)]="medecin.address" class="w-full" placeholder="ex: 123 Rue de la Liberté, Quartier Anfa" />
+                            </div>
+
+                            <!-- Embedded Map Preview -->
+                            <div class="col-12 w-full h-40 rounded-2xl overflow-hidden border border-[var(--mc-border)] bg-[var(--mc-surface-2)] mt-2" *ngIf="medecin.address || medecin.ville">
+                               <iframe 
+                                 width="100%" 
+                                 height="100%" 
+                                 frameborder="0" 
+                                 style="border:0;" 
+                                 [src]="'https://maps.google.com/maps?q=' + (medecin.address || '') + ' ' + (medecin.ville || '') + '&t=&z=15&ie=UTF8&iwloc=&output=embed' | safeUrl" 
+                                 allowfullscreen>
+                               </iframe>
+                            </div>
                             <div class="col-12 field">
-                                <label for="newPassword" class="font-semibold text-sm mb-2 block text-slate-600">
+                                <label for="newPassword" class="font-semibold text-sm mb-2 block text-[var(--mc-text-2)]">
                                     Nouveau Mot de Passe
-                                    <span class="text-xs text-slate-400 ml-2 font-normal">(laisser vide pour ne pas changer)</span>
+                                    <span class="text-xs text-[var(--mc-text-3)] ml-2 font-normal">(laisser vide pour ne pas changer)</span>
                                 </label>
                                 <p-password id="newPassword"
                                             [(ngModel)]="medecin.newPassword"
@@ -77,26 +103,26 @@
 
                     <!-- Abonnement -->
                     <div class="col-span-12 lg:col-span-4">
-                        <h5 class="font-bold text-lg mb-6 text-slate-800 border-b border-slate-100 pb-2">Détails Cabinet</h5>
-                        <div class="bg-slate-50 p-6 rounded-2xl border border-slate-200">
-                            <div class="flex items-center justify-between mb-4 border-b border-slate-200 pb-4">
-                                <span class="text-slate-500 font-semibold text-sm">Plan actuel</span>
+                        <h5 class="font-bold text-lg mb-6 text-[var(--mc-text-1)] border-b border-[var(--mc-border)] pb-2">Détails Cabinet</h5>
+                        <div class="bg-[var(--mc-surface-2)] p-6 rounded-2xl border border-[var(--mc-border)]">
+                            <div class="flex items-center justify-between mb-4 border-b border-[var(--mc-border)] pb-4">
+                                <span class="text-[var(--mc-text-2)] font-semibold text-sm">Plan actuel</span>
                                 <p-tag [value]="abonnement.plan" severity="info" styleClass="text-xs px-3 font-bold"></p-tag>
                             </div>
                             <div class="flex items-center justify-between mb-6">
-                                <span class="text-slate-500 font-semibold text-sm">Statut du compte</span>
+                                <span class="text-[var(--mc-text-2)] font-semibold text-sm">Statut du compte</span>
                                 <div class="flex items-center text-green-600 font-bold gap-2 text-sm">
                                     <i class="pi pi-check-circle"></i> {{ abonnement.statut }}
                                 </div>
                             </div>
-                            <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 mt-4 mb-6 text-center">
-                                <span class="block text-slate-400 mb-2 text-[10px] font-bold uppercase tracking-widest">Capacité Secrétariat</span>
+                            <div class="bg-[var(--mc-surface)] p-5 rounded-xl shadow-sm border border-[var(--mc-border)] mt-4 mb-6 text-center">
+                                <span class="block text-[var(--mc-text-3)] mb-2 text-[10px] font-bold uppercase tracking-widest">Capacité Secrétariat</span>
                                 <div class="flex items-baseline justify-center gap-1">
                                     <span class="text-4xl font-black text-blue-600">{{ secretaires.length }}</span>
                                     <span class="text-slate-300 text-xl font-bold">/</span>
-                                    <span class="text-slate-400 text-lg font-bold">{{ MAX_SECRETAIRES }}</span>
+                                    <span class="text-[var(--mc-text-3)] text-lg font-bold">{{ MAX_SECRETAIRES }}</span>
                                 </div>
-                                <span class="block text-slate-400 mt-2 text-xs font-medium">comptes utilisés</span>
+                                <span class="block text-[var(--mc-text-3)] mt-2 text-xs font-medium">comptes utilisés</span>
                             </div>
                             <div class="w-full">
                                 <p-button label="Passer au plan supérieur" icon="pi pi-star-fill" styleClass="w-full"
@@ -131,8 +157,8 @@
                          [showCurrentPageReport]="true" styleClass="mc-table-alt">
 
                     <ng-template pTemplate="caption">
-                        <div class="flex flex-col md:flex-row justify-between items-center bg-slate-50 px-6 py-4 rounded-t-xl border-x border-t border-slate-200">
-                            <h5 class="m-0 font-bold text-slate-700">Liste des Collaborateurs</h5>
+                        <div class="flex flex-col md:flex-row justify-between items-center bg-[var(--mc-surface-2)] px-6 py-4 rounded-t-xl border-x border-t border-[var(--mc-border)]">
+                            <h5 class="m-0 font-bold text-[var(--mc-text-1)]">Liste des Collaborateurs</h5>
                             <div class="flex gap-3 mt-3 md:mt-0">
                                 <span class="p-input-icon-left">
                                     <i class="pi pi-search"></i>
@@ -150,37 +176,37 @@
                     </ng-template>
 
                     <ng-template pTemplate="header">
-                        <tr class="bg-slate-50 border-x border-slate-200">
-                            <th pSortableColumn="nom" class="text-xs uppercase tracking-wider text-slate-500 py-4 px-6 border-b border-slate-200">Collaborateur <p-sortIcon field="nom"></p-sortIcon></th>
-                            <th pSortableColumn="email" class="text-xs uppercase tracking-wider text-slate-500 py-4 px-6 border-b border-slate-200">Contact <p-sortIcon field="email"></p-sortIcon></th>
-                            <th class="text-xs uppercase tracking-wider text-slate-500 py-4 px-6 border-b border-slate-200">Statut</th>
-                            <th class="text-xs uppercase tracking-wider text-slate-500 py-4 px-6 border-b border-slate-200 text-right">Actions</th>
+                        <tr class="bg-[var(--mc-surface-2)] border-x border-[var(--mc-border)]">
+                            <th pSortableColumn="nom" class="text-xs uppercase tracking-wider text-[var(--mc-text-2)] py-4 px-6 border-b border-[var(--mc-border)]">Collaborateur <p-sortIcon field="nom"></p-sortIcon></th>
+                            <th pSortableColumn="email" class="text-xs uppercase tracking-wider text-[var(--mc-text-2)] py-4 px-6 border-b border-[var(--mc-border)]">Contact <p-sortIcon field="email"></p-sortIcon></th>
+                            <th class="text-xs uppercase tracking-wider text-[var(--mc-text-2)] py-4 px-6 border-b border-[var(--mc-border)]">Statut</th>
+                            <th class="text-xs uppercase tracking-wider text-[var(--mc-text-2)] py-4 px-6 border-b border-[var(--mc-border)] text-right">Actions</th>
                         </tr>
                     </ng-template>
 
                     <ng-template pTemplate="body" let-sec>
-                        <tr class="border-x border-slate-200 hover:bg-blue-50/30 transition-colors">
-                            <td class="py-4 px-6 border-b border-slate-100">
+                        <tr class="border-x border-[var(--mc-border)] hover:bg-blue-50/30 transition-colors">
+                            <td class="py-4 px-6 border-b border-[var(--mc-border)]">
                                 <div class="flex items-center gap-3">
                                     <div class="w-10 h-10 rounded-lg bg-blue-100 text-blue-700 font-bold flex items-center justify-center uppercase">
                                         {{ (sec.prenom?.[0] || '') }}{{ (sec.nom?.[0] || '') }}
                                     </div>
                                     <div>
-                                        <div class="font-bold text-slate-800">{{ sec.prenom }} {{ sec.nom }}</div>
-                                        <div class="text-xs text-slate-400">@{{ sec.username }}</div>
+                                        <div class="font-bold text-[var(--mc-text-1)]">{{ sec.prenom }} {{ sec.nom }}</div>
+                                        <div class="text-xs text-[var(--mc-text-3)]">@{{ sec.username }}</div>
                                     </div>
                                 </div>
                             </td>
-                            <td class="py-4 px-6 border-b border-slate-100">
-                                <div class="text-sm font-medium text-slate-700">{{ sec.email }}</div>
-                                <div class="text-xs text-slate-400">{{ sec.telephone || 'Non renseigné' }}</div>
+                            <td class="py-4 px-6 border-b border-[var(--mc-border)]">
+                                <div class="text-sm font-medium text-[var(--mc-text-1)]">{{ sec.email }}</div>
+                                <div class="text-xs text-[var(--mc-text-3)]">{{ sec.telephone || 'Non renseigné' }}</div>
                             </td>
-                            <td class="py-4 px-6 border-b border-slate-100">
+                            <td class="py-4 px-6 border-b border-[var(--mc-border)]">
                                 <p-tag [value]="sec.statut" [severity]="getSeverity(sec.statut)" styleClass="font-bold text-[10px] cursor-pointer"
                                        (click)="toggleStatut(sec)" pTooltip="Cliquer pour changer le statut">
                                 </p-tag>
                             </td>
-                            <td class="py-4 px-6 border-b border-slate-100 text-right">
+                            <td class="py-4 px-6 border-b border-[var(--mc-border)] text-right">
                                 <div class="flex gap-1 justify-end">
                                     <p-button icon="pi pi-pencil" [rounded]="true" [text]="true" severity="info"
                                               pTooltip="Modifier" (onClick)="editSecretaire(sec)">
@@ -194,9 +220,9 @@
                     </ng-template>
 
                     <ng-template pTemplate="emptymessage">
-                        <tr class="border-x border-slate-200 border-b">
-                            <td colspan="4" class="text-center py-12 text-slate-400">
-                                <div class="bg-slate-50 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <tr class="border-x border-[var(--mc-border)] border-b">
+                            <td colspan="4" class="text-center py-12 text-[var(--mc-text-3)]">
+                                <div class="bg-[var(--mc-surface-2)] w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
                                     <i class="pi pi-users text-2xl"></i>
                                 </div>
                                 <p class="font-medium">Aucun compte collaborateur</p>
@@ -220,39 +246,39 @@
 
     <ng-template pTemplate="content">
         <div class="field mt-6">
-            <label for="secUsername" class="font-bold text-xs uppercase tracking-wider text-slate-500 mb-2 block">Nom d'utilisateur <span class="text-red-500">*</span></label>
+            <label for="secUsername" class="font-bold text-xs uppercase tracking-wider text-[var(--mc-text-2)] mb-2 block">Nom d'utilisateur <span class="text-red-500">*</span></label>
             <input type="text" pInputText id="secUsername" [(ngModel)]="secretaire.username" [disabled]="isEditMode" required autofocus
                    placeholder="ex: secretaire_1" class="py-2" />
             @if (isEditMode) {
-                <small class="text-slate-400 mt-1 block">Le nom d'utilisateur est l'identifiant unique de connexion.</small>
+                <small class="text-[var(--mc-text-3)] mt-1 block">Le nom d'utilisateur est l'identifiant unique de connexion.</small>
             }
         </div>
         <div class="grid grid-cols-2 gap-4">
             <div class="field">
-                <label for="secNom" class="font-bold text-xs uppercase tracking-wider text-slate-500 mb-2 block">Nom <span class="text-red-500">*</span></label>
+                <label for="secNom" class="font-bold text-xs uppercase tracking-wider text-[var(--mc-text-2)] mb-2 block">Nom <span class="text-red-500">*</span></label>
                 <input type="text" pInputText id="secNom" [(ngModel)]="secretaire.nom" required class="py-2" />
             </div>
             <div class="field">
-                <label for="secPrenom" class="font-bold text-xs uppercase tracking-wider text-slate-500 mb-2 block">Prénom <span class="text-red-500">*</span></label>
+                <label for="secPrenom" class="font-bold text-xs uppercase tracking-wider text-[var(--mc-text-2)] mb-2 block">Prénom <span class="text-red-500">*</span></label>
                 <input type="text" pInputText id="secPrenom" [(ngModel)]="secretaire.prenom" required class="py-2" />
             </div>
         </div>
         <div class="field">
-            <label for="secEmail" class="font-bold text-xs uppercase tracking-wider text-slate-500 mb-2 block">Email <span class="text-red-500">*</span></label>
+            <label for="secEmail" class="font-bold text-xs uppercase tracking-wider text-[var(--mc-text-2)] mb-2 block">Email <span class="text-red-500">*</span></label>
             <input type="email" pInputText id="secEmail" [(ngModel)]="secretaire.email" placeholder="contact@exemple.com" class="py-2" />
         </div>
         <div class="field">
-            <label for="secTelephone" class="font-bold text-xs uppercase tracking-wider text-slate-500 mb-2 block">Téléphone</label>
+            <label for="secTelephone" class="font-bold text-xs uppercase tracking-wider text-[var(--mc-text-2)] mb-2 block">Téléphone</label>
             <input type="text" pInputText id="secTelephone" [(ngModel)]="secretaire.telephone" placeholder="05 22 XX XX XX" class="py-2" />
         </div>
         @if (!isEditMode) {
             <div class="field">
-                <label for="secPassword" class="font-bold text-xs uppercase tracking-wider text-slate-500 mb-2 block">Mot de Passe <span class="text-red-500">*</span></label>
+                <label for="secPassword" class="font-bold text-xs uppercase tracking-wider text-[var(--mc-text-2)] mb-2 block">Mot de Passe <span class="text-red-500">*</span></label>
                 <p-password id="secPassword" [(ngModel)]="secretaire.password"
                             [toggleMask]="true" weakLabel="Faible" mediumLabel="Moyen" strongLabel="Fort"
                             placeholder="Définir un mot de passe" styleClass="w-full">
                 </p-password>
-                <small class="text-slate-400 mt-1 block">Sera utilisé par le collaborateur pour son accès.</small>
+                <small class="text-[var(--mc-text-3)] mt-1 block">Sera utilisé par le collaborateur pour son accès.</small>
             </div>
         }
     </ng-template>

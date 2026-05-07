@@ -1,4 +1,4 @@
-<p-toast></p-toast>
+﻿<p-toast></p-toast>
 <p-confirmDialog></p-confirmDialog>
 <!-- ── En-tête ─────────────────────────── -->
 <div class="page-header">
@@ -9,15 +9,15 @@
     <div class="header-actions">
         <input type="file" #fileInput style="display: none" (change)="importExcel($event)" accept=".xlsx, .xls">
         
-        <button class="btn-outline" (click)="triggerImport(fileInput)" pTooltip="Importer" tooltipPosition="bottom">
+        <button class="btn-import" (click)="triggerImport(fileInput)" pTooltip="Importer" tooltipPosition="bottom">
             <i class="pi pi-upload"></i> Importer
         </button>
         
-        <button class="btn-outline" (click)="exportExcel()" pTooltip="Excel" tooltipPosition="bottom">
+        <button class="btn-excel" (click)="exportExcel()" pTooltip="Excel" tooltipPosition="bottom">
             <i class="pi pi-file-excel"></i> Excel
         </button>
         
-        <button class="btn-outline" (click)="exportPDF()" pTooltip="PDF" tooltipPosition="bottom">
+        <button class="btn-pdf" (click)="exportPDF()" pTooltip="PDF" tooltipPosition="bottom">
             <i class="pi pi-file-pdf"></i> PDF
         </button>
 
@@ -27,24 +27,39 @@
     </div>
 </div>
 
+<!-- ── Recherche ───────────────────────── -->
+<div class="search-bar">
+    <div class="search-bar__input-wrap">
+        <i class="pi pi-search search-bar__icon"></i>
+        <input class="search-bar__input"
+               [(ngModel)]="searchQuery"
+               (ngModelChange)="rechercher()"
+               placeholder="Rechercher par patient, ID, statut..."/>
+    </div>
+    <button class="btn-icon" (click)="loadOrdonnances()" title="Rafraîchir">
+        <i class="pi pi-refresh"></i>
+    </button>
+</div>
+
 <!-- ── Grille principale ────────────────── -->
 <div class="ord-grid" [class.ord-grid--split]="ordonnanceActive">
 
     <!-- ── Liste ───────────────────────────── -->
     <div class="panel">
         <p-table
-            [value]="ordonnances"
+            [value]="ordonnancesFiltres"
             [loading]="loading"
+            [sortMode]="'single'"
             responsiveLayout="scroll"
             styleClass="mc-table">
 
             <ng-template pTemplate="header">
                 <tr>
-                    <th>ID</th>
+                    <th pSortableColumn="id">ID <p-sortIcon field="id"></p-sortIcon></th>
                     <th>Patient</th>
-                    <th>Date émission</th>
+                    <th pSortableColumn="dateEmission">Date émission <p-sortIcon field="dateEmission"></p-sortIcon></th>
                     <th>Médicaments</th>
-                    <th>Statut</th>
+                    <th pSortableColumn="statut">Statut <p-sortIcon field="statut"></p-sortIcon></th>
                     <th>Actions</th>
                 </tr>
             </ng-template>
@@ -117,7 +132,7 @@
                         <i class="pi pi-heart-fill"></i>
                     </div>
                     <div>
-                        <div class="ord-preview__clinic-name">MediCab Pro</div>
+                        <div class="ord-preview__clinic-name">MedGest</div>
                         <div class="ord-preview__clinic-sub">Cabinet Médical</div>
                     </div>
                 </div>
@@ -244,7 +259,8 @@
                 [filter]="true"
                 filterBy="label"
                 [showClear]="true"
-                styleClass="w-full form-input">
+                styleClass="w-full form-input"
+                appendTo="body">
             </p-select>
         </div>
 
@@ -255,7 +271,7 @@
                 <span class="form-hint">— le patient sera rempli automatiquement</span>
             </label>
             <p-select
-                [options]="consultationsOptions"
+                [options]="filteredConsultationOptions"
                 [(ngModel)]="selectedConsultationId"
                 (ngModelChange)="onConsultationChange($event)"
                 optionLabel="label"
@@ -264,7 +280,8 @@
                 [filter]="true"
                 filterBy="label"
                 [showClear]="true"
-                styleClass="w-full form-input">
+                styleClass="w-full form-input"
+                appendTo="body">
             </p-select>
         </div>
 
@@ -296,7 +313,8 @@
                         [(ngModel)]="nouvelleLigne.unite"
                         optionLabel="label"
                         optionValue="value"
-                        styleClass="unite-select">
+                        styleClass="unite-select"
+                        appendTo="body">
                     </p-select>
                 </div>
                 <button class="btn-primary btn-add" (click)="ajouterLigne()" title="Ajouter">

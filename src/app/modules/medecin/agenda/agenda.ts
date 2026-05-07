@@ -11,7 +11,7 @@ import { SelectModule } from 'primeng/select';
 import { MessageService } from 'primeng/api';
 import { AppointmentService } from '../../../core/services/appointment';
 import { PatientService } from '../../../core/services/patient';
-import { NotificationService } from '../../../core/services/notification';
+import { AuthService } from '../../../core/services/auth';
 import { FullCalendarModule } from '@fullcalendar/angular';
 import { CalendarOptions, EventApi, DateSelectArg, EventClickArg, EventDropArg, EventInput } from '@fullcalendar/core';
 import dayGridPlugin from '@fullcalendar/daygrid';
@@ -37,6 +37,11 @@ export class AgendaComponent implements OnInit {
     rdvDetailVisible = false;
     rdvSelectionne: any = null;
 
+    // ── Jours fermés / congés ──────────────────────────────
+    /** Stocke les dates fermées au format 'YYYY-MM-DD' */
+    joursFermes: Set<string> = new Set();
+    montrerAideConge = false;
+
     calendarOptions: CalendarOptions = {
         plugins: [dayGridPlugin, timeGridPlugin, interactionPlugin],
         initialView: 'timeGridWeek',
@@ -55,6 +60,27 @@ export class AgendaComponent implements OnInit {
         selectMirror: true,
         dayMaxEvents: true,
         nowIndicator: true,
+        // ── Bloquer weekends dans FullCalendar ──
+        businessHours: {
+            daysOfWeek: [1, 2, 3, 4, 5],  // Lun–Ven uniquement
+            startTime: '08:00',
+            endTime: '19:00'
+        },
+        selectConstraint: 'businessHours',
+        eventConstraint: 'businessHours',
+        weekends: true,  // Afficher mais bloqués
+        selectAllow: (selectInfo) => {
+            return this.estJourAutorise(selectInfo.start);
+        },
+        dayCellClassNames: (arg) => {
+            const key = this.toDateKey(arg.date);
+            const isWeekend = arg.date.getDay() === 0 || arg.date.getDay() === 6;
+            const isFerme  = this.joursFermes.has(key);
+            const classes: string[] = [];
+            if (isWeekend) classes.push('fc-day-weekend-blocked');
+            if (isFerme)   classes.push('fc-day-ferme');
+            return classes;
+        },
         select: this.handleDateSelect.bind(this),
         eventClick: this.handleEventClick.bind(this),
         eventDrop: this.handleEventDrop.bind(this),
@@ -62,7 +88,7 @@ export class AgendaComponent implements OnInit {
         events: []
     };
 
-    medecinId = 2; // Switched to 2 to match backend test data
+    medecinId = 0; // Initialisé dynamiquement depuis AuthService
     patientsOptions: any[] = [];
 
     nouveauRdv: any = { patientId: null, date: null, heure: '', type: '', motif: '' };
@@ -75,7 +101,10 @@ export class AgendaComponent implements OnInit {
         { label: 'Suivi', value: 'SUIVI' }
     ];
 
-    heureOptions = ['08:00', '08:30', '09:00', '09:30', '10:00', '10:30', '11:00', '11:30', '14:00', '14:30', '15:00', '15:30', '16:00', '16:30'].map((h) => ({ label: h, value: h }));
+    heureOptions = [
+        '08:00', '08:30', '09:00', '09:30', '10:00', '10:30', '11:00', '11:30', 
+        '14:00', '14:30', '15:00', '15:30', '16:00', '16:30', '17:00', '17:30', '18:00'
+    ].map((h) => ({ label: h, value: h }));
 
     joursMois: any[] = [];
     joursNoms = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
@@ -84,12 +113,46 @@ export class AgendaComponent implements OnInit {
         private messageService: MessageService,
         private appointmentService: AppointmentService,
         private patientService: PatientService,
-        private notificationService: NotificationService,
+        private authService: AuthService,
         private cdr: ChangeDetectorRef
     ) {}
 
     ngOnInit() {
+        // ── Récupérer le vrai ID du médecin connecté ──────────────
+        const user = this.authService.getCurrentUser();
+        if (user?.id) {
+            this.medecinId = user.id;
+        }
         this.loadPatients();
+        this.chargerJoursFermes();
+    }
+
+    chargerJoursFermes() {
+        this.appointmentService.getClosedDays(this.medecinId).subscribe({
+            next: (dates: string[]) => {
+                // ✅ Backend = source de vérité : données fraîches uniquement
+                this.joursFermes = new Set(dates);
+                // Synchroniser le cache local
+                localStorage.setItem(`joursFermes_med_${this.medecinId}`, JSON.stringify(dates));
+                this.updateCalendarEvents();
+                this.cdr.detectChanges();
+            },
+            error: () => {
+                console.warn('Backend indisponible pour les jours fermés, passage en local');
+                const saved = localStorage.getItem(`joursFermes_med_${this.medecinId}`);
+                if (saved) {
+                    const localDates = JSON.parse(saved);
+                    localDates.forEach((d: string) => this.joursFermes.add(d));
+                    this.updateCalendarEvents();
+                    this.cdr.detectChanges();
+                }
+            }
+        });
+    }
+
+    sauvegarderJoursFermes() {
+        // Cette méthode devient obsolète car on sauvegarde via toggleBackend
+        localStorage.setItem(`joursFermes_med_${this.medecinId}`, JSON.stringify(Array.from(this.joursFermes)));
     }
 
     loadPatients() {
@@ -98,7 +161,8 @@ export class AgendaComponent implements OnInit {
                 this.patientsOptions = data.map(p => ({
                     id: p.id,
                     nomComplet: p.nomComplet || `${p.prenom} ${p.nom}`,
-                    email: p.email || 'patient@example.com'
+                    email: p.email || '',
+                    telephone: p.telephone || ''
                 }));
                 this.loadRdv(); // On charge les rdv APRES avoir les patients
             },
@@ -110,19 +174,38 @@ export class AgendaComponent implements OnInit {
     }
 
     loadRdv() {
-        this.appointmentService.getAll().subscribe({
+        this.appointmentService.getByMedecin(this.medecinId).subscribe({
             next: (data) => {
                 this.tousRdv = data.map(rdv => {
                     const patObj = this.patientsOptions.find(p => p.id === rdv.patientId);
-                    const realName = rdv.patientNom || (patObj ? patObj.nomComplet : 'Patient Inconnu');
-                    
+                    let realName = rdv.patientNom || (patObj ? patObj.nomComplet : 'Patient Inconnu');
+                    let phone = patObj?.telephone || '';
+                    let email = patObj?.email || '';
+
+                    // ── Extraction pour Patient Public / Invité / Dossier Absent ────────
+                    if (rdv.notesInternes && (rdv.notesInternes.includes('PATIENT PUBLIC:') || rdv.notesInternes.includes('RDV INVITE:') || rdv.notesInternes.includes('Nom:'))) {
+                        const matchNom = rdv.notesInternes.match(/Nom:\s*([^\n\r]*)/i);
+                        if (matchNom && matchNom[1] && matchNom[1].trim()) {
+                            realName = matchNom[1].trim();
+                        }
+                        const matchTel = rdv.notesInternes.match(/Tel:\s*([^\n\r]*)/i);
+                        if (matchTel && matchTel[1]) phone = matchTel[1].trim();
+                        
+                        const matchEmail = rdv.notesInternes.match(/Email:\s*([^\n\r]*)/i);
+                        if (matchEmail && matchEmail[1]) email = matchEmail[1].trim();
+                    }
+
                     return {
                         id: rdv.id,
                         patientId: rdv.patientId || 1,
                         patient: realName,
+                        telephone: phone,
+                        email: email,
+                        tenantId: rdv.tenantId, 
                         initiales: (realName === 'Patient Inconnu' ? '??' : realName)
                                      .split(' ')
                                      .map((n: string) => n[0] || '')
+                                     .filter((n: string) => !!n)
                                      .join('')
                                      .toUpperCase()
                                      .substring(0, 2),
@@ -131,51 +214,38 @@ export class AgendaComponent implements OnInit {
                         type: rdv.typeConsultation || 'PRESENTIELLE',
                         typeLabel: this.typeOptions.find(t => t.value === rdv.typeConsultation)?.label || 'Consultation',
                         motif: rdv.motif,
+                        notesInternes: rdv.notesInternes,
                         statut: rdv.statut,
                         dureeMinute: rdv.dureeMinute || 30
                     };
                 });
 
-                const events: EventInput[] = this.tousRdv.map(rdv => {
-                    const d = new Date(rdv.date);
-                    const dEnd = new Date(d);
-                    dEnd.setMinutes(d.getMinutes() + rdv.dureeMinute);
-                    return {
-                        id: rdv.id.toString(),
-                        title: `${rdv.patient} - ${rdv.motif}`,
-                        start: d,
-                        end: dEnd,
-                        extendedProps: { ...rdv },
-                        backgroundColor: rdv.statut === 'CONFIRME' ? '#10B981' : 
-                                         rdv.statut === 'ANNULE' ? '#EF4444' :
-                                         rdv.statut === 'TERMINE' ? '#6B7280' : 
-                                         rdv.statut === 'EN_ATTENTE' ? '#F59E0B' : '#3B82F6',
-                        borderColor: 'transparent'
-                    };
-                });
-                
-                this.calendarOptions = { ...this.calendarOptions, events };
-
-                this.genererCalendrier();
-                this.filtrerRdvDuJour();
+                this.updateCalendarEvents();
                 this.cdr.detectChanges();
             },
             error: (err) => {
-                this.messageService.add({ severity: 'error', summary: 'Erreur', detail: 'Impossible de charger les rendez-vous' });
+                this.messageService.add({ severity: 'error', summary: 'Erreur', detail: 'Impossible de charger vos rendez-vous' });
                 console.error(err);
+                this.tousRdv = [];
+                this.updateCalendarEvents();
             }
         });
     }
 
     handleDateSelect(selectInfo: DateSelectArg) {
         const d = selectInfo.start;
+        if (!this.estJourAutorise(d)) {
+            const raison = this.getJourBloqueRaison(d);
+            this.messageService.add({ severity: 'warn', summary: 'Jour non disponible', detail: raison });
+            return;
+        }
         this.dateSelectionnee = d;
-        this.nouveauRdv = { 
-            patientId: null, 
-            date: d, 
-            heure: d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }), 
-            type: '', 
-            motif: '' 
+        this.nouveauRdv = {
+            patientId: null,
+            date: d,
+            heure: d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }),
+            type: '',
+            motif: ''
         };
         this.dialogVisible = true;
         this.cdr.detectChanges();
@@ -240,29 +310,127 @@ export class AgendaComponent implements OnInit {
         this.joursMois = [];
 
         for (let i = 0; i < decalage; i++) {
-            this.joursMois.push({ numero: null, date: null, rdvCount: 0, estAujourdhui: false, estSelectionne: false });
+            this.joursMois.push({ numero: null, date: null, rdvCount: 0, estAujourdhui: false, estSelectionne: false, estWeekend: false, estFerme: false });
         }
 
         const today = new Date();
         for (let j = 1; j <= dernierJour.getDate(); j++) {
             const date = new Date(annee, mois, j);
+            const jourSemaine = date.getDay(); // 0=Dim, 6=Sam
+            const estWeekend = jourSemaine === 0 || jourSemaine === 6;
+            const estFerme = this.joursFermes.has(this.toDateKey(date));
             const rdvCount = this.tousRdv.filter((r) => r.date.toDateString() === date.toDateString()).length;
             this.joursMois.push({
                 numero: j,
                 date,
                 rdvCount,
                 estAujourdhui: date.toDateString() === today.toDateString(),
-                estSelectionne: date.toDateString() === this.dateSelectionnee.toDateString()
+                estSelectionne: date.toDateString() === this.dateSelectionnee.toDateString(),
+                estWeekend,
+                estFerme
             });
         }
     }
 
     selectionnerJour(jour: any) {
         if (!jour.date) return;
+        if (jour.estWeekend) {
+            this.messageService.add({ severity: 'info', summary: 'Week-end', detail: 'Le cabinet est fermé le week-end.' });
+            return;
+        }
         this.dateSelectionnee = jour.date;
         this.genererCalendrier();
         this.filtrerRdvDuJour();
         this.cdr.detectChanges();
+    }
+
+    updateCalendarEvents() {
+        if (!this.tousRdv) return;
+        
+        const events: EventInput[] = this.tousRdv.map(rdv => {
+            const d = new Date(rdv.date);
+            const dEnd = new Date(d);
+            dEnd.setMinutes(d.getMinutes() + rdv.dureeMinute);
+            return {
+                id: rdv.id.toString(),
+                title: `${rdv.patient} - ${rdv.motif}`,
+                start: d,
+                end: dEnd,
+                extendedProps: { ...rdv },
+                backgroundColor: rdv.statut === 'CONFIRME' ? '#10B981' : 
+                                 rdv.statut === 'ANNULE' ? '#EF4444' :
+                                 rdv.statut === 'TERMINE' ? '#6B7280' : 
+                                 rdv.statut === 'EN_ATTENTE' ? '#F59E0B' : '#3B82F6',
+                borderColor: 'transparent'
+            };
+        });
+
+        // Background events pour les jours fermés
+        this.joursFermes.forEach(dateStr => {
+            events.push({
+                start: dateStr,
+                allDay: true,
+                display: 'background',
+                classNames: ['fc-day-ferme']
+            });
+        });
+
+        this.calendarOptions = { ...this.calendarOptions, events };
+        this.genererCalendrier();
+    }
+
+    // ── Gestion jours fermés / congés ───────────────────────
+    toDateKey(date: Date): string {
+        const y = date.getFullYear();
+        const m = String(date.getMonth() + 1).padStart(2, '0');
+        const d = String(date.getDate()).padStart(2, '0');
+        return `${y}-${m}-${d}`;
+    }
+
+    toggleJourFerme(jour: any) {
+        if (!jour.date || jour.estWeekend) return;
+        const key = this.toDateKey(jour.date);
+        
+        this.appointmentService.toggleClosedDay(this.medecinId, key).subscribe({
+            next: () => {
+                if (this.joursFermes.has(key)) {
+                    this.joursFermes.delete(key);
+                    this.messageService.add({ severity: 'success', summary: 'Cabinet ouvert', detail: `Le ${jour.date.toLocaleDateString('fr-FR')} est de nouveau disponible` });
+                } else {
+                    this.joursFermes.add(key);
+                    this.messageService.add({ severity: 'warn', summary: 'Cabinet fermé', detail: `Le ${jour.date.toLocaleDateString('fr-FR')} est marqué comme fermé` });
+                }
+                this.sauvegarderJoursFermes(); // Backup local
+                this.updateCalendarEvents();
+                this.cdr.detectChanges();
+            },
+            error: () => {
+                this.messageService.add({ severity: 'warn', summary: 'Mode Hors-ligne', detail: 'Sauvegarde locale uniquement (Backend non disponible)' });
+                // Fallback local
+                if (this.joursFermes.has(key)) {
+                    this.joursFermes.delete(key);
+                } else {
+                    this.joursFermes.add(key);
+                }
+                this.sauvegarderJoursFermes();
+                this.updateCalendarEvents();
+                this.cdr.detectChanges();
+            }
+        });
+    }
+
+    estJourAutorise(date: Date): boolean {
+        const jourSemaine = date.getDay();
+        if (jourSemaine === 0 || jourSemaine === 6) return false; // Weekend
+        if (this.joursFermes.has(this.toDateKey(date))) return false; // Congé
+        return true;
+    }
+
+    getJourBloqueRaison(date: Date): string {
+        const jourSemaine = date.getDay();
+        if (jourSemaine === 0 || jourSemaine === 6) return 'Le cabinet est fermé le week-end (samedi et dimanche).';
+        if (this.joursFermes.has(this.toDateKey(date))) return 'Ce jour est marqué comme congé ou cabinet fermé.';
+        return 'Ce jour n\'est pas disponible.';
     }
 
     filtrerRdvDuJour() {
@@ -290,6 +458,11 @@ export class AgendaComponent implements OnInit {
     }
 
     ouvrirDialogNouveauRdv() {
+        if (!this.estJourAutorise(this.dateSelectionnee)) {
+            const raison = this.getJourBloqueRaison(this.dateSelectionnee);
+            this.messageService.add({ severity: 'warn', summary: 'Jour non disponible', detail: raison });
+            return;
+        }
         this.nouveauRdv = { patientId: null, date: this.dateSelectionnee, heure: '', type: '', motif: '' };
         this.dialogVisible = true;
     }
@@ -351,19 +524,6 @@ export class AgendaComponent implements OnInit {
             next: () => {
                 rdv.statut = 'CONFIRME';
                 this.messageService.add({ severity: 'success', summary: 'RDV Confirmé', detail: `RDV de ${rdv.patient} confirmé` });
-
-                const patient = this.patientsOptions.find(p => p.id === rdv.patientId);
-                const email = patient ? patient.email : 'contact@patient.ma';
-
-                this.notificationService.envoyerConfirmationRDV(
-                    rdv.patientId || 1,
-                    email,
-                    'EMAIL',
-                    rdv.date.toLocaleDateString('fr-FR') + ' à ' + rdv.heure
-                ).subscribe({
-                    next: () => console.log('Notification envoyée'),
-                    error: (err) => console.error('Erreur notification', err)
-                });
                 this.cdr.detectChanges();
             },
             error: () => this.messageService.add({ severity: 'error', summary: 'Erreur', detail: 'Échec confirmation' })

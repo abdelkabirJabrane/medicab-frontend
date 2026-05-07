@@ -1,5 +1,5 @@
-// ================================================
-//  dashboard.scss  —  Secrétaire  —  MediCab Pro
+﻿// ================================================
+//  dashboard.scss  —  Secrétaire  —  MedGest
 // ================================================
 
 :host {
@@ -273,4 +273,94 @@
     &--disponible  { background: var(--mc-green);  }
     &--occupe      { background: var(--mc-orange); }
     &--absent      { background: var(--mc-red);    }
+}
+
+
+
+// ── Colored export/import buttons ────────────
+%btn-colored-base {
+    display: inline-flex;
+    align-items: center;
+    gap: .4rem;
+    padding: .55rem 1.1rem;
+    border-radius: var(--mc-radius-sm);
+    font-size: .875rem;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all .15s;
+    border: 1.5px solid transparent;
+    i { font-size: .82rem; }
+}
+
+.btn-import {
+    @extend %btn-colored-base;
+    background: rgba(124, 58, 237, 0.10);
+    color: #7c3aed;
+    border-color: rgba(124, 58, 237, 0.25);
+    &:hover { background: #7c3aed; color: #fff; box-shadow: 0 3px 10px rgba(124,58,237,.35); transform: translateY(-1px); }
+}
+
+.btn-excel {
+    @extend %btn-colored-base;
+    background: rgba(5, 150, 105, 0.10);
+    color: #059669;
+    border-color: rgba(5, 150, 105, 0.25);
+    &:hover { background: #059669; color: #fff; box-shadow: 0 3px 10px rgba(5,150,105,.35); transform: translateY(-1px); }
+}
+
+.btn-pdf {
+    @extend %btn-colored-base;
+    background: rgba(220, 38, 38, 0.10);
+    color: #dc2626;
+    border-color: rgba(220, 38, 38, 0.25);
+    &:hover { background: #dc2626; color: #fff; box-shadow: 0 3px 10px rgba(220,38,38,.35); transform: translateY(-1px); }
+}
+
+// ── Sortable column header styles ────────────
+::ng-deep .mc-table {
+    .p-datatable-thead > tr > th[pSortableColumn] {
+        cursor: pointer;
+        user-select: none;
+        transition: background .15s, color .15s;
+
+        &:hover {
+            background: var(--mc-primary-light);
+            color: var(--mc-primary) !important;
+        }
+
+        &.p-highlight {
+            background: var(--mc-primary-light);
+            color: var(--mc-primary) !important;
+            .p-sortable-column-icon { color: var(--mc-primary); }
+        }
+
+        .p-sortable-column-icon {
+            font-size: .65rem;
+            margin-left: .3rem;
+            color: var(--mc-text-3);
+            vertical-align: middle;
+            transition: color .15s;
+        }
+    }
+}
+
+:host-context([data-theme="dark"]) {
+    --mc-primary-light:  #1e293b;
+    --mc-bg:             #0f172a;
+    --mc-surface:         #1e293b;
+    --mc-surface-2:      #1a2744;
+    --mc-border:         #334155;
+    --mc-border-hover:   #475569;
+    --mc-text-1:         #f1f5f9;
+    --mc-text-2:         #94a3b8;
+    --mc-text-3:         #64748b;
+    
+    --mc-green-bg:       #022c22;
+    --mc-red-bg:         #450a0a;
+    --mc-orange-bg:      #451a03;
+    --mc-blue-bg:        #172554;
+
+    --sec-accent-light:  #042f2e;
+    --admin-accent-light: #431407;
 }

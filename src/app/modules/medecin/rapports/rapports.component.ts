@@ -80,12 +80,16 @@ export class RapportsComponent implements OnInit {
           let consultations = 0;
 
           factures.forEach(f => {
-              const d = f.dateEmission ? new Date(f.dateEmission) : new Date(f.dateCreation);
+              // ✅ Correction : backend utilise montantTTC et dateEmission (string "YYYY-MM-DD")
+              const rawDate = f.dateEmission || f.dateCreation;
+              if (!rawDate) return;
+              const d = new Date(rawDate);
               if (d.getMonth() === m.monthIndex && d.getFullYear() === m.year) {
-                  const t = f.montantTotal || 0;
-                  const p = f.montantPaye || 0;
-                  ca += t;
-                  impayes += (t - p);
+                  const total = f.montantTTC || f.montantTotal || 0;
+                  const paye  = f.montantPaye || 0;
+                  ca += total;
+                  const reste = f.montantRestant ?? (total - paye);
+                  impayes += Math.max(0, reste);
               }
           });
 
@@ -99,21 +103,20 @@ export class RapportsComponent implements OnInit {
               }
           });
 
-          const mCa = ca;
-          const taux = mCa > 0 ? Math.round(((mCa - impayes) / mCa) * 100) : 100;
+          const taux = ca > 0 ? Math.round(((ca - impayes) / ca) * 100) : 100;
 
           return {
               period: m.label,
-              consultations: consultations,
-              ca: ca,
-              impayes: Math.max(0, impayes),
-              taux: taux
+              consultations,
+              ca: Math.round(ca * 100) / 100,
+              impayes: Math.round(impayes * 100) / 100,
+              taux
           };
       });
 
-      this.totalCa = this.reportData.reduce((acc, curr) => acc + curr.ca, 0);
+      this.totalCa = Math.round(this.reportData.reduce((acc, curr) => acc + curr.ca, 0) * 100) / 100;
       this.totalConsultations = this.reportData.reduce((acc, curr) => acc + curr.consultations, 0);
-      this.totalImpayes = this.reportData.reduce((acc, curr) => acc + curr.impayes, 0);
+      this.totalImpayes = Math.round(this.reportData.reduce((acc, curr) => acc + curr.impayes, 0) * 100) / 100;
       this.tauxRecouvrement = this.totalCa === 0 ? 100 : Math.round(((this.totalCa - this.totalImpayes) / this.totalCa) * 100);
 
       this.initCharts(rdvs);
@@ -132,14 +135,14 @@ export class RapportsComponent implements OnInit {
           label: 'Chiffre d\'Affaires (DH)',
           data: this.reportData.map(d => d.ca),
           fill: false,
-          borderColor: documentStyle.getPropertyValue('--blue-500'),
+          borderColor: '#3B82F6',
           tension: 0.4
         },
         {
           label: 'Impayés (DH)',
           data: this.reportData.map(d => d.impayes),
           fill: false,
-          borderColor: documentStyle.getPropertyValue('--red-500'),
+          borderColor: '#EF4444',
           tension: 0.4
         }
       ]
@@ -159,37 +162,42 @@ export class RapportsComponent implements OnInit {
     (rdvs || []).forEach(r => {
         if (!r.dateHeureDebut) return;
         const d = new Date(r.dateHeureDebut);
-        if (now.getTime() - d.getTime() < 1000 * 3600 * 24 * 180) { // last 6 months
+        // Filtrer sur les 6 derniers mois
+        if (now.getTime() - d.getTime() < 1000 * 3600 * 24 * 180) {
             if (r.statut !== 'ANNULE') {
-                if (r.typeConsultation === 'Urgence') countUrgence++;
-                else if (r.typeConsultation === 'Suivi') countSuivi++;
+                const type = (r.typeConsultation || '').toLowerCase();
+                if (type.includes('urgence')) countUrgence++;
+                else if (type.includes('suivi')) countSuivi++;
                 else countNouvelles++;
             }
         }
     });
-    // Fallback if no rdvs
-    if (countNouvelles === 0 && countSuivi === 0 && countUrgence === 0) {
-        countNouvelles = 1;
-    }
+
+    // Fallback data for visualization if total is 0
+    const hasData = (countNouvelles + countSuivi + countUrgence) > 0;
+    const displayData = hasData ? [countNouvelles, countSuivi, countUrgence] : [100, 0, 0];
 
     this.pieChartData = {
       labels: ['Consultations', 'Suivi', 'Urgence'],
       datasets: [
         {
-          data: [countNouvelles, countSuivi, countUrgence],
+          data: displayData,
           backgroundColor: [
-            documentStyle.getPropertyValue('--blue-500'),
-            documentStyle.getPropertyValue('--green-500'),
-            documentStyle.getPropertyValue('--orange-500')
+            '#3B82F6', // Blue 500
+            '#10B981', // Emerald 500
+            '#F59E0B'  // Amber 500
           ],
           hoverBackgroundColor: [
-            documentStyle.getPropertyValue('--blue-400'),
-            documentStyle.getPropertyValue('--green-400'),
-            documentStyle.getPropertyValue('--orange-400')
-          ]
+            '#2563EB',
+            '#059669',
+            '#D97706'
+          ],
+          borderColor: surfaceBorder || '#ffffff',
+          borderWidth: 2
         }
       ]
     };
+
 
     this.pieOptions = { plugins: { legend: { labels: { usePointStyle: true, color: textColor } } } };
   }

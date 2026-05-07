@@ -4,12 +4,14 @@ import { Observable, BehaviorSubject, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { ChatMessage, AgentResponse, TranscriptionResponse, PatientContext } from '../models/ai.model';
 
+import { environment } from '../../../environments/environment';
+
 @Injectable({
     providedIn: 'root'
 })
 export class AiService {
-    private httpUrl = 'http://127.0.0.1:8000/api/ai';
-    private wsUrl = 'ws://127.0.0.1:8000/ws/chat';
+    private httpUrl = environment.services.ai || 'http://localhost:8000/api/ai';
+    private wsUrl = environment.services.aiWs || 'ws://localhost:8000/ws/chat';
 
     private sessionIdSubject = new BehaviorSubject<string>(this.generateUUID());
     public sessionId$ = this.sessionIdSubject.asObservable();

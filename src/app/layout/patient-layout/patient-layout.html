@@ -1,0 +1,53 @@
+﻿<div class="min-h-screen flex flex-col">
+    
+    <!-- Navbar Patient Premium -->
+    <nav class="bg-white border-b border-slate-100 px-8 py-5 sticky top-0 z-[100] shadow-sm">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            
+            <div class="flex items-center gap-4 cursor-pointer" routerLink="/search">
+                <div class="bg-indigo-600 p-2 rounded-xl">
+                   <i class="pi pi-plus text-white font-bold"></i>
+                </div>
+                <div class="flex flex-col">
+                   <span class="text-xl font-black text-slate-900 tracking-tight">MedGest<span class="text-indigo-600">Pro</span></span>
+                   <span class="text-[9px] text-slate-400 font-bold uppercase tracking-[0.2em]">Patient Portal</span>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-6">
+                <!-- User Profile Summary -->
+                <div class="hidden md:flex flex-col text-right cursor-pointer hover:opacity-80 transition-opacity" routerLink="/patient/profile">
+                    <span class="text-sm font-black text-slate-900">{{ currentUser?.firstName }} {{ currentUser?.lastName }}</span>
+                    <span class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Mon Profil</span>
+                </div>
+                
+                <div class="h-10 w-[1px] bg-slate-100 hidden md:block"></div>
+
+                <div class="flex items-center gap-3">
+                   <button (click)="logout()" 
+                           class="w-10 h-10 rounded-xl bg-slate-50 text-slate-400 hover:bg-rose-50 hover:text-rose-500 transition-all border border-slate-100 flex items-center justify-center">
+                      <i class="pi pi-power-off"></i>
+                   </button>
+                </div>
+            </div>
+
+        </div>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main class="flex-1">
+        <router-outlet></router-outlet>
+    </main>
+
+    <!-- Simple Footer -->
+    <footer class="bg-white border-t border-slate-50 py-10">
+        <div class="max-w-7xl mx-auto px-8 flex justify-between items-center text-slate-400 text-[10px] font-black uppercase tracking-[0.2em]">
+            <div>&copy; 2026 MedGest</div>
+            <div class="flex gap-6">
+                <a href="#" class="hover:text-indigo-600 transition-colors">Support</a>
+                <a href="#" class="hover:text-indigo-600 transition-colors">Confidentialité</a>
+            </div>
+        </div>
+    </footer>
+
+</div>

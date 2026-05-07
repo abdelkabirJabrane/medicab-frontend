@@ -28,7 +28,7 @@ export class AdminUtilisateursComponent implements OnInit {
     filtreActif = 'TOUS';
     dialogVisible = false;
     loading = false;
-    form: any = { firstName: '', lastName: '', email: '', username: '', role: '', cabinet: '' };
+    form: any = { firstName: '', lastName: '', email: '', username: '', role: '', cabinet: '', gender: 'MALE', address: '', ville: '', phoneNumber: '' };
 
     tabs = [
         { label: 'Tous', value: 'TOUS', count: 0 },
@@ -41,6 +41,11 @@ export class AdminUtilisateursComponent implements OnInit {
         { label: 'Médecin', value: 'ROLE_MEDECIN' },
         { label: 'Secrétaire', value: 'ROLE_SECRETAIRE' },
         { label: 'Super Admin', value: 'ROLE_SUPER_ADMIN' }
+    ];
+
+    genderOptions = [
+        { label: 'Masculin', value: 'MALE' },
+        { label: 'Féminin', value: 'FEMALE' }
     ];
 
     cabinetOptions: any[] = [];
@@ -142,7 +147,7 @@ export class AdminUtilisateursComponent implements OnInit {
     }
 
     ouvrirNouveau() {
-        this.form = { firstName: '', lastName: '', email: '', username: '', password: '', role: 'ROLE_MEDECIN', cabinet: '' };
+        this.form = { firstName: '', lastName: '', email: '', username: '', password: '', role: 'ROLE_MEDECIN', cabinet: '', specialite: '', slug: '', biographie: '', gender: 'MALE', address: '', ville: '', phoneNumber: '' };
         this.dialogVisible = true;
     }
 
@@ -191,7 +196,12 @@ export class AdminUtilisateursComponent implements OnInit {
     }
 
     modifier(u: any) {
-        this.form = { ...u };
+        this.form = { 
+            ...u,
+            specialite: u.specialite || '',
+            slug: u.slug || '',
+            biographie: u.biographie || ''
+        };
         this.dialogVisible = true;
     }
 

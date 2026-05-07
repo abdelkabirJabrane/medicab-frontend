@@ -10,15 +10,15 @@
     <div class="header-actions">
         <input type="file" #fileInput style="display: none" (change)="importExcel($event)" accept=".xlsx, .xls">
         
-        <button class="btn-outline" (click)="triggerImport(fileInput)" pTooltip="Importer" tooltipPosition="bottom">
+        <button class="btn-import" (click)="triggerImport(fileInput)" pTooltip="Importer" tooltipPosition="bottom">
             <i class="pi pi-upload"></i> Importer
         </button>
         
-        <button class="btn-outline" (click)="exportExcel()" pTooltip="Excel" tooltipPosition="bottom">
+        <button class="btn-excel" (click)="exportExcel()" pTooltip="Excel" tooltipPosition="bottom">
             <i class="pi pi-file-excel"></i> Excel
         </button>
         
-        <button class="btn-outline" (click)="exportPDF()" pTooltip="PDF" tooltipPosition="bottom">
+        <button class="btn-pdf" (click)="exportPDF()" pTooltip="PDF" tooltipPosition="bottom">
             <i class="pi pi-file-pdf"></i> PDF
         </button>
 
@@ -63,6 +63,7 @@
         [showCurrentPageReport]="true"
         currentPageReportTemplate="{first}-{last} sur {totalRecords}"
         responsiveLayout="scroll"
+        [sortMode]="'single'"
         styleClass="mc-table">
 
         <ng-template pTemplate="header">
@@ -89,7 +90,9 @@
                         <div class="patient-cell__av">{{ p.initiales }}</div>
                         <div>
                             <div class="patient-cell__name">{{ p.prenom }} {{ p.nom }}</div>
-                            <div class="patient-cell__city">{{ p.ville }}</div>
+                            <div class="patient-cell__city hover:text-blue-600 cursor-pointer transition-colors" (click)="openGoogleMaps(p.adresse || '', p.ville || '')" title="Voir sur Google Maps">
+                                <i class="pi pi-map-marker text-[10px]"></i> {{ p.ville }}
+                            </div>
                         </div>
                     </div>
                 </td>
@@ -209,13 +212,15 @@
                 <label class="form-label">Sexe</label>
                 <p-select [(ngModel)]="nouveauPatient.sexe" [options]="sexeOptions"
                           optionLabel="label" optionValue="value"
-                          placeholder="Choisir" styleClass="w-full"></p-select>
+                          placeholder="Choisir" styleClass="w-full"
+                          appendTo="body"></p-select>
             </div>
             <div class="form-field">
                 <label class="form-label">Groupe Sanguin</label>
                 <p-select [(ngModel)]="nouveauPatient.groupeSanguin" [options]="groupeSanguinOptions"
                           optionLabel="label" optionValue="value"
-                          placeholder="Choisir" styleClass="w-full"></p-select>
+                          placeholder="Choisir" styleClass="w-full"
+                          appendTo="body"></p-select>
             </div>
         </div>
 
@@ -224,13 +229,15 @@
                 <label class="form-label">Assurance</label>
                 <p-select [(ngModel)]="nouveauPatient.typeAssurance" [options]="assuranceOptions"
                           optionLabel="label" optionValue="value"
-                          placeholder="Choisir" styleClass="w-full"></p-select>
+                          placeholder="Choisir" styleClass="w-full"
+                          appendTo="body"></p-select>
             </div>
             <div class="form-field">
                 <label class="form-label">Médecin référent</label>
                 <p-select [(ngModel)]="nouveauPatient.medecinRef" [options]="medecinOptions"
-                          optionLabel="label" optionValue="label"
-                          placeholder="Choisir" styleClass="w-full"></p-select>
+                          optionLabel="label" optionValue="value"
+                          placeholder="Choisir" styleClass="w-full"
+                          appendTo="body"></p-select>
             </div>
         </div>
 
@@ -298,8 +305,23 @@
                 <div class="detail-field__value">{{ patientSelectionne.medecinRef }}</div>
             </div>
             <div class="detail-field">
-                <div class="detail-field__label">Ville</div>
-                <div class="detail-field__value">{{ patientSelectionne.ville }}</div>
+                <div class="detail-field__label">Ville / Adresse</div>
+                <div class="detail-field__value hover:text-blue-600 cursor-pointer transition-colors" (click)="openGoogleMaps(patientSelectionne.adresse || '', patientSelectionne.ville || '')" title="Ouvrir dans Google Maps">
+                    <i class="pi pi-map-marker"></i> {{ patientSelectionne.ville }}
+                    <div style="font-size: 0.75rem; color: #8a95b0; font-weight: normal;" *ngIf="patientSelectionne.adresse">{{ patientSelectionne.adresse }}</div>
+                </div>
+            </div>
+
+            <!-- Embedded Map Preview -->
+            <div class="col-span-2 w-full h-32 rounded-xl overflow-hidden border border-slate-100 bg-slate-50 mt-1" *ngIf="patientSelectionne.ville || patientSelectionne.adresse">
+               <iframe 
+                 width="100%" 
+                 height="100%" 
+                 frameborder="0" 
+                 style="border:0;" 
+                 [src]="'https://maps.google.com/maps?q=' + (patientSelectionne.adresse || '') + ' ' + (patientSelectionne.ville || '') + '&t=&z=14&ie=UTF8&iwloc=&output=embed' | safeUrl" 
+                 allowfullscreen>
+               </iframe>
             </div>
             <div class="detail-field detail-field--full">
                 <div class="detail-field__label">Dernier RDV</div>

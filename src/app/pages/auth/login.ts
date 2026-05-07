@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+﻿import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
@@ -48,7 +48,7 @@ import { CommonModule } from '@angular/common';
                                  class="mb-3">🏥</div>
                             <div class="text-900 text-3xl
                                     font-bold mb-2">
-                                MediCab Pro
+                                MedGest
                             </div>
                             <span class="text-500 text-sm">
                             Plateforme SaaS Médicale
@@ -65,7 +65,7 @@ import { CommonModule } from '@angular/common';
                                 pInputText
                                 [(ngModel)]="email"
                                 type="email"
-                                placeholder="email@medicab.ma"
+                                placeholder="email@MedGest.ma"
                                 class="w-full mb-3"/>
 
                             <label class="block text-900
@@ -128,7 +128,7 @@ import { CommonModule } from '@angular/common';
                                             </div>
                                             <div class="text-xs"
                                                  style="color:#93c5fd">
-                                                medecin&#64;medicab.ma
+                                                medecin&#64;MedGest.ma
                                             </div>
                                         </div>
                                     </div>
@@ -153,7 +153,7 @@ import { CommonModule } from '@angular/common';
                                             </div>
                                             <div class="text-xs"
                                                  style="color:#86efac">
-                                                secretaire&#64;medicab.ma
+                                                secretaire&#64;MedGest.ma
                                             </div>
                                         </div>
                                     </div>
@@ -178,7 +178,7 @@ import { CommonModule } from '@angular/common';
                                             </div>
                                             <div class="text-xs"
                                                  style="color:#fdba74">
-                                                admin&#64;medicab.ma
+                                                admin&#64;MedGest.ma
                                             </div>
                                         </div>
                                     </div>
@@ -203,7 +203,7 @@ import { CommonModule } from '@angular/common';
                                             </div>
                                             <div class="text-xs"
                                                  style="color:#d8b4fe">
-                                                patient&#64;medicab.ma
+                                                patient&#64;MedGest.ma
                                             </div>
                                         </div>
                                     </div>

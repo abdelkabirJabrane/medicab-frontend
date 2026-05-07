@@ -1,4 +1,4 @@
-import { Component, ElementRef, ViewChild, AfterViewChecked, OnDestroy } from '@angular/core';
+﻿import { Component, ElementRef, ViewChild, AfterViewChecked, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AiService } from '../../../core/services/ai.service';
@@ -16,6 +16,7 @@ export class FloatingAiWidgetComponent implements AfterViewChecked, OnDestroy {
   isOpen = false;
   inputText = '';
   isRecording = false; 
+  connectionError = false;
   messages: DisplayMessage[] = [];
   
   private ws: WebSocket | null = null;
@@ -33,7 +34,7 @@ export class FloatingAiWidgetComponent implements AfterViewChecked, OnDestroy {
       this.messages.push({
           id: Date.now(),
           role: 'MEDAGENT',
-          text: 'Bonjour ! 👋 Je suis l\'assistant IA de MediCab Pro. Avez-vous une question sur une pathologie, un médicament ou cherchez-vous une fonctionnalité ?',
+          text: 'Bonjour ! 👋 Je suis l\'assistant IA de MedGest. Avez-vous une question sur une pathologie, un médicament ou cherchez-vous une fonctionnalité ?',
           isStreaming: false,
           isTranscription: false,
           timestamp: new Date()
@@ -110,10 +111,11 @@ export class FloatingAiWidgetComponent implements AfterViewChecked, OnDestroy {
                });
            },
            error: (err: any) => {
+               this.connectionError = true;
                this.messages.push({
                     id: Date.now(),
                     role: 'MEDAGENT',
-                    text: '❌ Connexion au backend FastAPI (port 8000) impossible. Veuillez démarrer l\'API.',
+                    text: '❌ Connexion au service IA impossible. Vérifiez que le service FastAPI est bien démarré sur le port 8000.',
                     isStreaming: false,
                     isTranscription: false,
                     timestamp: new Date()
@@ -131,6 +133,7 @@ export class FloatingAiWidgetComponent implements AfterViewChecked, OnDestroy {
   }
 
   private connectWebSocket() {
+        this.connectionError = false;
         try {
             const socket = this.aiService.connectWebSocket('global-widget-session');
             this.ws = socket;
@@ -177,7 +180,12 @@ export class FloatingAiWidgetComponent implements AfterViewChecked, OnDestroy {
             };
 
             socket.onclose = () => {
+                this.connectionError = true;
                 setTimeout(() => { if(this.isOpen) this.connectWebSocket(); }, 5000);
+            };
+
+            socket.onerror = () => {
+                this.connectionError = true;
             };
 
         } catch (e) {

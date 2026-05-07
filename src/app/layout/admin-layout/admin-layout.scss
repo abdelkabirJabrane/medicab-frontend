@@ -1,5 +1,5 @@
-// ================================================
-//  admin-layout.scss  —  MediCab Pro
+﻿// ================================================
+//  admin-layout.scss  —  MedGest
 //  Accent : Orange #EA580C — identité admin
 // ================================================
 
@@ -38,7 +38,11 @@
     // Accent admin : orange
     --adm-accent:        #EA580C;
     --adm-accent-dark:   #C2410C;
-    --adm-accent-light:  #FFF7ED;
+    --adm-accent-light:  #FFF7ED;
+
+
+
+
 
     display: block; height: 100vh; overflow: hidden;
 }
@@ -164,7 +168,7 @@
     &::-webkit-scrollbar { width: 4px; }
     &::-webkit-scrollbar-thumb { background: var(--mc-border); border-radius: 4px; }
 
-    &--closed { width: 0; margin-left: calc(-1 * var(--mc-sidebar-w)); overflow: hidden; }
+    &--closed { width: 0; border-right-width: 0; visibility: hidden; opacity: 0; }
 
     &__nav { flex: 1; padding: .625rem 0 .5rem; }
 
@@ -234,4 +238,25 @@
     scrollbar-width: thin; scrollbar-color: var(--mc-border) transparent;
     &::-webkit-scrollbar { width: 6px; }
     &::-webkit-scrollbar-thumb { background: var(--mc-border); border-radius: 4px; }
+}
+
+
+:host-context([data-theme="dark"]) {
+    --mc-primary-light:  #1e293b;
+    --mc-bg:             #0f172a;
+    --mc-surface:         #1e293b;
+    --mc-surface-2:      #1a2744;
+    --mc-border:         #334155;
+    --mc-border-hover:   #475569;
+    --mc-text-1:         #f1f5f9;
+    --mc-text-2:         #94a3b8;
+    --mc-text-3:         #64748b;
+    
+    --mc-green-bg:       #022c22;
+    --mc-red-bg:         #450a0a;
+    --mc-orange-bg:      #451a03;
+    --mc-blue-bg:        #172554;
+
+    --sec-accent-light:  #042f2e;
+    --admin-accent-light: #431407;
 }

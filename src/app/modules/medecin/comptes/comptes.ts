@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+﻿import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
@@ -14,6 +14,7 @@ import { DialogModule } from 'primeng/dialog';
 import { TagModule } from 'primeng/tag';
 import { RippleModule } from 'primeng/ripple';
 import { TooltipModule } from 'primeng/tooltip';
+import { SafeUrlPipe } from '../../../core/pipes/safe-url.pipe';
 
 import { AuthService } from '../../../core/services/auth';
 import { UserAdminService } from '../../../core/services/user-admin';
@@ -24,7 +25,7 @@ import { UserAdminService } from '../../../core/services/user-admin';
   imports: [
     CommonModule, FormsModule,
     TabsModule, InputTextModule, ButtonModule, TableModule, PasswordModule,
-    ToastModule, DialogModule, TagModule, RippleModule, TooltipModule
+    ToastModule, DialogModule, TagModule, RippleModule, TooltipModule, SafeUrlPipe
   ],
   providers: [MessageService],
   templateUrl: './comptes.html',
@@ -39,6 +40,8 @@ export class ComptesComponent implements OnInit {
     prenom: '',
     email: '',
     telephone: '',
+    address: '',
+    ville: '',
     password: '',
     newPassword: ''
   };
@@ -82,6 +85,8 @@ export class ComptesComponent implements OnInit {
           this.medecin.prenom = fullUser.firstName || '';
           this.medecin.email = fullUser.email || '';
           this.medecin.telephone = fullUser.phoneNumber || '';
+          this.medecin.address = fullUser.address || '';
+          this.medecin.ville = fullUser.ville || '';
           this.loadingProfil = false;
         },
         error: () => {
@@ -105,7 +110,9 @@ export class ComptesComponent implements OnInit {
       firstName: this.medecin.prenom,
       lastName: this.medecin.nom,
       email: this.medecin.email,
-      phoneNumber: this.medecin.telephone
+      phoneNumber: this.medecin.telephone,
+      address: this.medecin.address,
+      ville: this.medecin.ville
     };
 
     this.userAdminService.update(user.id, updatePayload).subscribe({
@@ -119,7 +126,7 @@ export class ComptesComponent implements OnInit {
           email: updatedUser.email,
           phoneNumber: updatedUser.phoneNumber
         };
-        localStorage.setItem('medicab-user', JSON.stringify(merged));
+        localStorage.setItem('MedGest-user', JSON.stringify(merged));
         window.dispatchEvent(new Event('storage'));
         this.loadingProfil = false;
         this.messageService.add({ severity: 'success', summary: 'Succès', detail: 'Profil mis à jour avec succès' });
@@ -274,5 +281,11 @@ export class ComptesComponent implements OnInit {
 
   getSeverity(statut: string): 'success' | 'danger' {
     return statut === 'Actif' ? 'success' : 'danger';
+  }
+
+  openGoogleMaps(address: string, city: string = '') {
+    const fullAddress = `${address || ''}${address && city ? ', ' : ''}${city || ''}`;
+    const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(fullAddress)}`;
+    window.open(url, '_blank');
   }
 }

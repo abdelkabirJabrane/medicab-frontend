@@ -51,12 +51,12 @@
     </div>
 
     <div class="kpi-card kpi-card--red">
-        <div class="kpi-card__icon"><i class="pi pi-exclamation-triangle"></i></div>
+        <div class="kpi-card__icon"><i class="pi pi-exclamation-circle"></i></div>
         <div class="kpi-card__body">
-            <div class="kpi-card__label">Alertes Système</div>
-            <div class="kpi-card__value">{{ stats.alertes }}</div>
-            <div class="kpi-card__trend kpi-card__trend--down">
-                <i class="pi pi-arrow-down"></i> {{ stats.alertesCritiques }} critiques
+            <div class="kpi-card__label">Maintenance</div>
+            <div class="kpi-card__value">OK</div>
+            <div class="kpi-card__trend kpi-card__trend--up">
+                <i class="pi pi-check"></i> Système Nominal
             </div>
         </div>
     </div>
@@ -152,26 +152,7 @@
             </div>
         </div>
 
-        <!-- Alertes système -->
-        <div class="panel">
-            <div class="panel__header">
-                <h3 class="panel__title">Alertes Système</h3>
-            </div>
-            <div class="alerts-list">
-                @for (alert of alertesSysteme; track alert.id) {
-                    <div class="alert-item alert-item--{{ alert.niveau }}">
-                        <div class="alert-item__icon">
-                            <i [class]="alert.icon"></i>
-                        </div>
-                        <div class="alert-item__content">
-                            <div class="alert-item__msg">{{ alert.message }}</div>
-                            <div class="alert-item__time">{{ alert.temps }}</div>
-                        </div>
-                        <span class="alert-badge alert-badge--{{ alert.niveau }}">{{ alert.niveauLabel }}</span>
-                    </div>
-                }
-            </div>
-        </div>
+        <!-- Alertes système removed -->
 
     </div>
 

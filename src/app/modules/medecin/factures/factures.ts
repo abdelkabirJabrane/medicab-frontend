@@ -31,6 +31,7 @@ import { saveAs } from 'file-saver';
 export class FacturesComponent implements OnInit {
     factures: any[] = [];
     facturesFiltres: any[] = [];
+    searchQuery = '';
     dialogPaiementVisible = false;
     factureSelectionnee: any = null;
     montantPaiement = 0;
@@ -59,10 +60,10 @@ export class FacturesComponent implements OnInit {
         return {
             fullName: `Dr. ${user?.firstName || ''} ${user?.lastName || ''}`,
             specialty: 'Médecin Généraliste',
-            email: user?.email || 'contact@medicab.com',
+            email: user?.email || 'contact@MedGest.com',
             phone: (user as any)?.phoneNumber || '05 22 00 00 00',
             address: '123 Avenue Mohamed V, Casablanca',
-            website: 'www.medicab.ma'
+            website: 'www.MedGest.ma'
         };
     }
 
@@ -159,7 +160,7 @@ export class FacturesComponent implements OnInit {
                     </div>
                     
                     <div class="footer">
-                        Cette facture est générée par MediCab Pro - Solution de gestion de cabinet médical.
+                        Cette facture est générée par MedGest - Solution de gestion de cabinet médical.
                         <br>Merci de votre confiance.
                     </div>
                 </body>
@@ -235,6 +236,19 @@ export class FacturesComponent implements OnInit {
         this.stats.totalImpaye = this.factures.reduce((s, f) => s + f.montantRestant, 0);
         this.stats.nbFactures = this.factures.length;
         this.stats.nbImpayes = this.factures.filter(f => f.montantRestant > 0 && f.statut !== 'ANNULEE').length;
+    }
+
+    rechercher() {
+        const q = this.searchQuery.toLowerCase().trim();
+        if (!q) {
+            this.facturesFiltres = [...this.factures];
+        } else {
+            this.facturesFiltres = this.factures.filter(f =>
+                (f.patient         || '').toLowerCase().includes(q) ||
+                (f.numeroFacture   || '').toLowerCase().includes(q) ||
+                this.getStatutLabel(f.statut).toLowerCase().includes(q)
+            );
+        }
     }
 
     ouvrirPaiement(facture: any) {
@@ -342,6 +356,7 @@ export class FacturesComponent implements OnInit {
     }
 
     importExcel(event: any): void {
+        console.log('🚀 DÉBUT IMPORTATION RÉELLE DES FACTURES');
         const file = event.target.files[0];
         if (!file) return;
 
@@ -352,10 +367,110 @@ export class FacturesComponent implements OnInit {
             const ws = wb.Sheets[wb.SheetNames[0]];
             const data: any[] = XLSX.utils.sheet_to_json(ws);
 
-            if (data.length === 0) return;
+            if (data.length === 0) {
+                this.messageService.add({ severity: 'warn', summary: 'Fichier vide', detail: 'Aucune donnée trouvée.' });
+                return;
+            }
 
-            this.messageService.add({ severity: 'info', summary: 'Importation', detail: `Importation de ${data.length} factures simulée...` });
+            let success = 0;
+            let failed  = 0;
+
+            this.messageService.add({
+                severity: 'info',
+                summary:  'Import en cours…',
+                detail:   `Traitement de ${data.length} facture(s) vers la base de données.`
+            });
+
+            // Charger les patients pour le mapping si pas déjà fait
+            this.patientService.getAll().subscribe(patients => {
+                const processNext = (index: number) => {
+                    if (index >= data.length) {
+                        event.target.value = '';
+                        this.loadFactures();
+                        this.messageService.add({
+                            severity: success > 0 ? 'success' : 'warn',
+                            summary:  'Import terminé',
+                            detail:   `${success} facture(s) créée(s) ✔️ — ${failed} échouée(s).`
+                        });
+                        return;
+                    }
+
+                    const row = data[index];
+                    const patientName = (row['Patient'] || row['patient'] || '').toLowerCase().trim();
+
+                    // Recherche du patient par nom (fuzzy match)
+                    const patient = patients.find(p => {
+                        const fullName = (p.nomComplet || `${p.prenom || ''} ${p.nom || ''}`).toLowerCase();
+                        if (fullName.includes(patientName)) return true;
+                        
+                        // Split and check each part (ex: "Simo Hamouda" matches "Hamouda Simo")
+                        const parts = patientName.split(' ').filter((word: string) => word.length > 2);
+                        return parts.length > 0 && parts.every((part: string) => fullName.includes(part));
+                    });
+
+                    if (!patient) {
+                        console.warn(`⚠️ Patient "${patientName}" non trouvé.`);
+                        failed++;
+                        processNext(index + 1);
+                        return;
+                    }
+
+                    // Nettoyage des montants
+                    const montantTTCRaw = String(row['Montant'] || row['montant'] || '0');
+                    const montantTTC    = parseFloat(montantTTCRaw.replace(/[^\d.]/g, '')) || 0;
+                    
+                    const verseRaw      = String(row['Versé'] || row['Verse'] || row['verse'] || '0');
+                    const montantPaye   = parseFloat(verseRaw.replace(/[^\d.]/g, '')) || 0;
+
+                    // Déduction du statut si pas précisé
+                    let statut = (row['Statut'] || row['statut'] || '').toUpperCase();
+                    if (!statut) {
+                        if (montantPaye >= montantTTC) statut = 'PAYEE';
+                        else if (montantPaye > 0) statut = 'PARTIELLEMENT_PAYEE';
+                        else statut = 'EMISE';
+                    }
+
+                    const payload = {
+                        patientId: patient.id,
+                        medecinId: this.authService.getCurrentUser()?.id || 1,
+                        dateEmission: this.formatXlsxDate(row['Date'] || row['date']),
+                        montantTTC: montantTTC,
+                        montantPaye: montantPaye,
+                        montantHT: montantTTC / 1.2, // Simulation TVA 20%
+                        tva: montantTTC - (montantTTC / 1.2),
+                        statut: statut,
+                        nature: 'CONSULTATION',
+                        typeFacture: 'NORMAL'
+                    };
+
+                    this.billingService.create(payload).subscribe({
+                        next: () => { success++; processNext(index + 1); },
+                        error: (err) => {
+                            console.error(`❌ Ligne ${index + 1} :`, err);
+                            failed++;
+                            processNext(index + 1);
+                        }
+                    });
+                };
+
+                processNext(0);
+            });
         };
         reader.readAsBinaryString(file);
+    }
+
+    private formatXlsxDate(val: any): string {
+        if (!val) return new Date().toISOString().split('T')[0];
+        
+        // Si c'est déjà une date ISO
+        if (typeof val === 'string' && val.includes('-')) return val;
+        
+        // Si c'est DD/MM/YYYY
+        if (typeof val === 'string' && val.includes('/')) {
+            const p = val.split('/');
+            if (p.length === 3) return `${p[2]}-${p[1].padStart(2, '0')}-${p[0].padStart(2, '0')}`;
+        }
+        
+        return new Date().toISOString().split('T')[0];
     }
 }

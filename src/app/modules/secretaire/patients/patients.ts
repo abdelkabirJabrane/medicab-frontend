@@ -17,11 +17,12 @@ import * as XLSX from 'xlsx';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { saveAs } from 'file-saver';
+import { SafeUrlPipe } from '../../../core/pipes/safe-url.pipe';
 
 @Component({
     selector: 'app-sec-patients',
     standalone: true,
-    imports: [CommonModule, RouterModule, FormsModule, ButtonModule, TableModule, DialogModule, InputTextModule, ToastModule, ConfirmDialogModule, SelectModule],
+    imports: [CommonModule, RouterModule, FormsModule, ButtonModule, TableModule, DialogModule, InputTextModule, ToastModule, ConfirmDialogModule, SelectModule, SafeUrlPipe],
     providers: [MessageService, ConfirmationService],
     templateUrl: './patients.html',
     styleUrls: ['./patients.scss']
@@ -62,7 +63,13 @@ export class SecPatientsComponent implements OnInit {
         { label: 'Féminin', value: 'FEMININ' }
     ];
 
-    groupeSanguinOptions = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'].map((g) => ({ label: g, value: g }));
+    groupeSanguinOptions = [
+        { label: 'Inconnu', value: 'INCONNU' },
+        { label: 'A+', value: 'A+' }, { label: 'A-', value: 'A-' },
+        { label: 'B+', value: 'B+' }, { label: 'B-', value: 'B-' },
+        { label: 'AB+', value: 'AB+' }, { label: 'AB-', value: 'AB-' },
+        { label: 'O+', value: 'O+' }, { label: 'O-', value: 'O-' }
+    ];
 
     assuranceOptions = [
         { label: 'CNSS', value: 'CNSS' },
@@ -352,5 +359,11 @@ export class SecPatientsComponent implements OnInit {
             this.messageService.add({ severity: 'info', summary: 'Importation', detail: `Importation de ${data.length} patients simulée...` });
         };
         reader.readAsBinaryString(file);
+    }
+
+    openGoogleMaps(address: string, city: string = ''): void {
+        const fullAddress = `${address}${city ? ', ' + city : ''}`;
+        const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(fullAddress)}`;
+        window.open(url, '_blank');
     }
 }

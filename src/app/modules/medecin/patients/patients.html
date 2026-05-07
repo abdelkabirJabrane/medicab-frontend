@@ -12,15 +12,15 @@
         <!-- Input caché pour l'import Excel -->
         <input type="file" #fileInput style="display: none" (change)="importExcel($event)" accept=".xlsx, .xls">
         
-        <button class="btn-outline" (click)="triggerImport(fileInput)" pTooltip="Importer depuis Excel" tooltipPosition="bottom">
+        <button class="btn-import" (click)="triggerImport(fileInput)" pTooltip="Importer depuis Excel" tooltipPosition="bottom">
             <i class="pi pi-upload"></i> Importer
         </button>
         
-        <button class="btn-outline" (click)="exportExcel()" pTooltip="Exporter vers Excel" tooltipPosition="bottom">
+        <button class="btn-excel" (click)="exportExcel()" pTooltip="Exporter vers Excel" tooltipPosition="bottom">
             <i class="pi pi-file-excel"></i> Excel
         </button>
         
-        <button class="btn-outline" (click)="exportPDF()" pTooltip="Exporter vers PDF" tooltipPosition="bottom">
+        <button class="btn-pdf" (click)="exportPDF()" pTooltip="Exporter vers PDF" tooltipPosition="bottom">
             <i class="pi pi-file-pdf"></i> PDF
         </button>
 
@@ -58,18 +58,19 @@
         [showCurrentPageReport]="true"
         currentPageReportTemplate="{first}-{last} sur {totalRecords}"
         responsiveLayout="scroll"
+        [sortMode]="'single'"
         styleClass="mc-table">
 
         <ng-template pTemplate="header">
             <tr>
-                <th>Patient</th>
-                <th>CIN</th>
-                <th>Contact</th>
-                <th>Âge</th>
-                <th>Groupe Sanguin</th>
-                <th>Assurance</th>
-                <th>IMC</th>
-                <th>Statut</th>
+                <th pSortableColumn="nom">Patient <p-sortIcon field="nom"></p-sortIcon></th>
+                <th pSortableColumn="cin">CIN <p-sortIcon field="cin"></p-sortIcon></th>
+                <th pSortableColumn="telephone">Contact <p-sortIcon field="telephone"></p-sortIcon></th>
+                <th pSortableColumn="age">Âge <p-sortIcon field="age"></p-sortIcon></th>
+                <th pSortableColumn="groupeSanguin">Groupe Sanguin <p-sortIcon field="groupeSanguin"></p-sortIcon></th>
+                <th pSortableColumn="typeAssurance">Assurance <p-sortIcon field="typeAssurance"></p-sortIcon></th>
+                <th pSortableColumn="categorieIMC">IMC <p-sortIcon field="categorieIMC"></p-sortIcon></th>
+                <th pSortableColumn="actif">Statut <p-sortIcon field="actif"></p-sortIcon></th>
                 <th>Actions</th>
             </tr>
         </ng-template>
@@ -82,7 +83,9 @@
                         <div class="patient-cell__avatar">{{ p.initiales }}</div>
                         <div>
                             <div class="patient-cell__name">{{ p.prenom }} {{ p.nom }}</div>
-                            <div class="patient-cell__city">{{ p.ville }}</div>
+                            <div class="patient-cell__city hover:text-blue-600 cursor-pointer transition-colors" (click)="openGoogleMaps(p.adresse || '', p.ville || '')" title="Voir sur Google Maps">
+                                <i class="pi pi-map-marker text-[10px]"></i> {{ p.ville }}
+                            </div>
                         </div>
                     </div>
                 </td>
@@ -185,12 +188,14 @@
             <div class="form-field">
                 <label class="form-label">Sexe</label>
                 <p-select [(ngModel)]="nouveauPatient.sexe" [options]="sexeOptions"
-                          optionLabel="label" optionValue="value" placeholder="Choisir" styleClass="w-full"></p-select>
+                          optionLabel="label" optionValue="value" placeholder="Choisir" styleClass="w-full"
+                          appendTo="body"></p-select>
             </div>
             <div class="form-field">
                 <label class="form-label">Groupe Sanguin</label>
                 <p-select [(ngModel)]="nouveauPatient.groupeSanguin" [options]="groupeSanguinOptions"
-                          optionLabel="label" optionValue="value" placeholder="Choisir" styleClass="w-full"></p-select>
+                          optionLabel="label" optionValue="value" placeholder="Choisir" styleClass="w-full"
+                          appendTo="body"></p-select>
             </div>
         </div>
 
@@ -198,7 +203,8 @@
             <div class="form-field">
                 <label class="form-label">Assurance</label>
                 <p-select [(ngModel)]="nouveauPatient.typeAssurance" [options]="assuranceOptions"
-                          optionLabel="label" optionValue="value" placeholder="Choisir" styleClass="w-full"></p-select>
+                          optionLabel="label" optionValue="value" placeholder="Choisir" styleClass="w-full"
+                          appendTo="body"></p-select>
             </div>
             <div class="form-field">
                 <label class="form-label">Ville</label>
@@ -284,8 +290,23 @@
             </div>
 
             <div class="detail-field">
-                <div class="detail-field__label">Ville</div>
-                <div class="detail-field__value">{{ patientSelectionne.ville }}</div>
+                <div class="detail-field__label">Ville / Adresse</div>
+                <div class="detail-field__value hover:text-blue-600 cursor-pointer transition-colors" (click)="openGoogleMaps(patientSelectionne.adresse || '', patientSelectionne.ville || '')" title="Ouvrir dans Google Maps">
+                    <i class="pi pi-map-marker"></i> {{ patientSelectionne.ville }}
+                    <div style="font-size: 0.75rem; color: #8a95b0; font-weight: normal;" *ngIf="patientSelectionne.adresse">{{ patientSelectionne.adresse }}</div>
+                </div>
+            </div>
+
+            <!-- Embedded Map Preview -->
+            <div class="col-span-2 w-full h-32 rounded-xl overflow-hidden border border-slate-100 bg-slate-50 mt-1" *ngIf="patientSelectionne.ville || patientSelectionne.adresse">
+               <iframe 
+                 width="100%" 
+                 height="100%" 
+                 frameborder="0" 
+                 style="border:0;" 
+                 [src]="'https://maps.google.com/maps?q=' + (patientSelectionne.adresse || '') + ' ' + (patientSelectionne.ville || '') + '&t=&z=14&ie=UTF8&iwloc=&output=embed' | safeUrl" 
+                 allowfullscreen>
+               </iframe>
             </div>
 
             <div class="detail-field detail-field--full">

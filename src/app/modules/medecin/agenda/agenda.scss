@@ -1,4 +1,243 @@
+// ── FullCalendar weekend/closed day visual ──────────
+::ng-deep {
+    .fc-day-weekend-blocked {
+        background: repeating-linear-gradient(
+            45deg,
+            transparent,
+            transparent 4px,
+            rgba(148, 163, 184, 0.08) 4px,
+            rgba(148, 163, 184, 0.08) 8px
+        ) !important;
+        cursor: not-allowed !important;
+
+        .fc-daygrid-day-number,
+        .fc-col-header-cell-cushion { color: var(--mc-text-3) !important; font-style: italic; }
+    }
+
+    .fc-day-ferme {
+        background: rgba(220, 38, 38, 0.05) !important;
+        cursor: not-allowed !important;
+        .fc-daygrid-day-number { color: var(--mc-red) !important; }
+    }
+
+    // Hachures grises sur les colonnes weekend en vue semaine
+    .fc-timegrid .fc-day-sat,
+    .fc-timegrid .fc-day-sun {
+        background: repeating-linear-gradient(
+            45deg, transparent, transparent 6px,
+            rgba(148,163,184,.07) 6px, rgba(148,163,184,.07) 12px
+        ) !important;
+    }
+
+    .fc-non-business {
+        background: rgba(148, 163, 184, 0.06) !important;
+    }
+}
+
+// ── Agenda Layout ───────────────────────────────────
+.agenda-layout {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 1.25rem;
+    align-items: start;
+}
+
+// ── Side Panel ─────────────────────────────────────
+.side-panel {
+    padding: 1.125rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    overflow: hidden;
+}
+
+// ── Side Mini-Calendrier ───────────────────────────
+.side-cal {
+    &__nav {
+        display: flex; align-items: center; justify-content: space-between;
+        margin-bottom: .875rem;
+    }
+    &__nav-btn {
+        width: 28px; height: 28px; border-radius: 8px; border: 1px solid var(--mc-border);
+        background: transparent; cursor: pointer; display: flex; align-items: center;
+        justify-content: center; color: var(--mc-text-3);
+        &:hover { background: var(--mc-surface-2); color: var(--mc-primary); }
+        i { font-size: .7rem; }
+    }
+    &__month {
+        font-size: .8rem; font-weight: 700; color: var(--mc-text-1);
+        text-transform: capitalize;
+    }
+    &__week-header {
+        display: grid; grid-template-columns: repeat(7, 1fr);
+        margin-bottom: .35rem;
+    }
+    &__wday {
+        text-align: center; font-size: .6rem; font-weight: 700;
+        color: var(--mc-text-3); text-transform: uppercase; letter-spacing: .4px;
+        padding: .2rem 0;
+    }
+    &__grid {
+        display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px;
+    }
+    &__cell {
+        aspect-ratio: 1; border-radius: 6px; display: flex; flex-direction: column;
+        align-items: center; justify-content: center; position: relative;
+        cursor: pointer; transition: all .12s; font-size: .72rem; font-weight: 600;
+
+        &:hover:not(&--empty):not(&--weekend) { background: var(--mc-primary-light); }
+
+        &--empty { cursor: default; }
+
+        &--weekend {
+            background: repeating-linear-gradient(
+                45deg, transparent, transparent 3px,
+                rgba(148,163,184,.12) 3px, rgba(148,163,184,.12) 6px
+            );
+            cursor: not-allowed;
+            .side-cal__num { color: var(--mc-text-3); font-style: italic; }
+        }
+
+        &--ferme {
+            background: rgba(220, 38, 38, 0.07);
+            cursor: pointer;
+            .side-cal__num { color: var(--mc-red); }
+        }
+
+        &--today {
+            .side-cal__num {
+                width: 22px; height: 22px; border-radius: 50%;
+                background: var(--mc-primary-light); color: var(--mc-primary);
+                display: flex; align-items: center; justify-content: center;
+            }
+        }
+
+        &--selected {
+            background: var(--mc-primary) !important;
+            .side-cal__num { color: #fff !important; font-style: normal; }
+            .side-cal__dot { background: rgba(255,255,255,.7); }
+            .side-cal__lock { color: rgba(255,255,255,.8); }
+        }
+    }
+    &__num { font-size: .72rem; font-weight: 600; color: var(--mc-text-2); }
+    &__lock {
+        position: absolute; top: 2px; right: 2px;
+        font-size: .45rem; color: var(--mc-red);
+    }
+    &__dots { display: flex; gap: 2px; justify-content: center; margin-top: 1px; }
+    &__dot {
+        width: 4px; height: 4px; border-radius: 50%; background: var(--mc-primary);
+    }
+}
+
+// ── Congé Section ──────────────────────────────────
+.conge-section {
+    background: var(--mc-surface-2);
+    border: 1px solid var(--mc-border);
+    border-radius: 10px;
+    padding: .875rem;
+
+    &__title {
+        font-size: .7rem; font-weight: 700; text-transform: uppercase;
+        letter-spacing: .5px; color: var(--mc-text-3);
+        display: flex; align-items: center; gap: .35rem; margin-bottom: .35rem;
+    }
+    &__date { font-size: .8rem; font-weight: 600; color: var(--mc-text-1); margin-bottom: .625rem; }
+}
+
+.conge-badge {
+    display: inline-flex; align-items: center; gap: .35rem;
+    padding: .3rem .7rem; border-radius: 20px;
+    font-size: .72rem; font-weight: 600; margin-bottom: .625rem;
+
+    &--ouvert   { background: var(--mc-green-bg);  color: var(--mc-green);  }
+    &--ferme    { background: var(--mc-red-bg);    color: var(--mc-red);    }
+    &--weekend  { background: var(--mc-surface-2); color: var(--mc-text-3); border: 1px solid var(--mc-border); }
+}
+
+.btn-conge {
+    width: 100%; display: flex; align-items: center; justify-content: center;
+    gap: .4rem; padding: .45rem .875rem; border-radius: 8px;
+    font-size: .78rem; font-weight: 600; font-family: inherit;
+    cursor: pointer; transition: all .15s; border: 1.5px solid;
+
+    &--fermer {
+        background: rgba(220,38,38,.08); color: var(--mc-red); border-color: rgba(220,38,38,.25);
+        &:hover { background: var(--mc-red); color: #fff; }
+    }
+    &--ouvrir {
+        background: rgba(5,150,105,.08); color: var(--mc-green); border-color: rgba(5,150,105,.25);
+        &:hover { background: var(--mc-green); color: #fff; }
+    }
+}
+
+// ── Side RDV list ──────────────────────────────────
+.side-rdvlist {
+    &__header {
+        font-size: .72rem; font-weight: 700; text-transform: uppercase;
+        letter-spacing: .5px; color: var(--mc-text-3);
+        display: flex; align-items: center; justify-content: space-between;
+        margin-bottom: .625rem;
+    }
+    &__count {
+        background: var(--mc-primary-light); color: var(--mc-primary);
+        font-size: .65rem; font-weight: 800; padding: .1rem .4rem; border-radius: 10px;
+    }
+    &__empty {
+        display: flex; flex-direction: column; align-items: center;
+        padding: 1.25rem; color: var(--mc-text-3); font-size: .78rem; gap: .5rem;
+        i { font-size: 1.5rem; color: var(--mc-border); }
+    }
+}
+
+.side-rdv-item {
+    display: flex; align-items: center; gap: .625rem;
+    padding: .5rem .625rem; border-radius: 8px; margin-bottom: .375rem;
+    border-left: 3px solid;
+
+    &--confirme   { border-color: var(--mc-green);  background: var(--mc-green-bg);  }
+    &--en_attente { border-color: var(--mc-orange); background: var(--mc-orange-bg); }
+    &--annule     { border-color: var(--mc-red);    background: var(--mc-red-bg);    }
+    &--termine    { border-color: var(--mc-text-3); background: var(--mc-surface-2); }
+
+    &__time { font-size: .68rem; font-weight: 700; color: var(--mc-text-3); min-width: 32px; }
+    &__av {
+        width: 26px; height: 26px; border-radius: 6px; flex-shrink: 0;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: #fff; font-size: .6rem; font-weight: 700;
+        display: flex; align-items: center; justify-content: center;
+    }
+    &__info { flex: 1; min-width: 0; }
+    &__name { font-size: .75rem; font-weight: 600; color: var(--mc-text-1); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    &__motif { font-size: .68rem; color: var(--mc-text-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+}
+
+// ── Legend chips ───────────────────────────────────
+.legend-chips {
+    display: flex; gap: .5rem; align-items: center;
+}
+.legend-chip {
+    display: inline-flex; align-items: center; gap: .3rem;
+    padding: .25rem .65rem; border-radius: 20px; font-size: .72rem; font-weight: 600;
+    border: 1px solid var(--mc-border); background: var(--mc-surface);
+
+    &--weekend { color: var(--mc-text-3); }
+    &--ferme   { color: var(--mc-red); border-color: rgba(220,38,38,.25); background: var(--mc-red-bg); }
+}
+
+.header-actions { display: flex; align-items: center; gap: .875rem; }
+
+// ── Alerte jour fermé dans le dialog ──────────────
+.alert-ferme {
+    background: var(--mc-red-bg); border: 1px solid rgba(220,38,38,.25);
+    border-radius: 8px; padding: .75rem 1rem;
+    display: flex; align-items: flex-start; gap: .625rem;
+    font-size: .8rem; font-weight: 600; color: var(--mc-red);
+    i { font-size: .9rem; flex-shrink: 0; margin-top: .05rem; }
+}
+
 // ── FullCalendar Custom Styling ─────────────────
+
 .calendar-wrapper {
     background: var(--mc-surface);
     padding: 1.5rem;
@@ -321,4 +560,49 @@
     &--confirme   { background: var(--mc-green-bg);  color: var(--mc-green);  }
     &--annule     { background: var(--mc-red-bg);    color: var(--mc-red);    }
     &--en_attente { background: var(--mc-orange-bg); color: var(--mc-orange); }
+}
+
+
+:host-context([data-theme="dark"]) {
+    --mc-primary-light:  #1e293b;
+    --mc-bg:             #0f172a;
+    --mc-surface:         #1e293b;
+    --mc-surface-2:      #1a2744;
+    --mc-border:         #334155;
+    --mc-border-hover:   #475569;
+    --mc-text-1:         #f1f5f9;
+    --mc-text-2:         #94a3b8;
+    --mc-text-3:         #64748b;
+    
+    --mc-green-bg:       #022c22;
+    --mc-red-bg:         #450a0a;
+    --mc-orange-bg:      #451a03;
+    --mc-blue-bg:        #172554;
+
+    --sec-accent-light:  #042f2e;
+    --admin-accent-light: #431407;
+}
+
+/* -- Patient Contact Chips -- */
+.rdv-detail__contacts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+}
+.rdv-contact-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.25rem 0.625rem;
+    background: var(--mc-surface-2);
+    border: 1px solid var(--mc-border);
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--mc-text-2);
+}
+.rdv-contact-chip i {
+    font-size: 0.7rem;
+    color: var(--mc-primary);
 }

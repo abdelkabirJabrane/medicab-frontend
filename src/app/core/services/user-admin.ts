@@ -13,10 +13,15 @@ export interface User {
     phoneNumber?: string;
     gender?: string;
     roles: string[];
+    address?: string;
+    ville?: string;
     medecinId?: number;
     tenantId?: number;
     active: boolean;
     accountLocked: boolean;
+    specialite?: string;
+    slug?: string;
+    biographie?: string;
     lastLogin?: string;
     createdAt?: string;
     updatedAt?: string;

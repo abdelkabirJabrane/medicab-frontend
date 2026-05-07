@@ -56,25 +56,8 @@
     </div>
 
     <!-- ── Colonne droite : détail ─────────── -->
-    @if (dossierActif) {
+    @if (dossierActif && dossierActif.hasDossier) {
         <div class="dossier-detail">
-            @if (!dossierActif.hasDossier) {
-                <div class="doc-empty" style="margin: 2rem; border: 1px dashed var(--mc-border); border-radius: var(--mc-radius-lg)">
-                    <i class="pi pi-folder"></i>
-                    <h3 style="margin-top: 1rem; margin-bottom: .5rem">Dossier médical non créé</h3>
-                    <p style="text-align: center; color: var(--mc-text-3);">
-                        Ce patient n'a pas encore de dossier médical enregistré.<br>
-                        Créez le dossier pour ajouter ses antécédents et constantes.
-                    </p>
-                    <button class="btn-primary mt-3" (click)="ouvrirEdit()">
-                        <i class="pi pi-plus"></i> Créer le dossier
-                    </button>
-                    <button class="btn-icon mt-2" (click)="fermerDossier()" title="Fermer">
-                        Retour
-                    </button>
-                </div>
-            } @else {
-
             <!-- Header -->
             <div class="dossier-detail__header">
                 <div class="dossier-detail__profile">
@@ -290,7 +273,6 @@
                     <i class="pi pi-calendar-plus"></i> Prendre RDV
                 </button>
             </div>
-            } <!-- fin de @else (hasDossier) -->
         </div>
     }
 
@@ -330,7 +312,7 @@
 
 <!-- ── Dialog Preview Document ────────── -->
 <p-dialog header="Prévisualisation" [(visible)]="previewVisible" [modal]="true" [style]="{width: '85vw'}" [contentStyle]="{height: '80vh', padding: '0'}">
-    <div class="preview-container" [class.preview-container--image]="currentPreviewType?.includes('image')">
+    <div class="preview-container" [class.preview-container--image]="currentPreviewType.includes('image')">
         @if (currentPreviewType && currentPreviewType.includes('image')) {
             <img [src]="currentPreviewUrl" class="preview-img" alt="Document"/>
         } @else {
@@ -396,3 +378,4 @@
         </div>
     </div>
 </p-dialog>
+ 

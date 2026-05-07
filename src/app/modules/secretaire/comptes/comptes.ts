@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+﻿import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
@@ -115,7 +115,7 @@ export class SecComptesComponent implements OnInit {
                     email:       updated.email,
                     phoneNumber: updated.phoneNumber
                 };
-                localStorage.setItem('medicab-user', JSON.stringify(merged));
+                localStorage.setItem('MedGest-user', JSON.stringify(merged));
                 window.dispatchEvent(new Event('storage'));
                 this.loading = false;
                 this.messageService.add({ severity: 'success', summary: 'Succès', detail: 'Profil mis à jour !' });

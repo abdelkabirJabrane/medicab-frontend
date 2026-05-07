@@ -1,60 +1,83 @@
 <div class="context-drawer">
-  <h3>Contexte Patient</h3>
+  <div class="drawer-header">
+    <h3 class="drawer-title">
+      <i class="pi pi-user-plus"></i>
+      Nouvelle Session
+    </h3>
+    <p class="drawer-subtitle">Sélectionnez un patient pour commencer</p>
+  </div>
+
   <form (ngSubmit)="onSubmit()">
-    <div class="form-group">
-      <label>Médecin</label>
-      <input type="text" [(ngModel)]="context.nom_medecin" name="medecin" disabled>
+
+    <!-- Médecin (lecture seule) -->
+    <div class="doctor-badge">
+      <div class="doctor-avatar">{{ doctorInitials }}</div>
+      <div>
+        <div class="doctor-name">{{ context.nom_medecin }}</div>
+        <div class="doctor-spec">{{ context.specialite }}</div>
+      </div>
     </div>
-    
-    <div class="form-group">
-      <label>Nom Patient</label>
-      <p-autoComplete 
-        [(ngModel)]="selectedPatient" 
-        [suggestions]="filteredPatients" 
-        (completeMethod)="searchPatients($event)" 
+
+    <!-- Recherche patient -->
+    <div class="patient-search-group">
+      <label class="search-label">
+        <i class="pi pi-search"></i> Patient
+      </label>
+      <p-autoComplete
+        [(ngModel)]="selectedPatient"
+        [suggestions]="filteredPatients"
+        (completeMethod)="searchPatients($event)"
         (onSelect)="onPatientSelect($event)"
-        optionLabel="displayName" 
-        placeholder="Rechercher un patient..."
+        optionLabel="displayName"
+        placeholder="Rechercher par nom ou CIN..."
         [style]="{'width':'100%'}"
         [inputStyle]="{'width':'100%'}"
         name="patient">
         <ng-template let-patient pTemplate="item">
-            <div class="flex align-items-center">
-                <span>{{ patient.displayName }}</span>
+          <div class="patient-option">
+            <div class="patient-option__avatar">{{ patient.initiales || (patient.nom?.[0] + patient.prenom?.[0]) }}</div>
+            <div>
+              <div class="patient-option__name">{{ patient.displayName }}</div>
+              <div class="patient-option__meta">{{ patient.cin }} · {{ patient.age }} ans</div>
             </div>
+          </div>
         </ng-template>
       </p-autoComplete>
     </div>
-    
-    <div class="form-group row">
-      <div class="half">
-        <label>Âge</label>
-        <input type="text" [(ngModel)]="context.age" name="age">
-      </div>
-      <div class="half">
-        <label>Sexe</label>
-        <select [(ngModel)]="context.sexe" name="sexe">
-            <option value="M">M</option>
-            <option value="F">F</option>
-        </select>
-      </div>
-    </div>
-    
-    <div class="form-group">
-      <label>Antécédents</label>
-      <textarea [(ngModel)]="context.antecedents" name="antecedents"></textarea>
-    </div>
 
-    <div class="form-group">
-      <label>Allergies</label>
-      <input type="text" [(ngModel)]="context.allergies" name="allergies">
-    </div>
+    <!-- Aperçu patient (affiché après sélection) -->
+    @if (selectedPatient && selectedPatient.id) {
+      <div class="patient-preview">
+        <div class="patient-preview__header">
+          <div class="patient-preview__avatar">{{ selectedPatient.initiales || '' }}</div>
+          <div>
+            <div class="patient-preview__name">{{ context.nom_patient }}</div>
+            <div class="patient-preview__chips">
+              @if (context.age) { <span class="chip">{{ context.age }} ans</span> }
+              @if (context.sexe) { <span class="chip">{{ context.sexe }}</span> }
+              @if (context.allergies) { <span class="chip chip--red">⚠ Allergies</span> }
+            </div>
+          </div>
+        </div>
+        @if (loadingDossier) {
+          <div class="loading-info"><i class="pi pi-spin pi-spinner"></i> Chargement du dossier...</div>
+        }
+        @if (!loadingDossier && context.antecedents) {
+          <div class="info-row"><span class="info-label">Antécédents</span><span class="info-val">{{ context.antecedents }}</span></div>
+        }
+        @if (!loadingDossier && context.allergies) {
+          <div class="info-row info-row--alert"><span class="info-label">Allergies</span><span class="info-val">{{ context.allergies }}</span></div>
+        }
+        @if (!loadingDossier && context.medicaments_actuels) {
+          <div class="info-row"><span class="info-label">Traitements</span><span class="info-val">{{ context.medicaments_actuels }}</span></div>
+        }
+      </div>
+    }
 
-    <div class="form-group">
-      <label>Médicaments Actuels</label>
-      <textarea [(ngModel)]="context.medicaments_actuels" name="medicaments"></textarea>
-    </div>
-    
-    <button type="submit" class="btn-start">Commencer Session</button>
+    <button type="submit" class="btn-start" [disabled]="!selectedPatient">
+      <i class="pi pi-play"></i>
+      Démarrer la Session
+    </button>
+
   </form>
 </div>

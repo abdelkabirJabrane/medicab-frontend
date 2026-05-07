@@ -37,9 +37,11 @@ import { saveAs } from 'file-saver';
 export class ConsultationsComponent implements OnInit {
 
     consultations:      any[] = [];
+    consultationsFiltres: any[] = [];
     consultationActive: any   = null;
     dialogVisible = false;
     activeStep    = 0;
+    searchQuery   = '';
 
     dossiersOptions: any[] = [];
 
@@ -79,6 +81,33 @@ export class ConsultationsComponent implements OnInit {
     ) {}
 
     ngOnInit() { this.loadData(); }
+
+    // ── Clé localStorage ─────────────────────────────────
+    private readonly LS_KEY = 'medgest_consultations_imported';
+
+    /** Convertit DD/MM/YYYY → YYYY-MM-DD (ISO) pour éviter "Invalid Date" */
+    private toIsoDate(dateStr: string): string {
+        if (!dateStr) return '';
+        const parts = dateStr.split('/');
+        if (parts.length === 3) {
+            return `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
+        }
+        return dateStr;
+    }
+
+    private loadFromLocalStorage(): any[] {
+        try {
+            const raw = localStorage.getItem(this.LS_KEY);
+            return raw ? JSON.parse(raw) : [];
+        } catch { return []; }
+    }
+
+    private saveToLocalStorage(items: any[]): void {
+        try {
+            const existing = this.loadFromLocalStorage();
+            localStorage.setItem(this.LS_KEY, JSON.stringify([...items, ...existing]));
+        } catch { }
+    }
 
     loadData() {
         forkJoin({
@@ -126,12 +155,28 @@ export class ConsultationsComponent implements OnInit {
                     hasOrdonnance: !!c.hasOrdonnance,
                     statut: c.statut || 'TERMINE'
                 };
-            }).sort((a, b) => {
-                // Pour pouvoir trier plus précisément il faudrait conserver l'objet date. On garde le tri simple sans date si ce n'est pas fiable.
-                return b.id - a.id;
-            });
+            }).sort((a, b) => b.id - a.id);
+
+            // ✅ Fusionner avec les données importées du localStorage
+            const saved = this.loadFromLocalStorage();
+            this.consultations = [...saved, ...this.consultations];
+            this.consultationsFiltres = [...this.consultations];
             this.cdr.markForCheck();
         });
+    }
+
+    rechercher() {
+        const q = this.searchQuery.toLowerCase().trim();
+        if (!q) {
+            this.consultationsFiltres = [...this.consultations];
+        } else {
+            this.consultationsFiltres = this.consultations.filter(c =>
+                (c.patient    || '').toLowerCase().includes(q) ||
+                (c.motif      || '').toLowerCase().includes(q) ||
+                (c.diagnostic || '').toLowerCase().includes(q) ||
+                (c.typeLabel  || '').toLowerCase().includes(q)
+            );
+        }
     }
 
     nouvelleConsultation() {
@@ -308,10 +353,81 @@ export class ConsultationsComponent implements OnInit {
             const ws = wb.Sheets[wb.SheetNames[0]];
             const data: any[] = XLSX.utils.sheet_to_json(ws);
 
-            if (data.length === 0) return;
+            if (data.length === 0) {
+                this.messageService.add({ severity: 'warn', summary: 'Fichier vide', detail: 'Aucune donnée trouvée.' });
+                return;
+            }
 
-            this.messageService.add({ severity: 'info', summary: 'Importation', detail: `Importation de ${data.length} consultations simulée...` });
-            // L'importation réelle dépendrait d'un bulk endpoint backend
+            let success = 0;
+            let failed  = 0;
+
+            this.messageService.add({
+                severity: 'info',
+                summary:  'Import en cours…',
+                detail:   `Traitement de ${data.length} ligne(s) vers la base de données.`
+            });
+
+            // Traitement séquentiel pour ne pas surcharger le backend
+            const processNext = (index: number) => {
+                if (index >= data.length) {
+                    event.target.value = '';
+                    // Recharger depuis le backend pour afficher les vraies données
+                    this.loadData();
+                    this.messageService.add({
+                        severity: success > 0 ? 'success' : 'warn',
+                        summary:  'Import terminé',
+                        detail:   `${success} consultation(s) créée(s) en base ✔️ — ${failed} échouée(s).`
+                    });
+                    return;
+                }
+
+                const row = data[index];
+                const patientNom: string = (row['Patient'] || row['patient'] || '').toLowerCase().trim();
+
+                // Trouver le dossier correspondant au patient (par nom)
+                const dossierOpt = this.dossiersOptions.find(d =>
+                    d.label.toLowerCase().includes(patientNom)
+                );
+
+                if (!dossierOpt || !dossierOpt.dossierId) {
+                    console.warn(`⚠️ Patient "${patientNom}" non trouvé dans la base.`);
+                    failed++;
+                    processNext(index + 1);
+                    return;
+                }
+
+                // Convertir la date en ISO datetime
+                const rawDate  = String(row['Date']  || row['date']  || '');
+                const rawHeure = String(row['Heure'] || row['heure'] || '09:00');
+                const isoDate  = this.toIsoDate(rawDate) || new Date().toISOString().split('T')[0];
+                const dateHeure = `${isoDate}T${rawHeure}:00`;
+
+                const typeVal   = (row['Type'] || row['type'] || 'PRESENTIELLE').toUpperCase();
+                const montantRaw = String(row['Montant'] || row['montant'] || '150');
+                const montant   = parseFloat(montantRaw.replace(/[^\d.]/g, '')) || 150;
+
+                const payload = {
+                    tenantId:         this.authService.getCurrentUser()?.tenantId || 1,
+                    medecinId:        this.authService.getCurrentUser()?.id || 1,
+                    dossierId:        dossierOpt.dossierId,
+                    dateHeure,
+                    motif:            row['Motif']        || row['motif']        || 'Import Excel',
+                    diagnostic:       row['Diagnostic']   || row['diagnostic']   || '',
+                    typeConsultation: typeVal,
+                    montantTotal:     montant
+                };
+
+                this.medicalRecordService.createConsultation(payload).subscribe({
+                    next: () => { success++; processNext(index + 1); },
+                    error: (err) => {
+                        console.error(`❌ Ligne ${index + 1} :`, err);
+                        failed++;
+                        processNext(index + 1);
+                    }
+                });
+            };
+
+            processNext(0);
         };
         reader.readAsBinaryString(file);
     }

@@ -5,6 +5,7 @@ import { PatientContext } from '../../../../core/models/ai.model';
 import { AuthService } from '../../../../core/services/auth';
 import { AutoCompleteModule } from 'primeng/autocomplete';
 import { PatientService } from '../../../../core/services/patient';
+import { MedicalRecordService } from '../../../../core/services/medical-record';
 
 @Component({
   selector: 'app-patient-context-form',
@@ -30,15 +31,21 @@ export class PatientContextFormComponent {
 
   filteredPatients: any[] = [];
   selectedPatient: any = null;
+  loadingDossier = false;
+  doctorInitials = '';
 
   constructor(
     private authService: AuthService,
-    private patientService: PatientService
+    private patientService: PatientService,
+    private medicalRecordService: MedicalRecordService
   ) {
     const user = this.authService.getCurrentUser();
     if (user) {
         this.context.nom_medecin = `Dr. ${user.firstName || ''} ${user.lastName || ''}`.trim();
-        this.context.specialite = user.roles.includes('ROLE_MEDECIN') ? 'Médecin Généraliste' : '';
+        this.context.specialite = user.roles?.includes('ROLE_MEDECIN') ? 'Médecin Généraliste' : 'Médecin';
+        const f = (user.firstName || ' ')[0] || '';
+        const l = (user.lastName || ' ')[0] || '';
+        this.doctorInitials = (f + l).toUpperCase();
     }
   }
 
@@ -48,7 +55,9 @@ export class PatientContextFormComponent {
         next: (data) => {
             this.filteredPatients = data.map(p => ({
                 ...p,
-                displayName: `${p.nom || ''} ${p.prenom || ''}`.trim() || p.cin || 'Patient sans nom'
+                displayName: `${p.prenom || ''} ${p.nom || ''}`.trim() || p.cin || 'Patient',
+                initiales: ((p.prenom?.[0] || '') + (p.nom?.[0] || '')).toUpperCase(),
+                age: p.dateNaissance ? this.calculateAge(p.dateNaissance) : ''
             }));
         }
     });
@@ -56,18 +65,44 @@ export class PatientContextFormComponent {
 
   onPatientSelect(event: any) {
     const patient = event.value;
-    this.context.nom_patient = `${patient.nom} ${patient.prenom}`;
-    this.context.sexe = patient.sexe === 'F' || patient.sexe === 'FEMININ' ? 'F' : 'M';
-    
+    this.context.patient_id = patient.id;
+    this.selectedPatient = patient;
+
+    // Infos de base depuis le patient
+    this.context.nom_patient = `${patient.prenom || ''} ${patient.nom || ''}`.trim();
+    this.context.sexe = (patient.sexe === 'F' || patient.sexe === 'FEMININ') ? 'F' : 'M';
     if (patient.dateNaissance) {
         this.context.age = this.calculateAge(patient.dateNaissance).toString();
     }
-    
-    // Check if there are medical history / allergies in the patient record
-    // Depending on the patient model, these might be in different fields
-    this.context.antecedents = patient.antecedents || '';
-    this.context.allergies = patient.allergies || '';
-    this.context.medicaments_actuels = patient.traitementEnCours || '';
+
+    // Réinitialiser le dossier
+    this.context.antecedents = '';
+    this.context.allergies = '';
+    this.context.medicaments_actuels = '';
+
+    // Charger le dossier médical automatiquement
+    this.loadingDossier = true;
+    this.medicalRecordService.getDossierByPatient(patient.id).subscribe({
+        next: (dossier: any) => {
+            this.loadingDossier = false;
+            if (dossier) {
+                const parts = [
+                    dossier.antecedentsPersonnels,
+                    dossier.antecedentsFamiliaux
+                ].filter(Boolean);
+                this.context.antecedents = parts.join(' | ') || '';
+                this.context.allergies = dossier.allergies || '';
+                this.context.medicaments_actuels = dossier.medicamentsEnCours || '';
+                if (dossier.groupeSanguin) {
+                    // Ajouter groupe sanguin au contexte via nom_patient pour l'IA
+                }
+            }
+        },
+        error: () => {
+            this.loadingDossier = false;
+            // Silencieux — dossier peut ne pas exister encore
+        }
+    });
   }
 
   private calculateAge(dateNaissance: any): number {
@@ -82,10 +117,9 @@ export class PatientContextFormComponent {
   }
 
   onSubmit() {
+    if (!this.selectedPatient) return;
     if (typeof this.selectedPatient === 'string') {
         this.context.nom_patient = this.selectedPatient;
-    } else if (this.selectedPatient && this.selectedPatient.displayName) {
-        this.context.nom_patient = this.selectedPatient.displayName;
     }
     this.contextReady.emit(this.context);
   }

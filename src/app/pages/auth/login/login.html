@@ -1,13 +1,13 @@
-<div class="login-page">
+﻿<div class="login-page">
 
     <!-- Panel gauche : branding -->
     <div class="login-brand">
         <div class="login-brand__content">
             <div class="login-brand__logo">
-                <i class="pi pi-plus"></i>
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M12 8v8"/><path d="M8 12h8"/></svg>
             </div>
-            <h1 class="login-brand__title">MediCab Pro</h1>
-            <p class="login-brand__tagline">Plateforme SaaS Médicale</p>
+            <h1 class="login-brand__title">MedGest</h1>
+            <p class="login-brand__tagline">Plateforme Médicale Globale</p>
 
             <div class="login-brand__features">
                 <div class="login-brand__feature">
@@ -42,10 +42,10 @@
             <!-- Header -->
             <div class="login-card__header">
                 <div class="login-card__icon">
-                    <i class="pi pi-plus"></i>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M12 8v8"/><path d="M8 12h8"/></svg>
                 </div>
                 <h2 class="login-card__title">Connexion</h2>
-                <p class="login-card__sub">Bienvenue sur MediCab Pro</p>
+                <p class="login-card__sub">Bienvenue sur MedGest</p>
             </div>
 
             <!-- Formulaire -->
@@ -113,7 +113,7 @@
                     <div class="role-card__icon"><i class="pi pi-user"></i></div>
                     <div class="role-card__info">
                         <div class="role-card__name">Médecin</div>
-                        <div class="role-card__email">medecin&#64;medicab.ma</div>
+                        <div class="role-card__email">t.maghroub</div>
                     </div>
                 </button>
 
@@ -121,7 +121,7 @@
                     <div class="role-card__icon"><i class="pi pi-briefcase"></i></div>
                     <div class="role-card__info">
                         <div class="role-card__name">Secrétaire</div>
-                        <div class="role-card__email">secretaire&#64;medicab.ma</div>
+                        <div class="role-card__email">Said.ej</div>
                     </div>
                 </button>
 
@@ -129,7 +129,7 @@
                     <div class="role-card__icon"><i class="pi pi-cog"></i></div>
                     <div class="role-card__info">
                         <div class="role-card__name">Super Admin</div>
-                        <div class="role-card__email">admin&#64;medicab.ma</div>
+                        <div class="role-card__email">admin</div>
                     </div>
                 </button>
 
@@ -137,10 +137,17 @@
                     <div class="role-card__icon"><i class="pi pi-heart"></i></div>
                     <div class="role-card__info">
                         <div class="role-card__name">Patient</div>
-                        <div class="role-card__email">patient&#64;medicab.ma</div>
+                        <div class="role-card__email">patient&#64;MedGest.ma</div>
                     </div>
                 </button>
 
+            </div>
+
+            <!-- Register Link -->
+            <div class="text-center mt-8 text-sm font-medium text-slate-400">
+                C'est votre première fois ? 
+                <br>
+                <a routerLink="/auth/register" class="text-indigo-600 font-bold hover:underline">Créer un compte Patient gratuitement</a>
             </div>
 
         </div>

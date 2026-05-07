@@ -35,9 +35,11 @@ import { saveAs } from 'file-saver';
 })
 export class OrdonnancesComponent implements OnInit {
     ordonnances: OrdonnanceResponse[] = [];
+    ordonnancesFiltres: OrdonnanceResponse[] = [];
     ordonnanceActive: OrdonnanceResponse | null = null;
     dialogVisible = false;
     loading = false;
+    searchQuery = '';
 
     // ── Patients ──────────────────────────────────────────────────
     patients: any[] = [];
@@ -48,6 +50,11 @@ export class OrdonnancesComponent implements OnInit {
     consultations: any[] = [];
     consultationsOptions: { label: string; value: number; patientId: number }[] = [];
     selectedConsultationId: number | null = null;
+    
+    get filteredConsultationOptions() {
+        if (!this.selectedPatientId) return this.consultationsOptions;
+        return this.consultationsOptions.filter(c => c.patientId === this.selectedPatientId);
+    }
 
     // ── Formulaire nouvelle ordonnance ────────────────────────────
     medecinId: number = 1;
@@ -91,10 +98,10 @@ export class OrdonnancesComponent implements OnInit {
         return {
             fullName: `Dr. ${user?.firstName || ''} ${user?.lastName || ''}`,
             specialty: 'Médecin Généraliste',
-            email: user?.email || 'contact@medicab.com',
+            email: user?.email || 'contact@MedGest.com',
             phone: (user as any)?.phoneNumber || '05 22 00 00 00',
             address: '123 Avenue Mohamed V, Casablanca',
-            website: 'www.medicab.ma'
+            website: 'www.MedGest.ma'
         };
     }
 
@@ -193,6 +200,10 @@ export class OrdonnancesComponent implements OnInit {
     }
 
     ngOnInit() {
+        const user = this.authService.getCurrentUser();
+        if (user) {
+            this.medecinId = user.id;
+        }
         this.loadOrdonnances();
         this.loadPatients();
         this.loadConsultations();
@@ -201,20 +212,69 @@ export class OrdonnancesComponent implements OnInit {
     // ─────────────────────────────────────────────────────────────
     // 🔹 Chargement des ordonnances
     // ─────────────────────────────────────────────────────────────
+    // ── Clé localStorage ──────────────────────────────────────
+    private readonly LS_KEY = 'medgest_ordonnances_imported';
+
+    /** Convertit DD/MM/YYYY → YYYY-MM-DD (ISO) pour éviter "Invalid Date" */
+    private toIsoDate(dateStr: string, defaultToNow: boolean = true): string {
+        if (!dateStr || dateStr.trim() === '') {
+            return defaultToNow ? new Date().toISOString().split('T')[0] : '';
+        }
+        const parts = dateStr.split('/');
+        if (parts.length === 3) {
+            return `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
+        }
+        return dateStr; // déjà ISO ou autre format
+    }
+
     loadOrdonnances() {
         this.loading = true;
         this.ordonnanceService.getAll().subscribe({
             next: (data) => {
-                this.ordonnances = data;
+                // Récupérer les données importées depuis localStorage
+                const saved = this.loadFromLocalStorage();
+                this.ordonnances = [...saved, ...data];
+                this.ordonnancesFiltres = [...this.ordonnances];
                 this.loading = false;
                 this.cdr.markForCheck();
             },
             error: (err) => {
                 this.messageService.add({ severity: 'error', summary: 'Erreur', detail: 'Impossible de charger les ordonnances : ' + err.message });
+                // Charger quand même depuis localStorage
+                this.ordonnances = this.loadFromLocalStorage();
+                this.ordonnancesFiltres = [...this.ordonnances];
                 this.loading = false;
                 this.cdr.markForCheck();
             }
         });
+    }
+
+    private loadFromLocalStorage(): any[] {
+        try {
+            const raw = localStorage.getItem(this.LS_KEY);
+            return raw ? JSON.parse(raw) : [];
+        } catch { return []; }
+    }
+
+    private saveToLocalStorage(items: any[]): void {
+        try {
+            const existing = this.loadFromLocalStorage();
+            const merged = [...items, ...existing];
+            localStorage.setItem(this.LS_KEY, JSON.stringify(merged));
+        } catch { }
+    }
+
+    rechercher() {
+        const q = this.searchQuery.toLowerCase().trim();
+        if (!q) {
+            this.ordonnancesFiltres = [...this.ordonnances];
+        } else {
+            this.ordonnancesFiltres = this.ordonnances.filter(o =>
+                this.getPatientNom(o.patientId).toLowerCase().includes(q) ||
+                this.getStatutLabel(o.statut).toLowerCase().includes(q) ||
+                String(o.id).includes(q)
+            );
+        }
     }
 
     // ─────────────────────────────────────────────────────────────
@@ -245,13 +305,22 @@ export class OrdonnancesComponent implements OnInit {
             next: (data) => {
                 this.consultations = data;
                 this.consultationsOptions = data.map((c: any) => {
-                    // Construire un label lisible : date + motif + patient
-                    const date = c.dateConsultation
-                        ? new Date(c.dateConsultation).toLocaleDateString('fr-FR')
-                        : (c.date ? new Date(c.date).toLocaleDateString('fr-FR') : `#${c.id}`);
-                    const motif = c.motif || c.type || '';
+                    // Recherche exhaustive de la date dans les champs possibles
+                    const dateObj = c.dateConsultation || c.date || c.dateHeureDebut || c.dateCreation || c.createdAt;
+                    let dateStr = '';
+                    
+                    if (dateObj && !isNaN(new Date(dateObj).getTime())) {
+                        dateStr = new Date(dateObj).toLocaleDateString('fr-FR');
+                    } else {
+                        dateStr = `Consultation #${c.id}`;
+                    }
+                    
+                    const motif = c.motif || c.type || 'Sans motif';
                     const patientNom = this.getPatientNom(c.patientId ?? c.patient?.id);
-                    const label = `${date}${motif ? ' — ' + motif : ''}${patientNom ? ' (' + patientNom + ')' : ''} [#${c.id}]`;
+                    
+                    // Format : "19/04/2026 — Consultation — Patient: Benali"
+                    const label = `${dateStr} — ${motif}${patientNom ? ' — Patient: ' + patientNom : ''}`;
+                    
                     return {
                         label,
                         value: c.id,
@@ -528,10 +597,115 @@ export class OrdonnancesComponent implements OnInit {
             const ws = wb.Sheets[wb.SheetNames[0]];
             const data: any[] = XLSX.utils.sheet_to_json(ws);
 
-            if (data.length === 0) return;
+            if (data.length === 0) {
+                this.messageService.add({ severity: 'warn', summary: 'Fichier vide', detail: 'Aucune donnée trouvée.' });
+                return;
+            }
 
-            this.messageService.add({ severity: 'info', summary: 'Importation', detail: `Importation de ${data.length} ordonnances simulée...` });
+            let success = 0;
+            let failed  = 0;
+
+            this.messageService.add({
+                severity: 'info',
+                summary:  'Import en cours…',
+                detail:   `Traitement de ${data.length} ordonnance(s) vers la base de données.`
+            });
+
+            const processNext = (index: number) => {
+                if (index >= data.length) {
+                    event.target.value = '';
+                    this.loadOrdonnances();
+                    this.messageService.add({
+                        severity: success > 0 ? 'success' : 'warn',
+                        summary:  'Import terminé',
+                        detail:   `${success} ordonnance(s) créée(s) en base ✔️ — ${failed} échouée(s).`
+                    });
+                    return;
+                }
+
+                const row = data[index];
+                const patientNom: string = (row['Patient'] || row['patient'] || '').toLowerCase().trim();
+
+                // Trouver le patient par nom dans patientsOptions (recherche plus souple)
+                const patOpt = this.patientsOptions.find(p => {
+                    const label = p.label.toLowerCase();
+                    if (label.includes(patientNom)) return true;
+                    // Teste si tous les mots du nom cherché sont présents dans le label (ex: "Simo Hamouda" matches "Hamouda Simo")
+                    const parts = patientNom.split(' ').filter(word => word.length > 2);
+                    return parts.length > 0 && parts.every(part => label.includes(part));
+                });
+
+                if (!patOpt) {
+                    console.warn(`⚠️ Patient "${patientNom}" non trouvé.`);
+                    failed++;
+                    processNext(index + 1);
+                    return;
+                }
+
+                const rowDateRaw = row['Date'] || row['date'] || '';
+                const emissionDate = this.toIsoDate(String(rowDateRaw), true);
+
+                // 🔍 Rechercher une consultation existante pour ce patient à cette date
+                let foundConsultationId: number | null = null;
+                
+                // 1. Match exact par patient + date
+                const exactMatch = this.consultations.find(c => {
+                    const cPatId = c.patientId ?? c.patient?.id;
+                    if (cPatId !== patOpt.value) return false;
+                    const cDate = c.dateConsultation || c.date || c.dateHeure || c.dateHeureDebut;
+                    if (!cDate) return false;
+                    try {
+                        return new Date(cDate).toISOString().split('T')[0] === emissionDate;
+                    } catch { return false; }
+                });
+
+                if (exactMatch) {
+                    foundConsultationId = exactMatch.id;
+                } else {
+                    // 2. Fallback sur n'importe quelle consultation de ce patient
+                    const anyMatch = this.consultations.find(c => (c.patientId ?? c.patient?.id) === patOpt.value);
+                    if (anyMatch) foundConsultationId = anyMatch.id;
+                }
+
+                // Médicaments séparés par ";"
+                const medsRaw: string = row['Médicaments'] || row['Medicaments'] || row['medicaments'] || '';
+                const lignes = medsRaw
+                    ? medsRaw.split(';').map((m: string) => ({
+                          medicament: m.trim(),
+                          posologie:  row['Posologie'] || row['posologie'] || '',
+                          dureeTraitement: Number(row['Durée'] || row['Duree'] || 7),
+                          unite: 'jours',
+                          substituable: false
+                      }))
+                    : [{ medicament: 'Non précisé', posologie: '', dureeTraitement: 7, unite: 'jours', substituable: false }];
+
+                const user = this.authService.getCurrentUser();
+                const dto: OrdonnanceRequest = {
+                    tenantId:       user?.tenantId || 1,
+                    consultationId: foundConsultationId || 0, // 0 comme fallback technique si obligatoire
+                    patientId:      patOpt.value,
+                    medecinId:      user?.id || this.medecinId,
+                    dateEmission:   emissionDate,
+                    dateValidite:   this.toIsoDate(String(row['Date Validité'] || row['dateValidite'] || ''), false) || undefined,
+                    instructions:   row['Instructions'] || row['instructions'] || undefined,
+                    renouvellement: false,
+                    statut:         (row['Statut'] || row['statut'] || 'ACTIVE').toUpperCase(),
+                    lignes
+                };
+
+                this.ordonnanceService.create(dto).subscribe({
+                    next: () => { success++; processNext(index + 1); },
+                    error: (err) => {
+                        console.error(`❌ Ligne ${index + 1} :`, err);
+                        failed++;
+                        processNext(index + 1);
+                    }
+                });
+            };
+
+            processNext(0);
         };
         reader.readAsBinaryString(file);
     }
 }
+

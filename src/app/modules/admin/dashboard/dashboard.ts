@@ -5,7 +5,6 @@ import { forkJoin, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { UserAdminService } from '../../../core/services/user-admin';
 import { BillingService } from '../../../core/services/billing';
-import { NotificationService } from '../../../core/services/notification';
 import { CabinetService } from '../../../core/services/cabinet';
 import { PlanService } from '../../../core/services/plan';
 import { Chart } from 'chart.js/auto';
@@ -38,7 +37,6 @@ export class AdminDashboardComponent implements OnInit {
     constructor(
         private userAdminService: UserAdminService,
         private billingService: BillingService,
-        private notificationService: NotificationService,
         private cabinetService: CabinetService,
         private planService: PlanService
     ) {}
@@ -63,8 +61,6 @@ export class AdminDashboardComponent implements OnInit {
         forkJoin({
             users: this.userAdminService.getAll().pipe(catchError(() => of([]))),
             revenue: this.billingService.getTotalEncaisse().pipe(catchError(() => of(0))),
-            notifs: this.notificationService.getAll().pipe(catchError(() => of([]))),
-            alertsCount: this.notificationService.count().pipe(catchError(() => of(0))),
             cabinets: this.cabinetService.getAll().pipe(catchError(() => of([]))),
             plans: this.planService.getAll().pipe(catchError(() => of([])))
         }).subscribe(res => {
@@ -79,16 +75,9 @@ export class AdminDashboardComponent implements OnInit {
             // Stats Revenus
             this.stats.revenusMensuel = res.revenue.toLocaleString('fr-FR');
             
-            // Stats Alertes
-            this.stats.alertes = res.alertsCount;
-            this.alertesSysteme = res.notifs.filter(n => n.type === 'ALERT' || n.statut === 'ERROR').map(n => ({
-                id: n.id,
-                message: n.sujet || n.contenu,
-                temps: n.dateCreation ? 'Récemment' : 'Inconnu',
-                niveau: n.statut === 'ERROR' ? 'critique' : 'warning',
-                niveauLabel: n.statut === 'ERROR' ? 'Critique' : 'Warning',
-                icon: n.statut === 'ERROR' ? 'pi pi-bolt' : 'pi pi-exclamation-triangle'
-            })).slice(0, 5);
+            // Stats Alertes - Removed
+            this.stats.alertes = 0;
+            this.alertesSysteme = [];
 
             // Simulation cabinets (On compte les tenants distincts dans la liste des utilisateurs si re.cabinets est vide)
             const tenants = new Set(res.users.map(u => u.tenantId).filter(t => t !== null));

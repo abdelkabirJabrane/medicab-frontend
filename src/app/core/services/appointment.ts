@@ -62,7 +62,27 @@ export class AppointmentService {
         return this.http.put<any>(`${this.url}/${id}/terminer`, {});
     }
 
+    enCours(id: number): Observable<any> {
+        return this.http.put<any>(`${this.url}/${id}/en-cours`, {});
+    }
+
     count(): Observable<number> {
         return this.http.get<number>(`${this.url}/count?tenantId=${this.tenantId}`);
+    }
+
+    // ── Nouveaux endpoints pour les jours fermés (Backend) ──────────
+    
+    getClosedDays(medecinId: number): Observable<string[]> {
+        return this.http.get<string[]>(`${this.url}/closed-days`, {
+            params: { medecinId: medecinId.toString(), tenantId: this.tenantId.toString() }
+        });
+    }
+
+    toggleClosedDay(medecinId: number, date: string): Observable<any> {
+        return this.http.post<any>(`${this.url}/closed-days/toggle`, {
+            medecinId,
+            date,
+            tenantId: this.tenantId
+        });
     }
 }

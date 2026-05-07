@@ -2,10 +2,20 @@ import { Routes } from '@angular/router';
 import { authGuard, roleGuard } from './app/core/guards/auth.guard';
 
 export const appRoutes: Routes = [
-    // ── Default → Login ───────────────────
+    // ── Public Access (No Login) ──────────
+    {
+        path: 'search',
+        loadComponent: () => import('./app/modules/public/search/public-search.component').then((c) => c.PublicSearchComponent)
+    },
+    {
+        path: 'rdv/:slug',
+        loadComponent: () => import('./app/modules/public/rdv/public-rdv').then((c) => c.PublicRdvComponent)
+    },
+
+    // ── Default → Search ───────────────────
     {
         path: '',
-        redirectTo: '/auth/login',
+        redirectTo: '/search',
         pathMatch: 'full'
     },
 
@@ -50,9 +60,20 @@ export const appRoutes: Routes = [
             { path: 'patients', loadComponent: () => import('./app/modules/secretaire/patients/patients').then((c) => c.SecPatientsComponent) },
             { path: 'salle-attente', loadComponent: () => import('./app/modules/secretaire/salle-attente/salle-attente').then((c) => c.SalleAttenteComponent) },
             { path: 'facturation', loadComponent: () => import('./app/modules/secretaire/facturation/facturation').then((c) => c.FacturationComponent) },
-            { path: 'scanner', loadComponent: () => import('./app/modules/secretaire/scanner/scanner').then((c) => c.ScannerComponent) },
-            { path: 'notifications', loadComponent: () => import('./app/modules/secretaire/notifications/notifications').then((c) => c.NotificationsComponent) },
             { path: 'comptes', loadComponent: () => import('./app/modules/secretaire/comptes/comptes').then((c) => c.SecComptesComponent) }
+        ]
+    },
+
+    // ── Patient ──────────────────────────
+    {
+        path: 'patient',
+        loadComponent: () => import('./app/layout/patient-layout/patient-layout').then((c) => c.PatientLayoutComponent),
+        canActivate: [authGuard, roleGuard],
+        data: { roles: ['ROLE_PATIENT'] },
+        children: [
+            { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+            { path: 'dashboard', loadComponent: () => import('./app/modules/patient/dashboard/patient-dashboard').then((c) => c.PatientDashboardComponent) },
+            { path: 'profile', loadComponent: () => import('./app/modules/patient/profile/patient-profile').then((c) => c.PatientProfileComponent) }
         ]
     },
 
