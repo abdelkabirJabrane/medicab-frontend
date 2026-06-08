@@ -20,7 +20,6 @@ pipeline {
 
         stage('Docker Build & Push') {
             steps {
-                sh 'git submodule update --init --recursive'
                 sh "docker build -t ${env.DOCKER_REGISTRY}/${env.SERVICE_NAME}:${env.BUILD_NUMBER} ."
                 withCredentials([usernamePassword(credentialsId: 'dockerhub-creds', passwordVariable: 'DOCKER_PASS', usernameVariable: 'DOCKER_USER')]) {
                     sh "echo \${DOCKER_PASS} | docker login -u \${DOCKER_USER} --password-stdin"
