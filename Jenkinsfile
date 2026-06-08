@@ -1,9 +1,6 @@
 pipeline {
     agent any
 
-    tools {
-        nodejs 'NodeJS' // Adjust this if your Jenkins NodeJS tool has a different name, or remove if you use docker agent
-    }
 
     environment {
         SERVICE_NAME = "medicab-frontend"
